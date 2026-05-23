@@ -10,38 +10,34 @@ export default async (req) => {
 
   try {
     const { image, mediaType, nom } = await req.json();
-    console.log("1. Image reçue ?", image ? "OUI (" + image.length + " caractères)" : "NON");
-    console.log("2. Dossier cible:", process.env.GDRIVE_FOLDER_ID);
-
     if (!image) {
       return new Response(JSON.stringify({ erreur: "Aucune image reçue." }), { headers: { "Content-Type": "application/json" } });
     }
 
-    const credentials = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT);
-    console.log("3. Robot email:", credentials.client_email);
+    // Authentification avec TON compte Google (via refresh token)
+    const oauth2 = new google.auth.OAuth2(
+      process.env.GOOGLE_CLIENT_ID,
+      process.env.GOOGLE_CLIENT_SECRET,
+      "https://developers.google.com/oauthplayground"
+    );
+    oauth2.setCredentials({ refresh_token: process.env.GOOGLE_REFRESH_TOKEN });
 
-    const auth = new google.auth.GoogleAuth({
-      credentials,
-      scopes: ["https://www.googleapis.com/auth/drive"]
-    });
-    const drive = google.drive({ version: "v3", auth });
+    const drive = google.drive({ version: "v3", auth: oauth2 });
 
     const buffer = Buffer.from(image, "base64");
     const { Readable } = await import("stream");
     const stream = Readable.from(buffer);
 
-    console.log("4. Tentative d'upload...");
     const fichier = await drive.files.create({
       requestBody: {
         name: nom || `facture-${Date.now()}.jpg`,
         parents: [process.env.GDRIVE_FOLDER_ID]
       },
       media: { mimeType: mediaType || "image/jpeg", body: stream },
-      fields: "id, name, webViewLink",
-      supportsAllDrives: true
+      fields: "id, name, webViewLink"
     });
 
-    console.log("5. SUCCÈS ! Fichier ID:", fichier.data.id);
+    console.log("SUCCÈS ! Fichier:", fichier.data.id);
     return new Response(JSON.stringify({ ok: true, id: fichier.data.id, lien: fichier.data.webViewLink }), { headers: { "Content-Type": "application/json" } });
 
   } catch (err) {
