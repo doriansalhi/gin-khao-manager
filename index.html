@@ -2680,8 +2680,8 @@ async function envoyerComptable() {
       btn.innerHTML = '✅ Envoyé à ' + email;
       setTimeout(() => { btn.innerHTML = texteInitial; btn.disabled = false; }, 3000);
     } else {
-      btn.innerHTML = '❌ Erreur, réessaie';
-      setTimeout(() => { btn.innerHTML = texteInitial; btn.disabled = false; }, 3000);
+      btn.innerHTML = texteInitial; btn.disabled = false;
+      alert('Erreur exacte : ' + (data.erreur || JSON.stringify(data)));
     }
   } catch (err) {
     btn.innerHTML = '❌ Erreur de connexion';
