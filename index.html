@@ -2454,39 +2454,39 @@ html, body {
 
         <div class="clients-hero">
           <div class="hero-label">CA récupérable · clients à réactiver</div>
-          <div class="hero-amount">+1 920<span class="currency">€</span></div>
+          <div class="hero-amount" id="ca-recuperable">+0<span class="currency">€</span></div>
           <div class="hero-delta">
-            <span class="up">38 clients</span>
+            <span class="up"><span id="nb-a-relancer">0</span> clients</span>
             <span class="label">n'ont pas commandé depuis +3 semaines</span>
           </div>
-          <div class="sub-line">Tu as <strong>312 clients</strong> dans ta base, mais seulement <strong>47% reviennent</strong>. Réactiver un habitué coûte 6× moins cher que trouver un nouveau client.</div>
+          <div class="sub-line">Tu as <strong id="clients-total-2">0</strong> clients fidélité. Réactiver un habitué coûte 6× moins cher que trouver un nouveau client.</div>
         </div>
 
         <div class="section">
           <div class="section-head">
             <h3 class="section-title">Ta base clients</h3>
-            <span class="section-link" style="color: var(--text-mute);">312 clients</span>
+            <span class="section-link" style="color: var(--text-mute);"><span id="clients-total">0</span> clients</span>
           </div>
           <div class="segment-grid">
             <div class="segment-card star">
-              <div class="seg-top"><span class="seg-emoji">🌟</span><span class="seg-count">41</span></div>
+              <div class="seg-top"><span class="seg-emoji">🌟</span><span class="seg-count" id="seg-fidele">0</span></div>
               <div class="seg-name">Fidèles</div>
-              <div class="seg-desc">3+ commandes/mois · ton trésor</div>
+              <div class="seg-desc">20+ visites · ton trésor</div>
             </div>
             <div class="segment-card">
-              <div class="seg-top"><span class="seg-emoji">👋</span><span class="seg-count">147</span></div>
+              <div class="seg-top"><span class="seg-emoji">👋</span><span class="seg-count" id="seg-occasionnel">0</span></div>
               <div class="seg-name">Occasionnels</div>
-              <div class="seg-desc">1-2 commandes/mois · à fidéliser</div>
+              <div class="seg-desc">viennent de temps en temps</div>
             </div>
             <div class="segment-card risk">
-              <div class="seg-top"><span class="seg-emoji">⚠️</span><span class="seg-count">38</span></div>
+              <div class="seg-top"><span class="seg-emoji">⚠️</span><span class="seg-count" id="seg-part">0</span></div>
               <div class="seg-name">En train de partir</div>
-              <div class="seg-desc">silence 3-6 sem · à relancer vite</div>
+              <div class="seg-desc">silence 3-7 sem · à relancer vite</div>
             </div>
             <div class="segment-card">
-              <div class="seg-top"><span class="seg-emoji">💤</span><span class="seg-count">86</span></div>
+              <div class="seg-top"><span class="seg-emoji">💤</span><span class="seg-count" id="seg-endormi">0</span></div>
               <div class="seg-name">Endormis</div>
-              <div class="seg-desc">+2 mois sans commande</div>
+              <div class="seg-desc">+7 sem sans visite</div>
             </div>
           </div>
         </div>
@@ -2496,32 +2496,8 @@ html, body {
             <h3 class="section-title">À relancer en priorité</h3>
             <span class="section-link" style="color: var(--sriracha);">SMS prêts</span>
           </div>
-
-          <div class="client-row">
-            <div class="client-avatar red">KB</div>
-            <div class="client-info">
-              <div class="client-name">Karim B. <span class="client-tag lost">part</span></div>
-              <div class="client-meta">Habitué Pad Thaï · <strong>9 commandes</strong> · dernier passage il y a <strong>23 jours</strong></div>
-            </div>
-            <button class="client-cta send" onclick="envoyerSMS('Karim', this)">SMS</button>
-          </div>
-
-          <div class="client-row">
-            <div class="client-avatar neutral">SL</div>
-            <div class="client-info">
-              <div class="client-name">Sophie L.</div>
-              <div class="client-meta">6 commandes · panier moyen <strong>24€</strong> · silence <strong>4 semaines</strong></div>
-            </div>
-            <button class="client-cta send" onclick="envoyerSMS('Sophie', this)">SMS</button>
-          </div>
-
-          <div class="client-row">
-            <div class="client-avatar neutral">TR</div>
-            <div class="client-info">
-              <div class="client-name">Thomas R.</div>
-              <div class="client-meta">Commandait chaque vendredi · <strong>rien depuis 3 vendredis</strong></div>
-            </div>
-            <button class="client-cta send" onclick="envoyerSMS('Thomas', this)">SMS</button>
+          <div id="liste-relancer">
+            <p style="font-size:13px; color:var(--text-mute); text-align:center; padding:16px;">Chargement…</p>
           </div>
         </div>
 
@@ -2563,21 +2539,8 @@ html, body {
             <h3 class="section-title">Tes meilleurs clients</h3>
             <span class="section-link" style="color: var(--gold);">à choyer</span>
           </div>
-          <div class="client-row">
-            <div class="client-avatar gold">MA</div>
-            <div class="client-info">
-              <div class="client-name">Mehdi A. <span class="client-tag vip">VIP</span></div>
-              <div class="client-meta">Commande chaque semaine · <strong>187€</strong> ce mois · avis 5★</div>
-            </div>
-            <button class="client-cta ghost" onclick="envoyerSMS('Mehdi', this)">Récompenser</button>
-          </div>
-          <div class="client-row">
-            <div class="client-avatar gold">LP</div>
-            <div class="client-info">
-              <div class="client-name">Léa P. <span class="client-tag vip">VIP</span></div>
-              <div class="client-meta">12 commandes ce mois · adore le Curry vert</div>
-            </div>
-            <button class="client-cta ghost" onclick="envoyerSMS('Léa', this)">Récompenser</button>
+          <div id="liste-vip">
+            <p style="font-size:13px; color:var(--text-mute); text-align:center; padding:16px;">Chargement…</p>
           </div>
         </div>
 
@@ -2716,6 +2679,8 @@ On vous attend ce soir, ou livraison Uber/Deliveroo</div>
   <div class="desktop-hint">↑ Cliquez sur les onglets en bas pour naviguer · Démo interactive</div>
 </div>
 
+<!-- Supabase (pour la fidélité) -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 // ===== TAB NAVIGATION =====
 const navBtns = document.querySelectorAll('.nav-btn');
@@ -2726,6 +2691,7 @@ function switchScreen(screenKey) {
   navBtns.forEach(b => b.classList.toggle('active', b.dataset.screen === screenKey));
   screens.forEach(s => s.classList.toggle('active', s.id === 'screen-' + screenKey));
   appContent.scrollTop = 0;
+  if (screenKey === 'clients' && typeof chargerClients === 'function') chargerClients();
 }
 
 navBtns.forEach(btn => {
@@ -2896,7 +2862,126 @@ function compresserImage(file) {
     reader.readAsDataURL(file);
   });
 }
-  // ===== CONFIGURATION DE L'OFFRE DE FIDÉLITÉ =====
+  // ===== FIDÉLITÉ : LECTURE DES VRAIS CLIENTS (Supabase) =====
+const SB_URL = 'https://szpgbdnijyoquqmjhhjj.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN6cGdiZG5panlvcXVxbWpoaGpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2MTMwNDUsImV4cCI6MjA5NTE4OTA0NX0.fKarVKMIOc4Ez2kOvE6xyvVibuENSGev6RsouYDb8ak';
+const RESTO_ID = 'gin-khao';
+const sbClient = supabase.createClient(SB_URL, SB_KEY);
+
+let clientsCache = [];
+
+// Calcule le nombre de jours depuis la dernière visite
+function joursDepuis(dateStr) {
+  if (!dateStr) return 999;
+  const d = new Date(dateStr);
+  return Math.floor((Date.now() - d.getTime()) / 86400000);
+}
+
+// Détermine le segment d'un client
+function segmentClient(c) {
+  const j = joursDepuis(c.derniere_visite);
+  const v = c.nb_visites || 0;
+  if (j > 50) return 'endormi';
+  if (j > 18) return 'part';          // en train de partir
+  if (v >= 20) return 'fidele';
+  return 'occasionnel';
+}
+
+// Charge les clients depuis Supabase et remplit l'onglet
+async function chargerClients() {
+  try {
+    const { data, error } = await sbClient.from('clients')
+      .select('*').eq('restaurant_id', RESTO_ID)
+      .order('derniere_visite', { ascending: true });
+    if (error) throw error;
+    clientsCache = data || [];
+    afficherSegments();
+    afficherARelancer();
+    afficherVIP();
+  } catch (e) {
+    console.log('Erreur chargement clients:', e.message);
+  }
+}
+
+// Compteurs par segment
+function afficherSegments() {
+  const seg = { fidele: 0, occasionnel: 0, part: 0, endormi: 0 };
+  clientsCache.forEach(c => seg[segmentClient(c)]++);
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  set('seg-fidele', seg.fidele);
+  set('seg-occasionnel', seg.occasionnel);
+  set('seg-part', seg.part);
+  set('seg-endormi', seg.endormi);
+  // total + CA récupérable estimé (clients à relancer × panier moyen estimé 16€ × 1 visite)
+  const aRelancer = seg.part + seg.endormi;
+  set('clients-total', clientsCache.length);
+  set('clients-total-2', clientsCache.length);
+  const caEl = document.getElementById('ca-recuperable');
+  if (caEl) caEl.textContent = '+' + (aRelancer * 120).toLocaleString('fr-FR');
+  const nbRelanceEl = document.getElementById('nb-a-relancer');
+  if (nbRelanceEl) nbRelanceEl.textContent = aRelancer;
+}
+
+function initiales(nom) {
+  return nom.split(' ').map(m => m[0]).join('').slice(0, 2).toUpperCase();
+}
+
+// Liste "à relancer" : clients qui partent ou endormis
+function afficherARelancer() {
+  const zone = document.getElementById('liste-relancer');
+  if (!zone) return;
+  const aRelancer = clientsCache
+    .filter(c => ['part', 'endormi'].includes(segmentClient(c)))
+    .slice(0, 8);
+
+  if (aRelancer.length === 0) {
+    zone.innerHTML = '<p style="font-size:13px; color:var(--text-mute); text-align:center; padding:16px;">Aucun client à relancer pour le moment 🎉</p>';
+    return;
+  }
+
+  zone.innerHTML = aRelancer.map(c => {
+    const j = joursDepuis(c.derniere_visite);
+    const segChip = segmentClient(c) === 'endormi'
+      ? '<span class="client-tag lost">endormi</span>'
+      : '<span class="client-tag lost">part</span>';
+    return `
+      <div class="client-row">
+        <div class="client-avatar red">${initiales(c.nom)}</div>
+        <div class="client-info">
+          <div class="client-name">${c.nom} ${segChip}</div>
+          <div class="client-meta"><strong>${c.nb_visites} visites</strong> · dernier passage il y a <strong>${j} jours</strong></div>
+        </div>
+        <button class="client-cta send" onclick="envoyerSMS('${c.nom.replace(/'/g, "\\'")}', this)">SMS</button>
+      </div>`;
+  }).join('');
+}
+
+// Liste VIP : les plus fidèles, récents
+function afficherVIP() {
+  const zone = document.getElementById('liste-vip');
+  if (!zone) return;
+  const vips = clientsCache
+    .filter(c => (c.nb_visites || 0) >= 20 && joursDepuis(c.derniere_visite) <= 50)
+    .sort((a, b) => (b.nb_visites || 0) - (a.nb_visites || 0))
+    .slice(0, 5);
+
+  if (vips.length === 0) {
+    zone.innerHTML = '<p style="font-size:13px; color:var(--text-mute); text-align:center; padding:16px;">Pas encore de VIP — ça viendra ! 🌟</p>';
+    return;
+  }
+
+  zone.innerHTML = vips.map(c => `
+    <div class="client-row">
+      <div class="client-avatar gold">${initiales(c.nom)}</div>
+      <div class="client-info">
+        <div class="client-name">${c.nom} <span class="client-tag vip">VIP</span></div>
+        <div class="client-meta"><strong>${c.nb_visites} visites</strong> · ${c.points}/10 tampons</div>
+      </div>
+      <button class="client-cta ghost" onclick="envoyerSMS('${c.nom.replace(/'/g, "\\'")}', this)">Récompenser</button>
+    </div>`).join('');
+}
+
+
 function getOffre() {
   return localStorage.getItem('offreFidelite') || '−15% sur la prochaine commande';
 }
