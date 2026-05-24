@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#0A0908">
+<title>Gin Khao · Fidélité</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-deep: #0A0908;
+  --surface: #1C1814;
+  --surface-2: #251F19;
+  --border: #2D261E;
+  --border-soft: #221C16;
+  --sriracha: #E63946;
+  --gold: #E4B860;
+  --gold-soft: #B8924E;
+  --lime: #A8E10C;
+  --text: #F5EDE2;
+  --text-soft: #C7B9A5;
+  --text-mute: #8B7E6F;
+  --text-dim: #5A5045;
+  --display: 'Fraunces', Georgia, serif;
+  --body: 'Manrope', system-ui, sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body {
+  min-height: 100dvh;
+  background:
+    radial-gradient(circle at 20% 10%, rgba(230,57,70,0.12), transparent 50%),
+    radial-gradient(circle at 80% 90%, rgba(228,184,96,0.10), transparent 50%),
+    linear-gradient(180deg, #0a0908 0%, #0d0a07 100%);
+  font-family: var(--body);
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32px 20px calc(40px + env(safe-area-inset-bottom, 0px));
+  -webkit-font-smoothing: antialiased;
+}
+.wrap { width: 100%; max-width: 420px; }
+
+/* Logo / header */
+.brand { text-align: center; margin-bottom: 28px; }
+.brand .mark {
+  font-family: var(--display); font-size: 13px; letter-spacing: 0.35em;
+  text-transform: uppercase; color: var(--gold); font-weight: 600;
+}
+.brand .name {
+  font-family: var(--display); font-size: 38px; font-weight: 500;
+  color: var(--text); line-height: 1; margin-top: 6px; letter-spacing: -0.02em;
+}
+.brand .tag { font-size: 12px; color: var(--text-mute); margin-top: 8px; letter-spacing: 0.05em; }
+
+/* Card */
+.card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 24px; padding: 28px 24px;
+  box-shadow: 0 30px 60px -25px rgba(0,0,0,0.7);
+}
+.card h1 {
+  font-family: var(--display); font-size: 24px; font-weight: 500;
+  color: var(--text); margin-bottom: 6px; line-height: 1.15;
+}
+.card .sub { font-size: 13px; color: var(--text-mute); line-height: 1.5; margin-bottom: 22px; }
+
+/* Form */
+.field { margin-bottom: 16px; }
+.field label {
+  display: block; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--text-mute); font-weight: 600; margin-bottom: 7px;
+}
+.field input {
+  width: 100%; background: var(--bg-deep); border: 1px solid var(--border);
+  border-radius: 13px; padding: 14px 16px; color: var(--text);
+  font-size: 15px; font-family: var(--body); outline: none; transition: border-color 0.2s;
+}
+.field input:focus { border-color: var(--gold-soft); }
+.field input::placeholder { color: var(--text-dim); }
+
+.btn {
+  width: 100%; border: none; border-radius: 13px; padding: 15px;
+  font-size: 15px; font-weight: 700; font-family: var(--body); cursor: pointer;
+  letter-spacing: 0.02em; transition: transform 0.15s, opacity 0.2s; margin-top: 6px;
+}
+.btn:active { transform: scale(0.98); }
+.btn-gold { background: linear-gradient(135deg, var(--gold), var(--gold-soft)); color: var(--bg-deep); }
+.btn-ghost { background: var(--surface-2); color: var(--text-soft); border: 1px solid var(--border); }
+.btn:disabled { opacity: 0.5; cursor: default; }
+
+.note { font-size: 11px; color: var(--text-dim); text-align: center; margin-top: 16px; line-height: 1.5; }
+
+/* Loyalty card */
+.loyalty {
+  background: linear-gradient(135deg, #2d2218 0%, #1a1410 100%);
+  border: 1px solid rgba(228,184,96,0.35); border-radius: 20px;
+  padding: 24px; position: relative; overflow: hidden;
+}
+.loyalty::after {
+  content: '🍜'; position: absolute; font-size: 120px; opacity: 0.06;
+  bottom: -30px; right: -20px; transform: rotate(-15deg);
+}
+.loyalty .lc-brand { font-family: var(--display); font-size: 20px; font-weight: 600; color: var(--gold); }
+.loyalty .lc-name { font-size: 14px; color: var(--text-soft); margin-top: 4px; }
+.loyalty .lc-sub { font-size: 12px; color: var(--text-mute); margin-top: 14px; }
+
+.stamps { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 14px; }
+.stamp {
+  aspect-ratio: 1; border-radius: 50%; border: 1.5px dashed rgba(228,184,96,0.4);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px; color: var(--text-dim); position: relative; z-index: 2;
+}
+.stamp.filled {
+  background: linear-gradient(135deg, var(--gold), var(--gold-soft));
+  border-style: solid; border-color: var(--gold); color: var(--bg-deep);
+}
+.stamp.reward { border-color: var(--sriracha); border-style: solid; color: var(--sriracha); }
+
+.progress-text { font-size: 13px; color: var(--text-soft); text-align: center; margin: 18px 0 4px; }
+.progress-text strong { color: var(--gold); }
+
+.reward-banner {
+  background: linear-gradient(135deg, rgba(230,57,70,0.18), rgba(230,57,70,0.06));
+  border: 1px solid rgba(230,57,70,0.4); border-radius: 14px;
+  padding: 16px; text-align: center; margin-top: 16px;
+}
+.reward-banner .big { font-family: var(--display); font-size: 18px; color: var(--sriracha); font-weight: 600; }
+.reward-banner .small { font-size: 12px; color: var(--text-soft); margin-top: 4px; }
+
+.toast {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(120px);
+  background: var(--surface-2); border: 1px solid var(--border); color: var(--text);
+  padding: 14px 22px; border-radius: 14px; font-size: 14px; font-weight: 600;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5); transition: transform 0.35s cubic-bezier(0.16,1,0.3,1); z-index: 999;
+  max-width: 90%; text-align: center;
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+.toast.ok { border-color: var(--lime); }
+.toast.err { border-color: var(--sriracha); }
+
+.hidden { display: none !important; }
+.spin { display: inline-block; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.save-hint {
+  background: var(--surface-2); border: 1px dashed var(--border);
+  border-radius: 12px; padding: 12px 14px; margin-top: 16px;
+  font-size: 12px; color: var(--text-soft); line-height: 1.5;
+}
+.save-hint strong { color: var(--gold); }
+
+/* Zone QR du client */
+.qr-zone { text-align: center; margin-top: 20px; }
+.qr-title {
+  font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--gold); font-weight: 700; margin-bottom: 14px;
+}
+.qr-box {
+  background: #fff; border-radius: 16px; padding: 16px;
+  display: inline-block; line-height: 0;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+}
+.qr-box canvas, .qr-box img { display: block; }
+.qr-hint { font-size: 11px; color: var(--text-mute); margin-top: 14px; line-height: 1.5; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="brand">
+    <div class="mark">Street Food Thaï</div>
+    <div class="name">Gin Khao</div>
+    <div class="tag">Saint Just · Marseille</div>
+  </div>
+
+  <!-- ÉCRAN 1 : INSCRIPTION -->
+  <div class="card" id="screen-signup">
+    <h1>Rejoignez notre carte de fidélité 🍜</h1>
+    <p class="sub">1 visite = 1 tampon. Au 10ᵉ, votre plat est offert. Inscription en 20 secondes, gratuite.</p>
+
+    <div class="field">
+      <label for="nom">Votre prénom</label>
+      <input type="text" id="nom" placeholder="Ex : Karim" autocomplete="given-name">
+    </div>
+    <div class="field">
+      <label for="tel">Votre téléphone</label>
+      <input type="tel" id="tel" placeholder="06 12 34 56 78" autocomplete="tel">
+    </div>
+
+    <button class="btn btn-gold" id="btn-signup" onclick="inscrire()">Rejoindre le programme</button>
+    <p class="note">En vous inscrivant, vous acceptez de recevoir nos offres par SMS. Désinscription à tout moment.</p>
+  </div>
+
+  <!-- ÉCRAN 2 : CARTE DE FIDÉLITÉ -->
+  <div class="card hidden" id="screen-card">
+    <div class="loyalty">
+      <div class="lc-brand">Gin Khao · Fidélité</div>
+      <div class="lc-name" id="card-name">—</div>
+      <div class="stamps" id="stamps"></div>
+      <div class="lc-sub" id="card-sub">Le 10ᵉ plat offert</div>
+    </div>
+
+    <div class="progress-text" id="progress">—</div>
+
+    <div class="reward-banner hidden" id="reward-banner">
+      <div class="big">🎁 Plat offert débloqué !</div>
+      <div class="small">Montrez cette carte au comptoir pour en profiter.</div>
+    </div>
+
+    <div class="qr-zone">
+      <div class="qr-title">Montrez ce code au comptoir</div>
+      <div class="qr-box" id="qr-client"></div>
+      <div class="qr-hint">Le restaurant scanne votre code pour ajouter votre tampon ✓</div>
+    </div>
+
+    <div class="save-hint">
+      💡 <strong>Gardez cette page !</strong> Ajoutez-la à votre écran d'accueil ou en favori : c'est votre carte de fidélité, à présenter à chaque visite.
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- QR code generator -->
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<!-- Supabase -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// ===== CONFIG SUPABASE =====
+const SUPABASE_URL = 'https://szpgbdnijyoquqmjhhjj.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN6cGdiZG5panlvcXVxbWpoaGpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2MTMwNDUsImV4cCI6MjA5NTE4OTA0NX0.fKarVKMIOc4Ez2kOvE6xyvVibuENSGev6RsouYDb8ak';
+const RESTO_ID = 'gin-khao';
+const OBJECTIF = 10; // 10 tampons = plat offert
+
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// ===== TOAST =====
+function toast(msg, type = '') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + type;
+  setTimeout(() => { t.className = 'toast ' + type; }, 3200);
+}
+
+// ===== AU CHARGEMENT : carte existante ? =====
+document.addEventListener('DOMContentLoaded', async () => {
+  // 1) un id client dans l'URL ? (?c=xxxx)
+  const params = new URLSearchParams(location.search);
+  let clientId = params.get('c') || localStorage.getItem('ginkhao_client_id');
+
+  if (clientId) {
+    await chargerCarte(clientId);
+  }
+});
+
+// ===== INSCRIPTION =====
+async function inscrire() {
+  const nom = document.getElementById('nom').value.trim();
+  const tel = document.getElementById('tel').value.trim();
+  if (!nom) { toast('Indiquez votre prénom 🙏', 'err'); return; }
+  if (!tel || tel.replace(/\D/g, '').length < 8) { toast('Numéro de téléphone invalide', 'err'); return; }
+
+  const btn = document.getElementById('btn-signup');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin">⏳</span> Inscription…';
+
+  try {
+    // Déjà inscrit avec ce téléphone ?
+    const { data: existant } = await sb.from('clients')
+      .select('id').eq('telephone', tel).eq('restaurant_id', RESTO_ID).maybeSingle();
+
+    let clientId;
+    if (existant) {
+      clientId = existant.id;
+      toast('Vous étiez déjà inscrit, content de vous revoir ! 👋', 'ok');
+    } else {
+      const { data, error } = await sb.from('clients').insert({
+        nom, telephone: tel, restaurant_id: RESTO_ID,
+        points: 0, total_points_gagnes: 0, nb_visites: 0
+      }).select('id').single();
+      if (error) throw error;
+      clientId = data.id;
+    }
+
+    localStorage.setItem('ginkhao_client_id', clientId);
+    await chargerCarte(clientId);
+  } catch (e) {
+    toast('Erreur : ' + e.message, 'err');
+    btn.disabled = false;
+    btn.innerHTML = 'Rejoindre le programme';
+  }
+}
+
+// ===== CHARGER LA CARTE =====
+async function chargerCarte(clientId) {
+  try {
+    const { data: c, error } = await sb.from('clients')
+      .select('*').eq('id', clientId).single();
+    if (error) throw error;
+
+    localStorage.setItem('ginkhao_client_id', c.id);
+    document.getElementById('screen-signup').classList.add('hidden');
+    document.getElementById('screen-card').classList.remove('hidden');
+    document.getElementById('card-name').textContent = c.nom;
+    afficherTampons(c.points);
+    genererQRClient(c.id);
+
+    // met à jour l'URL pour que la page soit "sa" carte (favori)
+    history.replaceState(null, '', '?c=' + c.id);
+  } catch (e) {
+    toast('Impossible de charger la carte', 'err');
+  }
+}
+
+// ===== AFFICHER LES TAMPONS =====
+function afficherTampons(points) {
+  const grid = document.getElementById('stamps');
+  grid.innerHTML = '';
+  for (let i = 1; i <= OBJECTIF; i++) {
+    const d = document.createElement('div');
+    if (i <= points) { d.className = 'stamp filled'; d.textContent = '🍜'; }
+    else if (i === OBJECTIF) { d.className = 'stamp reward'; d.textContent = '🎁'; }
+    else { d.className = 'stamp'; d.textContent = i; }
+    grid.appendChild(d);
+  }
+  const reste = Math.max(0, OBJECTIF - points);
+  const prog = document.getElementById('progress');
+  const banner = document.getElementById('reward-banner');
+  if (points >= OBJECTIF) {
+    prog.innerHTML = '<strong>Bravo !</strong> Votre plat est offert 🎉';
+    banner.classList.remove('hidden');
+  } else {
+    prog.innerHTML = `Plus que <strong>${reste} tampon${reste > 1 ? 's' : ''}</strong> avant votre plat offert !`;
+    banner.classList.add('hidden');
+  }
+}
+
+// ===== GÉNÉRER LE QR DU CLIENT (scanné par le caissier) =====
+function genererQRClient(clientId) {
+  const box = document.getElementById('qr-client');
+  box.innerHTML = '';
+  // Le QR contient l'identifiant du client, préfixé pour reconnaissance
+  new QRCode(box, {
+    text: 'GINKHAO:' + clientId,
+    width: 190,
+    height: 190,
+    colorDark: '#0A0908',
+    colorLight: '#ffffff',
+    correctLevel: QRCode.CorrectLevel.M
+  });
+}
+</script>
+</body>
+</html>
