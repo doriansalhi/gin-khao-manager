@@ -1282,10 +1282,15 @@ function afficherTicket() {
 
   btn.disabled = false;
   majTotal();
+
+  // Rafraîchit le bloc fidélité pour afficher/masquer le bouton "Offrir le plat"
+  // selon que le ticket contient des articles ou non.
+  if (clientFid) majBoutonOffrir();
 }
 
-function totalTicket() {
-  return ticket.reduce((s, l) => s + l.prix * l.quantite, 0) - remisePlatOffert();
+// Met à jour seulement le bloc fidélité sans tout reconstruire (évite les boucles)
+function majBoutonOffrir() {
+  afficherClientFid();
 }
 
 // Le plat offert = l'article au prix unitaire le plus bas du ticket (1 unité).
