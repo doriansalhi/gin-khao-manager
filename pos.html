@@ -368,6 +368,24 @@ html, body {
   min-width: 56px;
   text-align: right;
 }
+.ligne-offert {
+  background: linear-gradient(135deg, rgba(230,57,70,0.12), rgba(230,57,70,0.03));
+  border-color: rgba(230,57,70,0.35);
+}
+.ligne-offert .ligne-nom { color: var(--sriracha); }
+.offert-montant { color: var(--lime) !important; }
+.offert-retirer {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-mute);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 6px 10px;
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.offert-retirer:hover { color: var(--danger); border-color: var(--danger); }
 
 /* ===== BLOC CLIENT FIDÉLITÉ (dans le pied) ===== */
 .fid-bloc {
@@ -416,6 +434,33 @@ html, body {
 .fid-client-nom { font-size: 14px; font-weight: 700; color: var(--text); }
 .fid-client-tampons { font-size: 12px; color: var(--gold); font-weight: 600; margin-top: 2px; }
 .fid-client-tampons.reward { color: var(--sriracha); }
+.btn-offrir {
+  width: 100%;
+  margin-top: 8px;
+  padding: 12px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, var(--sriracha), var(--sriracha-soft));
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: var(--body);
+  cursor: pointer;
+  transition: all 0.18s;
+  box-shadow: 0 8px 20px -8px rgba(230,57,70,0.5);
+}
+.btn-offrir:hover { transform: translateY(-1px); }
+.offert-actif {
+  margin-top: 8px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  background: rgba(168,225,12,0.08);
+  border: 1px solid rgba(168,225,12,0.3);
+  color: var(--lime);
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+}
 .fid-detacher {
   background: none; border: none; color: var(--text-mute);
   font-size: 20px; cursor: pointer; padding: 4px 8px; line-height: 1;
@@ -1036,6 +1081,7 @@ const MIN_TAMPON = 12.90;       // minimum de commande pour gagner un tampon
 let clientFid = null;           // client attaché au ticket {id, nom, points, ...}
 let scannerFid = null;          // instance Html5Qrcode
 let scanEnCours = false;
+let platOffertApplique = false; // true quand le plat offert est appliqué sur le ticket courant
 
 // ============================================
 //  HORLOGE
@@ -1218,12 +1264,46 @@ function afficherTicket() {
     </div>
   `).join('');
 
+  // Ligne "plat offert" (remise fidélité) si appliquée
+  if (platOffertApplique) {
+    const l = ligneLaMoinsChere();
+    if (l) {
+      zone.innerHTML += `
+        <div class="ligne ligne-offert">
+          <div class="ligne-info">
+            <div class="ligne-nom">🎁 Plat offert — ${l.nom}</div>
+            <div class="ligne-pu">Fidélité · 10 tampons</div>
+          </div>
+          <button class="offert-retirer" onclick="retirerPlatOffert()">retirer</button>
+          <div class="ligne-st offert-montant">−${fmt(l.prix)}</div>
+        </div>`;
+    }
+  }
+
   btn.disabled = false;
   majTotal();
 }
 
 function totalTicket() {
-  return ticket.reduce((s, l) => s + l.prix * l.quantite, 0);
+  return ticket.reduce((s, l) => s + l.prix * l.quantite, 0) - remisePlatOffert();
+}
+
+// Le plat offert = l'article au prix unitaire le plus bas du ticket (1 unité).
+// Renvoie l'objet ligne concerné, ou null.
+function ligneLaMoinsChere() {
+  if (ticket.length === 0) return null;
+  let min = null;
+  ticket.forEach(l => {
+    if (min === null || l.prix < min.prix) min = l;
+  });
+  return min;
+}
+
+// Montant de la remise (prix d'une unité du plat le moins cher), 0 si non appliqué.
+function remisePlatOffert() {
+  if (!platOffertApplique) return 0;
+  const l = ligneLaMoinsChere();
+  return l ? l.prix : 0;
 }
 
 function majTotal() {
@@ -1236,6 +1316,8 @@ function viderTicket() {
   if (ticket.length === 0) return;
   if (!confirm('Vider la commande en cours ?')) return;
   ticket = [];
+  platOffertApplique = false;
+  afficherClientFid();
   afficherTicket();
 }
 
@@ -1329,12 +1411,28 @@ async function validerVente() {
   btnValider.textContent = 'Enregistrement…';
 
   // Prépare les lignes pour la fonction SQL
+  // On garde tous les articles à leur prix normal (le stock se décrémente correctement,
+  // car le plat offert sort bien du stock même s'il est gratuit).
   const lignes = ticket.map(l => ({
     produit_id: l.produit_id,
     nom: l.nom,
     prix: l.prix,
     quantite: l.quantite
   }));
+
+  // Si plat offert appliqué : on ajoute une ligne de remise négative
+  // pour que le total enregistré reflète le montant réellement payé.
+  if (platOffertApplique) {
+    const lo = ligneLaMoinsChere();
+    if (lo) {
+      lignes.push({
+        produit_id: null,            // pas un produit → pas de stock touché
+        nom: '🎁 Plat offert (fidélité) — ' + lo.nom,
+        prix: -lo.prix,              // remise
+        quantite: 1
+      });
+    }
+  }
 
   try {
     const { data, error } = await sb.rpc('enregistrer_vente', {
@@ -1361,6 +1459,7 @@ async function validerVente() {
     // Réinitialise pour la commande suivante
     ticket = [];
     clientFid = null;
+    platOffertApplique = false;
     afficherClientFid();
     afficherTicket();
     await chargerMenu(); // recharge le stock à jour
@@ -1513,7 +1612,9 @@ async function traiterCodeFid(texte, camera = false) {
 
 function detacherClientFid() {
   clientFid = null;
+  platOffertApplique = false;
   afficherClientFid();
+  afficherTicket();
 }
 
 function afficherClientFid() {
@@ -1545,11 +1646,32 @@ function afficherClientFid() {
         <div class="fid-client-tampons ${tamponCls}">${tamponTxt}</div>
       </div>
       <button class="fid-detacher" onclick="detacherClientFid()" title="Retirer le client">×</button>
-    </div>`;
+    </div>
+    ${(pts >= OBJECTIF_FID && !platOffertApplique && ticket.length > 0)
+      ? `<button class="btn-offrir" onclick="appliquerPlatOffert()">🎁 Offrir le plat le moins cher</button>`
+      : ''}
+    ${platOffertApplique
+      ? `<div class="offert-actif">🎁 Plat offert appliqué · tampons remis à 0 après validation</div>`
+      : ''}`;
 }
 
 function initialesFid(nom) {
   return (nom || '?').split(' ').map(m => m[0]).join('').slice(0, 2).toUpperCase();
+}
+
+// Applique le plat offert (déduit le plat le moins cher)
+function appliquerPlatOffert() {
+  if (!clientFid || (clientFid.points || 0) < OBJECTIF_FID) return;
+  if (ticket.length === 0) { alert('Ajoutez d\'abord des produits au ticket.'); return; }
+  platOffertApplique = true;
+  afficherClientFid();
+  afficherTicket();
+}
+
+function retirerPlatOffert() {
+  platOffertApplique = false;
+  afficherClientFid();
+  afficherTicket();
 }
 
 function ymdAujourdhui() {
@@ -1559,9 +1681,26 @@ function ymdAujourdhui() {
 // Applique le tampon fidélité après une vente validée.
 // Reproduit EXACTEMENT la règle du scanner : +1 point/visite/total,
 // 1 seul tampon par jour, retour à 1 après 10. Conditionné au minimum de commande.
+// CAS SPÉCIAL : si le plat offert a été utilisé, on remet les tampons à 0
+// (visite "récompense") sans ajouter de nouveau tampon.
 // Renvoie un message à afficher, ou null si rien à signaler.
 async function appliquerTampon(totalVente) {
   if (!clientFid) return null;
+
+  // CAS RÉCOMPENSE : le client a utilisé son plat offert → remise à 0
+  if (platOffertApplique) {
+    try {
+      const { error } = await sb.from('clients').update({
+        points: 0,
+        nb_visites: (clientFid.nb_visites || 0) + 1,
+        derniere_visite: ymdAujourdhui()
+      }).eq('id', clientFid.id);
+      if (error) throw error;
+      return { titre: '🎁 Plat offert utilisé', sous: `${clientFid.nom} : carte repartie à 0/10` };
+    } catch (e) {
+      return { titre: 'Vente enregistrée', sous: 'Récompense non enregistrée : ' + e.message };
+    }
+  }
 
   // Condition minimum de commande
   if (totalVente < MIN_TAMPON) {
