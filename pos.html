@@ -896,6 +896,47 @@ html, body {
   white-space: nowrap;
 }
 .hv-annuler:hover { color: var(--danger); border-color: var(--danger); }
+.hv-ticket {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-mute);
+  font-size: 15px;
+  padding: 6px 9px;
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.hv-ticket:hover { border-color: var(--gold); }
+
+/* ===== TICKET (rendu reçu) ===== */
+.ticket-recu {
+  background: #fff;
+  color: #1a1a1a;
+  font-family: var(--mono);
+  width: 300px;
+  max-width: 100%;
+  margin: 0 auto 18px;
+  padding: 22px 20px;
+  border-radius: 6px;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.tr-center { text-align: center; }
+.tr-logo { font-family: var(--display); font-size: 22px; font-weight: 600; letter-spacing: -0.01em; }
+.tr-sub { font-size: 11px; color: #555; margin-top: 2px; }
+.tr-sep { border: none; border-top: 1px dashed #aaa; margin: 12px 0; }
+.tr-row { display: flex; justify-content: space-between; gap: 8px; }
+.tr-row.mute { color: #666; font-size: 11px; }
+.tr-art { display: flex; justify-content: space-between; gap: 8px; margin: 3px 0; }
+.tr-art .q { color: #555; }
+.tr-art.remise { color: #c0392b; }
+.tr-total { display: flex; justify-content: space-between; font-size: 16px; font-weight: 700; margin-top: 6px; }
+.tr-foot { text-align: center; font-size: 11px; color: #555; margin-top: 14px; }
+.tr-annulee {
+  text-align: center; color: #c0392b; font-weight: 700;
+  border: 2px solid #c0392b; border-radius: 6px; padding: 6px; margin-bottom: 12px;
+  text-transform: uppercase; letter-spacing: 0.1em; font-size: 12px;
+}
 .hv-badge-annulee {
   font-size: 10px;
   font-weight: 700;
@@ -1151,6 +1192,17 @@ html, body {
   </div>
 </div>
 
+<!-- ===== MODALE TICKET ===== -->
+<div class="overlay" id="overlay-ticket">
+  <div class="modal">
+    <div id="ticket-contenu"></div>
+    <div class="modal-actions">
+      <button class="btn-annuler" onclick="fermerTicket()">Fermer</button>
+      <button class="btn-valider" onclick="imprimerTicket()">🖨️ Imprimer</button>
+    </div>
+  </div>
+</div>
+
 <!-- ===== TOAST ===== -->
 <div class="toast" id="toast">
   <div class="ic">✓</div>
@@ -1190,6 +1242,9 @@ let platOffertApplique = false; // true quand le plat offert est appliqué sur l
 
 // --- Remise manuelle ---
 let remise = null;  // { type: 'pct'|'montant', valeur: number }  ou null
+
+// --- Historique (mémorise les ventes du jour pour générer les tickets) ---
+let ventesDuJour = [];
 
 // ============================================
 //  HORLOGE
@@ -1986,14 +2041,17 @@ async function chargerHistorique() {
     const debut = new Date();
     debut.setHours(0, 0, 0, 0);
 
-    // Récupère les ventes du jour + leurs lignes (pour le détail)
+    // Récupère les ventes du jour + leurs lignes complètes (pour le ticket)
     const { data: ventes, error } = await sb.from('ventes')
-      .select('id, numero, total, mode_paiement, statut, cree_le, lignes_vente(nom_produit, quantite)')
+      .select('id, numero, total, mode_paiement, statut, cree_le, lignes_vente(nom_produit, prix_unitaire, quantite, sous_total)')
       .eq('restaurant_id', RESTO_ID)
       .gte('cree_le', debut.toISOString())
       .order('numero', { ascending: false });
 
     if (error) throw error;
+
+    // Mémorise pour la génération de ticket
+    ventesDuJour = ventes || [];
 
     if (!ventes || ventes.length === 0) {
       liste.innerHTML = '<div class="histo-vide"><div class="ic">🧾</div>Aucune vente aujourd\'hui pour l\'instant</div>';
@@ -2030,6 +2088,7 @@ async function chargerHistorique() {
             <div class="hv-detail">${articles}</div>
           </div>
           <div class="hv-total">${fmt(v.total)}</div>
+          <button class="hv-ticket" onclick="voirTicket('${v.id}')" title="Voir le ticket">🧾</button>
           ${annulee
             ? '<div class="hv-badge-annulee">Annulée</div>'
             : `<button class="hv-annuler" onclick="annulerVente('${v.id}', ${v.numero})">Annuler</button>`}
@@ -2062,6 +2121,73 @@ async function annulerVente(venteId, numero) {
 }
 
 // ============================================
+//  TICKET (reçu) — aperçu, réimpression
+// ============================================
+const RESTO_INFOS = {
+  nom: 'Gin Khao',
+  sousTitre: 'Street Food Thaï',
+  adresse: 'Saint Just · Marseille'
+};
+
+// Construit le HTML du reçu à partir d'un objet vente (avec lignes_vente)
+function genererTicketHTML(v) {
+  const h = new Date(v.cree_le);
+  const date = h.toLocaleDateString('fr-FR') + ' à ' +
+    String(h.getHours()).padStart(2,'0') + ':' + String(h.getMinutes()).padStart(2,'0');
+  const modeLbl = v.mode_paiement === 'carte' ? 'Carte bancaire' : (v.mode_paiement === 'especes' ? 'Espèces' : v.mode_paiement);
+  const annulee = v.statut === 'annulee';
+
+  const lignesHTML = (v.lignes_vente || []).map(l => {
+    const pu = Number(l.prix_unitaire);
+    const st = Number(l.sous_total);
+    const estRemise = pu < 0 || st < 0;
+    return `
+      <div class="tr-art ${estRemise ? 'remise' : ''}">
+        <span>${estRemise ? '' : '<span class="q">' + l.quantite + '× </span>'}${l.nom_produit}</span>
+        <span>${fmt(st)}</span>
+      </div>`;
+  }).join('');
+
+  return `
+    <div class="ticket-recu" id="ticket-recu">
+      ${annulee ? '<div class="tr-annulee">★ Ticket annulé ★</div>' : ''}
+      <div class="tr-center">
+        <div class="tr-logo">${RESTO_INFOS.nom}</div>
+        <div class="tr-sub">${RESTO_INFOS.sousTitre}</div>
+        <div class="tr-sub">${RESTO_INFOS.adresse}</div>
+      </div>
+      <hr class="tr-sep">
+      <div class="tr-row mute"><span>Ticket n°</span><span>#${v.numero}</span></div>
+      <div class="tr-row mute"><span>Date</span><span>${date}</span></div>
+      <hr class="tr-sep">
+      ${lignesHTML}
+      <hr class="tr-sep">
+      <div class="tr-total"><span>TOTAL</span><span>${fmt(v.total)}</span></div>
+      <div class="tr-row mute" style="margin-top:6px;"><span>Règlement</span><span>${modeLbl}</span></div>
+      <div class="tr-foot">
+        Merci de votre visite !<br>À très bientôt chez ${RESTO_INFOS.nom} 🍜
+      </div>
+    </div>`;
+}
+
+function voirTicket(venteId) {
+  const v = ventesDuJour.find(x => x.id === venteId);
+  if (!v) { alert('Ticket introuvable'); return; }
+  document.getElementById('ticket-contenu').innerHTML = genererTicketHTML(v);
+  document.getElementById('overlay-ticket').classList.add('show');
+}
+
+function fermerTicket() {
+  document.getElementById('overlay-ticket').classList.remove('show');
+}
+
+// Impression : pour l'instant en attente de l'API myPOS.
+// Quand l'API sera dispo, on remplacera cette fonction par l'appel d'impression thermique.
+function imprimerTicket() {
+  alert('🖨️ Impression sur imprimante myPOS bientôt disponible.\n\nL\'impression sera activée une fois l\'accès à l\'API myPOS configuré.');
+}
+
+// ============================================
 //  UTILITAIRES
 // ============================================
 function fmt(n) {
@@ -2085,6 +2211,9 @@ document.getElementById('overlay-histo').addEventListener('click', e => {
 });
 document.getElementById('overlay-remise').addEventListener('click', e => {
   if (e.target.id === 'overlay-remise') fermerRemise();
+});
+document.getElementById('overlay-ticket').addEventListener('click', e => {
+  if (e.target.id === 'overlay-ticket') fermerTicket();
 });
 
 // Lancer
