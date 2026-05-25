@@ -1311,6 +1311,12 @@ function remisePlatOffert() {
   return l ? l.prix : 0;
 }
 
+// Total du ticket = somme des articles, moins la remise plat offert éventuelle.
+function totalTicket() {
+  const brut = ticket.reduce((s, l) => s + l.prix * l.quantite, 0);
+  return brut - remisePlatOffert();
+}
+
 function majTotal() {
   const t = totalTicket();
   const [euros, cents] = t.toFixed(2).split('.');
