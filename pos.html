@@ -117,6 +117,9 @@ html, body {
   transition: all 0.2s;
   font-weight: 600;
   letter-spacing: 0.02em;
+  background: transparent;
+  font-family: var(--body);
+  cursor: pointer;
 }
 .link-btn:hover { color: var(--text); border-color: var(--gold-soft); }
 
@@ -706,6 +709,105 @@ html, body {
 .toast .txt b { display: block; font-size: 14px; }
 .toast .txt span { font-size: 12px; color: var(--text-mute); }
 
+/* ===== MODALE HISTORIQUE ===== */
+.modal-histo {
+  width: 100%;
+  max-width: 540px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+}
+.histo-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+.histo-sub { font-size: 13px; color: var(--text-mute); margin-bottom: 18px; }
+.histo-sub b { color: var(--gold); font-family: var(--mono); }
+.histo-liste {
+  overflow-y: auto;
+  flex: 1;
+  margin: 0 -6px;
+  padding: 0 6px;
+  scrollbar-width: thin;
+}
+.histo-liste::-webkit-scrollbar { width: 6px; }
+.histo-liste::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+.histo-vente {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  margin-bottom: 8px;
+}
+.histo-vente.annulee { opacity: 0.5; }
+.histo-vente.annulee .hv-total { text-decoration: line-through; }
+.hv-num {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--text-mute);
+  min-width: 38px;
+  font-weight: 600;
+}
+.hv-info { flex: 1; min-width: 0; }
+.hv-heure { font-size: 13px; font-weight: 600; color: var(--text); }
+.hv-detail { font-size: 11px; color: var(--text-mute); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hv-mode {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-mute);
+}
+.hv-total {
+  font-family: var(--display);
+  font-size: 17px;
+  font-weight: 500;
+  color: var(--gold);
+  min-width: 64px;
+  text-align: right;
+}
+.hv-annuler {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-mute);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 7px 10px;
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.hv-annuler:hover { color: var(--danger); border-color: var(--danger); }
+.hv-badge-annulee {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--danger);
+  border: 1px solid var(--danger);
+  padding: 5px 9px;
+  border-radius: var(--radius-xs);
+}
+.histo-vide { text-align: center; padding: 40px 20px; color: var(--text-mute); }
+.histo-vide .ic { font-size: 36px; margin-bottom: 10px; opacity: 0.5; }
+.histo-total-jour {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding-top: 16px;
+  margin-top: 8px;
+  border-top: 1px solid var(--border);
+}
+.histo-total-jour .lbl { font-size: 13px; color: var(--text-mute); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; }
+.histo-total-jour .val { font-family: var(--display); font-size: 26px; color: var(--text); }
+.histo-total-jour .val span { color: var(--gold); }
+
 /* ===== LOGIN GATE ===== */
 .gate {
   position: fixed;
@@ -763,6 +865,7 @@ html, body {
       </div>
       <div class="topbar-right">
         <div class="clock" id="clock">--:--</div>
+        <button class="link-btn" onclick="ouvrirHistorique()">🧾 Historique</button>
         <a href="index.html" class="link-btn">← Gestion</a>
       </div>
     </div>
@@ -878,6 +981,22 @@ html, body {
         </div>
       </div>
 
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODALE HISTORIQUE ===== -->
+<div class="overlay" id="overlay-histo">
+  <div class="modal modal-histo">
+    <div class="histo-head">
+      <h3>Ventes du jour</h3>
+      <button class="link-btn" onclick="fermerHistorique()">Fermer</button>
+    </div>
+    <div class="histo-sub" id="histo-sub">Chargement…</div>
+    <div class="histo-liste" id="histo-liste"></div>
+    <div class="histo-total-jour">
+      <span class="lbl">Total encaissé</span>
+      <span class="val" id="histo-total"><span>0,00 €</span></span>
     </div>
   </div>
 </div>
@@ -1479,6 +1598,101 @@ async function appliquerTampon(totalVente) {
 }
 
 // ============================================
+//  HISTORIQUE DES VENTES DU JOUR + ANNULATION
+// ============================================
+function ouvrirHistorique() {
+  document.getElementById('overlay-histo').classList.add('show');
+  chargerHistorique();
+}
+function fermerHistorique() {
+  document.getElementById('overlay-histo').classList.remove('show');
+}
+
+async function chargerHistorique() {
+  const liste = document.getElementById('histo-liste');
+  const sub = document.getElementById('histo-sub');
+  liste.innerHTML = '<div class="histo-vide"><div class="spinner" style="margin:0 auto 12px;"></div>Chargement des ventes…</div>';
+
+  try {
+    const debut = new Date();
+    debut.setHours(0, 0, 0, 0);
+
+    // Récupère les ventes du jour + leurs lignes (pour le détail)
+    const { data: ventes, error } = await sb.from('ventes')
+      .select('id, numero, total, mode_paiement, statut, cree_le, lignes_vente(nom_produit, quantite)')
+      .eq('restaurant_id', RESTO_ID)
+      .gte('cree_le', debut.toISOString())
+      .order('numero', { ascending: false });
+
+    if (error) throw error;
+
+    if (!ventes || ventes.length === 0) {
+      liste.innerHTML = '<div class="histo-vide"><div class="ic">🧾</div>Aucune vente aujourd\'hui pour l\'instant</div>';
+      sub.innerHTML = '0 vente';
+      document.getElementById('histo-total').innerHTML = '<span>0,00 €</span>';
+      return;
+    }
+
+    // Calculs
+    const valides = ventes.filter(v => v.statut === 'validee');
+    const totalJour = valides.reduce((s, v) => s + Number(v.total || 0), 0);
+    const nbAnnulees = ventes.length - valides.length;
+
+    sub.innerHTML = `<b>${valides.length}</b> vente${valides.length > 1 ? 's' : ''} validée${valides.length > 1 ? 's' : ''}` +
+      (nbAnnulees > 0 ? ` · ${nbAnnulees} annulée${nbAnnulees > 1 ? 's' : ''}` : '');
+
+    const [eu, ce] = totalJour.toFixed(2).split('.');
+    document.getElementById('histo-total').innerHTML = `${eu},${ce} <span>€</span>`;
+
+    // Affichage des ventes
+    liste.innerHTML = ventes.map(v => {
+      const h = new Date(v.cree_le);
+      const heure = String(h.getHours()).padStart(2,'0') + ':' + String(h.getMinutes()).padStart(2,'0');
+      const articles = (v.lignes_vente || [])
+        .map(l => l.quantite + '× ' + l.nom_produit).join(', ') || '—';
+      const modeLbl = v.mode_paiement === 'carte' ? 'Carte' : (v.mode_paiement === 'especes' ? 'Espèces' : v.mode_paiement);
+      const annulee = v.statut === 'annulee';
+
+      return `
+        <div class="histo-vente ${annulee ? 'annulee' : ''}">
+          <div class="hv-num">#${v.numero}</div>
+          <div class="hv-info">
+            <div class="hv-heure">${heure} · <span class="hv-mode">${modeLbl}</span></div>
+            <div class="hv-detail">${articles}</div>
+          </div>
+          <div class="hv-total">${fmt(v.total)}</div>
+          ${annulee
+            ? '<div class="hv-badge-annulee">Annulée</div>'
+            : `<button class="hv-annuler" onclick="annulerVente('${v.id}', ${v.numero})">Annuler</button>`}
+        </div>`;
+    }).join('');
+
+  } catch (e) {
+    liste.innerHTML = '<div class="histo-vide"><div class="ic">⚠️</div>Erreur : ' + e.message + '</div>';
+  }
+}
+
+async function annulerVente(venteId, numero) {
+  if (!confirm(`Annuler le ticket #${numero} ?\n\nLa vente sera marquée annulée et les produits seront remis en stock. Cette action est tracée et irréversible.`)) {
+    return;
+  }
+  try {
+    const { data, error } = await sb.rpc('annuler_vente', {
+      p_vente_id: venteId,
+      p_restaurant_id: RESTO_ID
+    });
+    if (error) throw error;
+    if (data && data.ok === false) throw new Error(data.erreur || 'Annulation impossible');
+
+    afficherToast(numero, 'Ticket #' + numero + ' annulé', 'Stock remis · CA mis à jour');
+    await chargerHistorique();  // rafraîchit la liste
+    await chargerMenu();        // rafraîchit le stock affiché sur la caisse
+  } catch (e) {
+    alert('Erreur lors de l\'annulation : ' + e.message);
+  }
+}
+
+// ============================================
 //  UTILITAIRES
 // ============================================
 function fmt(n) {
@@ -1496,6 +1710,9 @@ document.getElementById('overlay-paiement').addEventListener('click', e => {
 });
 document.getElementById('overlay-scan').addEventListener('click', e => {
   if (e.target.id === 'overlay-scan') fermerScanFid();
+});
+document.getElementById('overlay-histo').addEventListener('click', e => {
+  if (e.target.id === 'overlay-histo') fermerHistorique();
 });
 
 // Lancer
