@@ -585,6 +585,73 @@ html, body {
 }
 .btn-vider:hover { color: var(--danger); border-color: var(--danger); }
 
+/* Boutons secondaires (remise + vider) côte à côte */
+.actions-sec { display: flex; gap: 10px; }
+.btn-sec {
+  flex: 1;
+  background: transparent;
+  color: var(--text-mute);
+  border: 1px solid var(--border);
+  padding: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: var(--body);
+}
+.btn-sec:hover { color: var(--text); border-color: var(--gold-soft); }
+.remise-val {
+  font-family: var(--display);
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--lime);
+}
+
+/* Modale remise */
+.remise-types { display: flex; gap: 10px; margin-bottom: 18px; }
+.remise-type-btn {
+  flex: 1;
+  padding: 14px;
+  border: 1.5px solid var(--border);
+  background: var(--surface-2);
+  border-radius: var(--radius-sm);
+  color: var(--text-soft);
+  font-size: 14px;
+  font-weight: 700;
+  font-family: var(--body);
+  cursor: pointer;
+  transition: all 0.18s;
+}
+.remise-type-btn.active { border-color: var(--gold); background: rgba(228,184,96,0.08); color: var(--gold); }
+.field-remise { position: relative; margin-bottom: 14px; }
+.remise-unite {
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--gold);
+  font-family: var(--mono);
+}
+.quick-remise { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; }
+.quick-remise button {
+  flex: 1;
+  min-width: 56px;
+  padding: 10px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+  color: var(--text-soft);
+  font-size: 13px;
+  font-weight: 700;
+  font-family: var(--mono);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.quick-remise button:hover { border-color: var(--gold); color: var(--gold); }
+
 /* ===== MODALE PAIEMENT ===== */
 .overlay {
   position: fixed;
@@ -946,13 +1013,20 @@ html, body {
           Carte fidélité
         </button>
       </div>
+      <div class="total-row" id="remise-ligne" style="display:none;">
+        <span class="lbl" id="remise-label">Remise</span>
+        <span class="remise-val" id="remise-aff">−0,00 €</span>
+      </div>
       <div class="total-row">
         <span class="lbl">Total</span>
         <span class="val" id="total-aff">0<span>,00 €</span></span>
       </div>
       <div class="actions">
         <button class="btn-pay btn-encaisser" id="btn-encaisser" disabled onclick="ouvrirPaiement()">Encaisser</button>
-        <button class="btn-vider" onclick="viderTicket()">Vider la commande</button>
+        <div class="actions-sec">
+          <button class="btn-sec" onclick="ouvrirRemise()">% Remise</button>
+          <button class="btn-sec" onclick="viderTicket()">Vider</button>
+        </div>
       </div>
     </div>
   </div>
@@ -1046,6 +1120,37 @@ html, body {
   </div>
 </div>
 
+<!-- ===== MODALE REMISE ===== -->
+<div class="overlay" id="overlay-remise">
+  <div class="modal">
+    <h3>Appliquer une remise</h3>
+    <div class="modal-total">Sous-total : <b id="remise-soustotal">0,00 €</b></div>
+
+    <div class="remise-types">
+      <button class="remise-type-btn active" id="rtype-pct" onclick="choisirTypeRemise('pct')">En %</button>
+      <button class="remise-type-btn" id="rtype-montant" onclick="choisirTypeRemise('montant')">En €</button>
+    </div>
+
+    <div class="field-remise">
+      <input type="number" class="cash-input" id="remise-input" placeholder="0" inputmode="decimal" oninput="apercuRemise()">
+      <span class="remise-unite" id="remise-unite">%</span>
+    </div>
+
+    <div class="quick-remise" id="quick-remise"></div>
+
+    <div class="rendu" style="margin-bottom:22px;">
+      <div class="lbl">Nouveau total</div>
+      <div class="val" id="remise-apercu">—</div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-annuler" onclick="fermerRemise()">Annuler</button>
+      <button class="btn-annuler" id="btn-retirer-remise" onclick="retirerRemise()" style="display:none;">Retirer la remise</button>
+      <button class="btn-valider" onclick="validerRemise()">Appliquer</button>
+    </div>
+  </div>
+</div>
+
 <!-- ===== TOAST ===== -->
 <div class="toast" id="toast">
   <div class="ic">✓</div>
@@ -1082,6 +1187,9 @@ let clientFid = null;           // client attaché au ticket {id, nom, points, .
 let scannerFid = null;          // instance Html5Qrcode
 let scanEnCours = false;
 let platOffertApplique = false; // true quand le plat offert est appliqué sur le ticket courant
+
+// --- Remise manuelle ---
+let remise = null;  // { type: 'pct'|'montant', valeur: number }  ou null
 
 // ============================================
 //  HORLOGE
@@ -1311,16 +1419,111 @@ function remisePlatOffert() {
   return l ? l.prix : 0;
 }
 
-// Total du ticket = somme des articles, moins la remise plat offert éventuelle.
-function totalTicket() {
+// Sous-total après plat offert, avant remise manuelle.
+function sousTotalApresPlatOffert() {
   const brut = ticket.reduce((s, l) => s + l.prix * l.quantite, 0);
-  return brut - remisePlatOffert();
+  return Math.max(0, brut - remisePlatOffert());
+}
+
+// Montant de la remise manuelle, calculé sur le sous-total. 0 si aucune remise.
+function montantRemise() {
+  if (!remise) return 0;
+  const base = sousTotalApresPlatOffert();
+  let m = 0;
+  if (remise.type === 'pct') m = base * (remise.valeur / 100);
+  else m = remise.valeur;
+  // la remise ne peut pas dépasser le sous-total
+  return Math.min(Math.max(0, m), base);
+}
+
+// Total du ticket = articles − plat offert − remise manuelle.
+function totalTicket() {
+  return Math.max(0, sousTotalApresPlatOffert() - montantRemise());
 }
 
 function majTotal() {
   const t = totalTicket();
   const [euros, cents] = t.toFixed(2).split('.');
   document.getElementById('total-aff').innerHTML = `${euros}<span>,${cents} €</span>`;
+
+  // Affiche / masque la ligne de remise
+  const ligneR = document.getElementById('remise-ligne');
+  const m = montantRemise();
+  if (remise && m > 0) {
+    let lbl = 'Remise';
+    if (remise.type === 'pct') lbl = `Remise (−${remise.valeur}%)`;
+    document.getElementById('remise-label').textContent = lbl;
+    document.getElementById('remise-aff').textContent = '−' + fmt(m);
+    ligneR.style.display = 'flex';
+  } else {
+    ligneR.style.display = 'none';
+  }
+}
+
+// ============================================
+//  REMISE MANUELLE
+// ============================================
+let typeRemiseChoisi = 'pct';
+
+function ouvrirRemise() {
+  if (ticket.length === 0) { alert('Ajoutez d\'abord des produits.'); return; }
+  document.getElementById('overlay-remise').classList.add('show');
+  document.getElementById('remise-soustotal').textContent = fmt(sousTotalApresPlatOffert());
+  document.getElementById('remise-input').value = remise ? remise.valeur : '';
+  choisirTypeRemise(remise ? remise.type : 'pct');
+  document.getElementById('btn-retirer-remise').style.display = remise ? 'block' : 'none';
+  apercuRemise();
+  setTimeout(() => document.getElementById('remise-input').focus(), 100);
+}
+
+function fermerRemise() {
+  document.getElementById('overlay-remise').classList.remove('show');
+}
+
+function choisirTypeRemise(type) {
+  typeRemiseChoisi = type;
+  document.getElementById('rtype-pct').classList.toggle('active', type === 'pct');
+  document.getElementById('rtype-montant').classList.toggle('active', type === 'montant');
+  document.getElementById('remise-unite').textContent = type === 'pct' ? '%' : '€';
+  genererQuickRemise();
+  apercuRemise();
+}
+
+function genererQuickRemise() {
+  const zone = document.getElementById('quick-remise');
+  if (typeRemiseChoisi === 'pct') {
+    zone.innerHTML = [5, 10, 15, 20].map(v => `<button onclick="setRemise(${v})">${v}%</button>`).join('');
+  } else {
+    zone.innerHTML = [1, 2, 5, 10].map(v => `<button onclick="setRemise(${v})">${v}€</button>`).join('');
+  }
+}
+
+function setRemise(v) {
+  document.getElementById('remise-input').value = v;
+  apercuRemise();
+}
+
+function apercuRemise() {
+  const val = parseFloat(document.getElementById('remise-input').value) || 0;
+  const base = sousTotalApresPlatOffert();
+  let m = typeRemiseChoisi === 'pct' ? base * (val / 100) : val;
+  m = Math.min(Math.max(0, m), base);
+  const nouveau = base - m;
+  document.getElementById('remise-apercu').textContent = fmt(nouveau) + '  (−' + fmt(m) + ')';
+}
+
+function validerRemise() {
+  const val = parseFloat(document.getElementById('remise-input').value) || 0;
+  if (val <= 0) { retirerRemise(); return; }
+  remise = { type: typeRemiseChoisi, valeur: val };
+  fermerRemise();
+  afficherTicket();
+}
+
+function retirerRemise() {
+  remise = null;
+  fermerRemise();
+  afficherTicket();
 }
 
 function viderTicket() {
@@ -1328,6 +1531,7 @@ function viderTicket() {
   if (!confirm('Vider la commande en cours ?')) return;
   ticket = [];
   platOffertApplique = false;
+  remise = null;
   afficherClientFid();
   afficherTicket();
 }
@@ -1445,6 +1649,20 @@ async function validerVente() {
     }
   }
 
+  // Si remise manuelle : on ajoute une ligne de remise négative
+  const mRemise = montantRemise();
+  if (remise && mRemise > 0) {
+    const libelle = remise.type === 'pct'
+      ? `Remise −${remise.valeur}%`
+      : `Remise −${fmt(remise.valeur)}`;
+    lignes.push({
+      produit_id: null,
+      nom: libelle,
+      prix: -mRemise,
+      quantite: 1
+    });
+  }
+
   try {
     const { data, error } = await sb.rpc('enregistrer_vente', {
       p_restaurant_id: RESTO_ID,
@@ -1471,6 +1689,7 @@ async function validerVente() {
     ticket = [];
     clientFid = null;
     platOffertApplique = false;
+    remise = null;
     afficherClientFid();
     afficherTicket();
     await chargerMenu(); // recharge le stock à jour
@@ -1863,6 +2082,9 @@ document.getElementById('overlay-scan').addEventListener('click', e => {
 });
 document.getElementById('overlay-histo').addEventListener('click', e => {
   if (e.target.id === 'overlay-histo') fermerHistorique();
+});
+document.getElementById('overlay-remise').addEventListener('click', e => {
+  if (e.target.id === 'overlay-remise') fermerRemise();
 });
 
 // Lancer
