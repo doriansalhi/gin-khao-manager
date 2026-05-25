@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0A0908">
+<title>Gin Khao — Caisse</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700&family=Manrope:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-deep:       #0A0908;
+  --bg-soft:       #14110E;
+  --surface:       #1C1814;
+  --surface-2:     #251F19;
+  --border:        #2D261E;
+  --border-soft:   #221C16;
+
+  --sriracha:      #E63946;
+  --sriracha-soft: #C42E3B;
+  --gold:          #E4B860;
+  --gold-soft:     #B8924E;
+  --lime:          #A8E10C;
+  --lime-soft:     #82B509;
+
+  --text:          #F5EDE2;
+  --text-soft:     #C7B9A5;
+  --text-mute:     #8B7E6F;
+  --text-dim:      #5A5045;
+
+  --danger:        #E63946;
+  --success:       #82B509;
+  --warning:       #E4B860;
+
+  --display: 'Fraunces', Georgia, serif;
+  --body:    'Manrope', system-ui, sans-serif;
+  --mono:    'JetBrains Mono', monospace;
+
+  --radius:    18px;
+  --radius-sm: 12px;
+  --radius-xs: 8px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body {
+  height: 100%;
+  background: var(--bg-deep);
+  font-family: var(--body);
+  color: var(--text);
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ===== LAYOUT ===== */
+.caisse {
+  height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  background:
+    radial-gradient(circle at 15% 20%, rgba(230, 57, 70, 0.06), transparent 45%),
+    radial-gradient(circle at 85% 80%, rgba(228, 184, 96, 0.05), transparent 45%),
+    var(--bg-deep);
+}
+
+/* ===== ZONE PRODUITS (gauche) ===== */
+.produits-zone {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-right: 1px solid var(--border);
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 28px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.brand {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+.brand .logo {
+  font-family: var(--display);
+  font-size: 24px;
+  font-weight: 500;
+  font-variation-settings: "opsz" 60;
+  letter-spacing: -0.01em;
+}
+.brand .logo span { color: var(--sriracha); }
+.brand .tag {
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gold);
+  font-weight: 600;
+}
+.topbar-right { display: flex; align-items: center; gap: 14px; }
+.clock {
+  font-family: var(--mono);
+  font-size: 14px;
+  color: var(--text-soft);
+  font-weight: 500;
+}
+.link-btn {
+  font-size: 12px;
+  color: var(--text-mute);
+  text-decoration: none;
+  padding: 8px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+  transition: all 0.2s;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+.link-btn:hover { color: var(--text); border-color: var(--gold-soft); }
+
+/* Filtres catégories */
+.cats {
+  display: flex;
+  gap: 10px;
+  padding: 18px 28px;
+  overflow-x: auto;
+  flex-shrink: 0;
+  scrollbar-width: none;
+}
+.cats::-webkit-scrollbar { display: none; }
+.cat-chip {
+  flex-shrink: 0;
+  padding: 10px 20px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-soft);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s;
+  white-space: nowrap;
+}
+.cat-chip:hover { border-color: var(--gold-soft); }
+.cat-chip.active {
+  background: var(--sriracha);
+  border-color: var(--sriracha);
+  color: #fff;
+}
+
+/* Grille produits */
+.produits-grid {
+  flex: 1;
+  overflow-y: auto;
+  padding: 4px 28px 28px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 14px;
+  align-content: start;
+  scrollbar-width: thin;
+}
+.produits-grid::-webkit-scrollbar { width: 8px; }
+.produits-grid::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+.produit-card {
+  position: relative;
+  background: linear-gradient(160deg, var(--surface-2) 0%, var(--surface) 100%);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 16px;
+  cursor: pointer;
+  transition: all 0.18s;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 110px;
+  overflow: hidden;
+}
+.produit-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 0%, rgba(228,184,96,0.10), transparent 70%);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.produit-card:hover { border-color: var(--gold-soft); transform: translateY(-2px); }
+.produit-card:hover::after { opacity: 1; }
+.produit-card:active { transform: translateY(0) scale(0.98); }
+.produit-card.rupture {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+.produit-nom {
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--text);
+  position: relative;
+  z-index: 1;
+}
+.produit-bas {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-top: 14px;
+  position: relative;
+  z-index: 1;
+}
+.produit-prix {
+  font-family: var(--display);
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--gold);
+}
+.produit-stock {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-mute);
+  font-family: var(--mono);
+}
+.produit-stock.warn { color: var(--warning); }
+.produit-stock.crit { color: var(--danger); }
+.badge-rupture {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: var(--danger);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 999px;
+  z-index: 2;
+}
+
+.empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-mute);
+}
+.empty-state .big { font-size: 40px; margin-bottom: 12px; }
+.empty-state p { font-size: 14px; line-height: 1.6; }
+.empty-state a { color: var(--gold); }
+
+/* ===== TICKET (droite) ===== */
+.ticket-zone {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-soft);
+  overflow: hidden;
+}
+.ticket-head {
+  padding: 22px 24px 16px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.ticket-head h2 {
+  font-family: var(--display);
+  font-size: 22px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+.ticket-head .num {
+  font-size: 12px;
+  color: var(--text-mute);
+  font-family: var(--mono);
+  margin-top: 2px;
+}
+
+.ticket-lignes {
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px 16px;
+  scrollbar-width: thin;
+}
+.ticket-lignes::-webkit-scrollbar { width: 6px; }
+.ticket-lignes::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+.ticket-vide {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-dim);
+  text-align: center;
+  gap: 10px;
+}
+.ticket-vide .ic { font-size: 38px; opacity: 0.5; }
+.ticket-vide p { font-size: 13px; }
+
+.ligne {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
+  animation: pop 0.2s ease;
+}
+@keyframes pop {
+  from { opacity: 0; transform: scale(0.96); }
+  to   { opacity: 1; transform: scale(1); }
+}
+.ligne-info { flex: 1; min-width: 0; }
+.ligne-nom {
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ligne-pu {
+  font-size: 11px;
+  color: var(--text-mute);
+  font-family: var(--mono);
+  margin-top: 2px;
+}
+.qte-ctrl {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-deep);
+  border-radius: 999px;
+  padding: 4px;
+}
+.qte-btn {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: none;
+  background: var(--surface-2);
+  color: var(--text);
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+.qte-btn:hover { background: var(--sriracha); color: #fff; }
+.qte-btn:active { transform: scale(0.9); }
+.qte-val {
+  min-width: 20px;
+  text-align: center;
+  font-weight: 700;
+  font-size: 14px;
+  font-family: var(--mono);
+}
+.ligne-st {
+  font-family: var(--display);
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--gold);
+  min-width: 56px;
+  text-align: right;
+}
+
+/* Pied ticket */
+.ticket-foot {
+  padding: 18px 24px 24px;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+  background: var(--surface);
+}
+.total-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+.total-row .lbl {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-mute);
+  font-weight: 600;
+}
+.total-row .val {
+  font-family: var(--display);
+  font-size: 38px;
+  font-weight: 500;
+  color: var(--text);
+  letter-spacing: -0.02em;
+}
+.total-row .val span { color: var(--gold); }
+
+.actions { display: flex; flex-direction: column; gap: 10px; }
+.btn-pay {
+  width: 100%;
+  padding: 18px;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.18s;
+  font-family: var(--body);
+  letter-spacing: 0.02em;
+}
+.btn-pay:disabled { opacity: 0.35; cursor: not-allowed; }
+.btn-encaisser {
+  background: linear-gradient(135deg, var(--sriracha) 0%, var(--sriracha-soft) 100%);
+  color: #fff;
+  box-shadow: 0 8px 24px -8px rgba(230,57,70,0.5);
+}
+.btn-encaisser:not(:disabled):hover { transform: translateY(-2px); box-shadow: 0 12px 30px -8px rgba(230,57,70,0.6); }
+.btn-encaisser:not(:disabled):active { transform: translateY(0); }
+.btn-vider {
+  background: transparent;
+  color: var(--text-mute);
+  border: 1px solid var(--border);
+  padding: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.btn-vider:hover { color: var(--danger); border-color: var(--danger); }
+
+/* ===== MODALE PAIEMENT ===== */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(5,4,3,0.78);
+  backdrop-filter: blur(6px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+.overlay.show { display: flex; animation: fadeIn 0.2s ease; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.modal {
+  width: 100%;
+  max-width: 440px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 28px;
+  padding: 28px;
+  box-shadow: 0 40px 80px -20px rgba(0,0,0,0.7);
+  animation: rise 0.25s cubic-bezier(0.16,1,0.3,1);
+}
+@keyframes rise { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+.modal h3 {
+  font-family: var(--display);
+  font-size: 24px;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+.modal .modal-total {
+  font-size: 13px;
+  color: var(--text-mute);
+  margin-bottom: 22px;
+}
+.modal .modal-total b { color: var(--gold); font-size: 16px; font-family: var(--mono); }
+
+.pay-modes { display: flex; gap: 10px; margin-bottom: 22px; }
+.pay-mode {
+  flex: 1;
+  padding: 16px 12px;
+  border: 1.5px solid var(--border);
+  background: var(--surface-2);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.18s;
+}
+.pay-mode .ic { font-size: 24px; margin-bottom: 6px; }
+.pay-mode .nm { font-size: 13px; font-weight: 700; }
+.pay-mode.active {
+  border-color: var(--gold);
+  background: rgba(228,184,96,0.08);
+}
+
+/* Espèces : rendu monnaie */
+.cash-zone { margin-bottom: 22px; display: none; }
+.cash-zone.show { display: block; }
+.cash-label {
+  font-size: 12px;
+  color: var(--text-mute);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 8px;
+}
+.cash-input {
+  width: 100%;
+  padding: 14px 16px;
+  background: var(--bg-deep);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-size: 22px;
+  font-family: var(--mono);
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 12px;
+}
+.cash-input:focus { outline: none; border-color: var(--gold); }
+.quick-cash { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+.quick-cash button {
+  flex: 1;
+  min-width: 60px;
+  padding: 10px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+  color: var(--text-soft);
+  font-size: 13px;
+  font-weight: 700;
+  font-family: var(--mono);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.quick-cash button:hover { border-color: var(--gold); color: var(--gold); }
+.rendu {
+  text-align: center;
+  padding: 16px;
+  background: var(--bg-deep);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+.rendu .lbl { font-size: 12px; color: var(--text-mute); text-transform: uppercase; letter-spacing: 0.08em; }
+.rendu .val {
+  font-family: var(--display);
+  font-size: 34px;
+  font-weight: 500;
+  color: var(--lime);
+  margin-top: 4px;
+}
+.rendu .val.insuffisant { color: var(--danger); font-size: 18px; }
+
+.modal-actions { display: flex; gap: 10px; }
+.modal-actions button {
+  flex: 1;
+  padding: 16px;
+  border-radius: var(--radius-sm);
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  transition: all 0.18s;
+  font-family: var(--body);
+}
+.btn-annuler {
+  background: var(--surface-2);
+  color: var(--text-soft);
+  border: 1px solid var(--border);
+}
+.btn-annuler:hover { color: var(--text); }
+.btn-valider {
+  background: linear-gradient(135deg, var(--lime) 0%, var(--lime-soft) 100%);
+  color: #0a0908;
+}
+.btn-valider:disabled { opacity: 0.35; cursor: not-allowed; }
+.btn-valider:not(:disabled):hover { transform: translateY(-1px); }
+
+/* ===== TOAST CONFIRMATION ===== */
+.toast {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%) translateY(120px);
+  background: var(--surface);
+  border: 1px solid var(--lime-soft);
+  border-radius: var(--radius);
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 20px 50px -15px rgba(0,0,0,0.6);
+  z-index: 2000;
+  transition: transform 0.35s cubic-bezier(0.16,1,0.3,1);
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+.toast .ic {
+  width: 38px; height: 38px;
+  background: var(--lime);
+  color: #0a0908;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; font-weight: 700;
+}
+.toast .txt b { display: block; font-size: 14px; }
+.toast .txt span { font-size: 12px; color: var(--text-mute); }
+
+/* ===== LOGIN GATE ===== */
+.gate {
+  position: fixed;
+  inset: 0;
+  background: var(--bg-deep);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5000;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px;
+}
+.gate .logo { font-family: var(--display); font-size: 32px; }
+.gate .logo span { color: var(--sriracha); }
+.gate p { color: var(--text-mute); font-size: 14px; text-align: center; max-width: 320px; line-height: 1.6; }
+.gate a { color: var(--gold); font-weight: 700; }
+.gate.hidden { display: none; }
+.spinner {
+  width: 32px; height: 32px;
+  border: 3px solid var(--border);
+  border-top-color: var(--sriracha);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ===== RESPONSIVE TABLETTE ===== */
+@media (max-width: 920px) {
+  .caisse { grid-template-columns: 1fr; grid-template-rows: 1fr auto; }
+  .ticket-zone {
+    border-top: 1px solid var(--border);
+    max-height: 45vh;
+  }
+  .produits-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); }
+}
+</style>
+</head>
+<body>
+
+<!-- Porte d'entrée : vérifie la connexion -->
+<div class="gate" id="gate">
+  <div class="logo">Gin <span>Khao</span></div>
+  <div class="spinner"></div>
+  <p id="gate-msg">Vérification de la session…</p>
+</div>
+
+<div class="caisse">
+  <!-- ===== GAUCHE : PRODUITS ===== -->
+  <div class="produits-zone">
+    <div class="topbar">
+      <div class="brand">
+        <div class="logo">Gin <span>Khao</span></div>
+        <div class="tag">Caisse</div>
+      </div>
+      <div class="topbar-right">
+        <div class="clock" id="clock">--:--</div>
+        <a href="index.html" class="link-btn">← Gestion</a>
+      </div>
+    </div>
+
+    <div class="cats" id="cats"></div>
+
+    <div class="produits-grid" id="produits-grid">
+      <div class="empty-state">
+        <div class="spinner" style="margin:0 auto 16px;"></div>
+        <p>Chargement du menu…</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== DROITE : TICKET ===== -->
+  <div class="ticket-zone">
+    <div class="ticket-head">
+      <h2>Commande</h2>
+      <div class="num" id="ticket-num">Nouveau ticket</div>
+    </div>
+
+    <div class="ticket-lignes" id="ticket-lignes">
+      <div class="ticket-vide" id="ticket-vide">
+        <div class="ic">🧾</div>
+        <p>Touchez un produit<br>pour l'ajouter à la commande</p>
+      </div>
+    </div>
+
+    <div class="ticket-foot">
+      <div class="total-row">
+        <span class="lbl">Total</span>
+        <span class="val" id="total-aff">0<span>,00 €</span></span>
+      </div>
+      <div class="actions">
+        <button class="btn-pay btn-encaisser" id="btn-encaisser" disabled onclick="ouvrirPaiement()">Encaisser</button>
+        <button class="btn-vider" onclick="viderTicket()">Vider la commande</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODALE PAIEMENT ===== -->
+<div class="overlay" id="overlay-paiement">
+  <div class="modal">
+    <h3>Encaissement</h3>
+    <div class="modal-total">Total à payer : <b id="modal-total">0,00 €</b></div>
+
+    <div class="pay-modes">
+      <div class="pay-mode active" data-mode="especes" onclick="choisirMode('especes')">
+        <div class="ic">💵</div>
+        <div class="nm">Espèces</div>
+      </div>
+      <div class="pay-mode" data-mode="carte" onclick="choisirMode('carte')">
+        <div class="ic">💳</div>
+        <div class="nm">Carte</div>
+      </div>
+    </div>
+
+    <div class="cash-zone show" id="cash-zone">
+      <div class="cash-label">Montant reçu</div>
+      <input type="number" class="cash-input" id="cash-input" placeholder="0,00" inputmode="decimal" oninput="calculerRendu()">
+      <div class="quick-cash" id="quick-cash"></div>
+      <div class="rendu">
+        <div class="lbl">À rendre</div>
+        <div class="val" id="rendu-val">—</div>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-annuler" onclick="fermerPaiement()">Annuler</button>
+      <button class="btn-valider" id="btn-valider" onclick="validerVente()">Valider la vente</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== TOAST ===== -->
+<div class="toast" id="toast">
+  <div class="ic">✓</div>
+  <div class="txt">
+    <b id="toast-title">Vente enregistrée</b>
+    <span id="toast-sub">Ticket #—</span>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// ============================================
+//  CONFIG — même base que l'app Gin Khao
+// ============================================
+const SB_URL = 'https://szpgbdnijyoquqmjhhjj.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN6cGdiZG5panlvcXVxbWpoaGpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2MTMwNDUsImV4cCI6MjA5NTE4OTA0NX0.fKarVKMIOc4Ez2kOvE6xyvVibuENSGev6RsouYDb8ak';
+const RESTO_ID = 'gin-khao';
+const sb = supabase.createClient(SB_URL, SB_KEY);
+
+// ============================================
+//  ÉTAT
+// ============================================
+let produits = [];        // tous les produits chargés
+let categories = [];      // catégories
+let catActive = 'tout';   // filtre catégorie actif
+let ticket = [];          // [{produit_id, nom, prix, quantite, stock_actif, stock}]
+let modePaiement = 'especes';
+
+// ============================================
+//  HORLOGE
+// ============================================
+function majHorloge() {
+  const d = new Date();
+  document.getElementById('clock').textContent =
+    String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+}
+majHorloge();
+setInterval(majHorloge, 1000);
+
+// ============================================
+//  SESSION (réutilise le login de l'app)
+// ============================================
+async function init() {
+  const gate = document.getElementById('gate');
+  const gateMsg = document.getElementById('gate-msg');
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) {
+      gateMsg.innerHTML = 'Vous devez être connecté.<br>Ouvrez d\'abord <a href="index.html">l\'application de gestion</a> pour vous connecter, puis revenez ici.';
+      gate.querySelector('.spinner').style.display = 'none';
+      return;
+    }
+    gate.classList.add('hidden');
+    await chargerMenu();
+  } catch (e) {
+    gateMsg.textContent = 'Erreur de connexion : ' + e.message;
+    gate.querySelector('.spinner').style.display = 'none';
+  }
+}
+
+// ============================================
+//  CHARGEMENT DU MENU
+// ============================================
+async function chargerMenu() {
+  // Catégories
+  const { data: cats } = await sb.from('categories')
+    .select('*').eq('restaurant_id', RESTO_ID).order('ordre');
+  categories = cats || [];
+
+  // Produits actifs
+  const { data: prods, error } = await sb.from('produits')
+    .select('*').eq('restaurant_id', RESTO_ID).eq('actif', true).order('ordre');
+
+  if (error) {
+    document.getElementById('produits-grid').innerHTML =
+      `<div class="empty-state"><div class="big">⚠️</div><p>Erreur de chargement : ${error.message}</p></div>`;
+    return;
+  }
+  produits = prods || [];
+  afficherCats();
+  afficherProduits();
+}
+
+function afficherCats() {
+  const zone = document.getElementById('cats');
+  let html = `<div class="cat-chip ${catActive==='tout'?'active':''}" onclick="filtrerCat('tout')">Tout</div>`;
+  categories.forEach(c => {
+    html += `<div class="cat-chip ${catActive===c.id?'active':''}" onclick="filtrerCat('${c.id}')">${c.nom}</div>`;
+  });
+  zone.innerHTML = html;
+}
+
+function filtrerCat(id) {
+  catActive = id;
+  afficherCats();
+  afficherProduits();
+}
+
+function afficherProduits() {
+  const grid = document.getElementById('produits-grid');
+  let liste = produits;
+  if (catActive !== 'tout') liste = produits.filter(p => p.categorie_id === catActive);
+
+  if (liste.length === 0) {
+    grid.innerHTML = `<div class="empty-state">
+      <div class="big">🍜</div>
+      <p>Aucun produit dans le menu.<br>Ajoutez vos plats dans la table <b>produits</b> de Supabase,<br>ou via la page Gestion.</p>
+    </div>`;
+    return;
+  }
+
+  grid.innerHTML = liste.map(p => {
+    const rupture = p.stock_actif && p.stock <= 0;
+    let stockHtml = '';
+    if (p.stock_actif) {
+      let cls = '';
+      if (p.stock <= 0) cls = 'crit';
+      else if (p.stock <= p.seuil_alerte) cls = 'warn';
+      stockHtml = `<div class="produit-stock ${cls}">${p.stock > 0 ? p.stock + ' en stock' : 'rupture'}</div>`;
+    }
+    return `
+      <div class="produit-card ${rupture?'rupture':''}" onclick="ajouter('${p.id}')">
+        ${rupture ? '<div class="badge-rupture">Épuisé</div>' : ''}
+        <div class="produit-nom">${p.nom}</div>
+        <div class="produit-bas">
+          <div class="produit-prix">${fmt(p.prix)}</div>
+          ${stockHtml}
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// ============================================
+//  GESTION DU TICKET
+// ============================================
+function ajouter(produitId) {
+  const p = produits.find(x => x.id === produitId);
+  if (!p) return;
+
+  const ligne = ticket.find(l => l.produit_id === produitId);
+  // Vérifie le stock disponible
+  if (p.stock_actif) {
+    const dejaDansTicket = ligne ? ligne.quantite : 0;
+    if (dejaDansTicket >= p.stock) {
+      flashStock();
+      return;
+    }
+  }
+
+  if (ligne) {
+    ligne.quantite++;
+  } else {
+    ticket.push({
+      produit_id: p.id,
+      nom: p.nom,
+      prix: parseFloat(p.prix),
+      quantite: 1,
+      stock_actif: p.stock_actif,
+      stock: p.stock
+    });
+  }
+  afficherTicket();
+}
+
+function modifierQte(produitId, delta) {
+  const ligne = ticket.find(l => l.produit_id === produitId);
+  if (!ligne) return;
+  // Empêche de dépasser le stock
+  if (delta > 0 && ligne.stock_actif && ligne.quantite >= ligne.stock) {
+    flashStock();
+    return;
+  }
+  ligne.quantite += delta;
+  if (ligne.quantite <= 0) {
+    ticket = ticket.filter(l => l.produit_id !== produitId);
+  }
+  afficherTicket();
+}
+
+function afficherTicket() {
+  const zone = document.getElementById('ticket-lignes');
+  const vide = document.getElementById('ticket-vide');
+  const btn = document.getElementById('btn-encaisser');
+
+  if (ticket.length === 0) {
+    zone.innerHTML = '';
+    zone.appendChild(vide);
+    vide.style.display = 'flex';
+    btn.disabled = true;
+    majTotal();
+    return;
+  }
+  vide.style.display = 'none';
+
+  zone.innerHTML = ticket.map(l => `
+    <div class="ligne">
+      <div class="ligne-info">
+        <div class="ligne-nom">${l.nom}</div>
+        <div class="ligne-pu">${fmt(l.prix)} / unité</div>
+      </div>
+      <div class="qte-ctrl">
+        <button class="qte-btn" onclick="modifierQte('${l.produit_id}', -1)">−</button>
+        <span class="qte-val">${l.quantite}</span>
+        <button class="qte-btn" onclick="modifierQte('${l.produit_id}', 1)">+</button>
+      </div>
+      <div class="ligne-st">${fmt(l.prix * l.quantite)}</div>
+    </div>
+  `).join('');
+
+  btn.disabled = false;
+  majTotal();
+}
+
+function totalTicket() {
+  return ticket.reduce((s, l) => s + l.prix * l.quantite, 0);
+}
+
+function majTotal() {
+  const t = totalTicket();
+  const [euros, cents] = t.toFixed(2).split('.');
+  document.getElementById('total-aff').innerHTML = `${euros}<span>,${cents} €</span>`;
+}
+
+function viderTicket() {
+  if (ticket.length === 0) return;
+  if (!confirm('Vider la commande en cours ?')) return;
+  ticket = [];
+  afficherTicket();
+}
+
+// ============================================
+//  PAIEMENT
+// ============================================
+function ouvrirPaiement() {
+  if (ticket.length === 0) return;
+  modePaiement = 'especes';
+  document.getElementById('modal-total').textContent = fmt(totalTicket());
+  document.getElementById('cash-input').value = '';
+  document.getElementById('rendu-val').textContent = '—';
+  document.getElementById('rendu-val').className = 'val';
+  choisirMode('especes');
+  genererQuickCash();
+  document.getElementById('overlay-paiement').classList.add('show');
+  setTimeout(() => document.getElementById('cash-input').focus(), 100);
+}
+
+function fermerPaiement() {
+  document.getElementById('overlay-paiement').classList.remove('show');
+}
+
+function choisirMode(mode) {
+  modePaiement = mode;
+  document.querySelectorAll('.pay-mode').forEach(el => {
+    el.classList.toggle('active', el.dataset.mode === mode);
+  });
+  const cashZone = document.getElementById('cash-zone');
+  const btnValider = document.getElementById('btn-valider');
+  if (mode === 'especes') {
+    cashZone.classList.add('show');
+    calculerRendu(); // recalcule l'état du bouton
+  } else {
+    cashZone.classList.remove('show');
+    btnValider.disabled = false; // carte : pas de contrainte de montant
+  }
+}
+
+function genererQuickCash() {
+  const total = totalTicket();
+  const zone = document.getElementById('quick-cash');
+  // Billets utiles : montant exact + billets ronds au-dessus
+  const billets = [5, 10, 20, 50];
+  const suggestions = new Set();
+  suggestions.add(Math.ceil(total)); // arrondi sup à l'euro
+  billets.forEach(b => { if (b >= total) suggestions.add(b); });
+  const tri = [...suggestions].sort((a,b) => a-b).slice(0, 4);
+  zone.innerHTML = tri.map(m =>
+    `<button onclick="setCash(${m})">${m} €</button>`
+  ).join('');
+}
+
+function setCash(montant) {
+  document.getElementById('cash-input').value = montant;
+  calculerRendu();
+}
+
+function calculerRendu() {
+  const recu = parseFloat(document.getElementById('cash-input').value) || 0;
+  const total = totalTicket();
+  const rendu = recu - total;
+  const el = document.getElementById('rendu-val');
+  const btnValider = document.getElementById('btn-valider');
+
+  if (recu === 0) {
+    el.textContent = '—';
+    el.className = 'val';
+    btnValider.disabled = true;
+  } else if (rendu < 0) {
+    el.textContent = 'Manque ' + fmt(Math.abs(rendu));
+    el.className = 'val insuffisant';
+    btnValider.disabled = true;
+  } else {
+    el.textContent = fmt(rendu);
+    el.className = 'val';
+    btnValider.disabled = false;
+  }
+}
+
+// ============================================
+//  VALIDATION : appel de la fonction Supabase
+// ============================================
+let enCours = false;
+async function validerVente() {
+  if (enCours || ticket.length === 0) return;
+  enCours = true;
+  const btnValider = document.getElementById('btn-valider');
+  const txtInit = btnValider.textContent;
+  btnValider.disabled = true;
+  btnValider.textContent = 'Enregistrement…';
+
+  // Prépare les lignes pour la fonction SQL
+  const lignes = ticket.map(l => ({
+    produit_id: l.produit_id,
+    nom: l.nom,
+    prix: l.prix,
+    quantite: l.quantite
+  }));
+
+  try {
+    const { data, error } = await sb.rpc('enregistrer_vente', {
+      p_restaurant_id: RESTO_ID,
+      p_mode_paiement: modePaiement,
+      p_lignes: lignes
+    });
+    if (error) throw error;
+
+    // Succès
+    const numero = data?.numero ?? '?';
+    fermerPaiement();
+    afficherToast(numero);
+    ticket = [];
+    afficherTicket();
+    await chargerMenu(); // recharge le stock à jour
+  } catch (e) {
+    alert('Erreur lors de l\'enregistrement : ' + e.message);
+  } finally {
+    enCours = false;
+    btnValider.disabled = false;
+    btnValider.textContent = txtInit;
+  }
+}
+
+function afficherToast(numero) {
+  const toast = document.getElementById('toast');
+  document.getElementById('toast-sub').textContent = 'Ticket #' + numero;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
+// ============================================
+//  UTILITAIRES
+// ============================================
+function fmt(n) {
+  return Number(n).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+}
+function flashStock() {
+  // petit retour visuel quand on dépasse le stock
+  const t = document.getElementById('clock');
+  // (placeholder discret ; on pourra ajouter un vrai feedback plus tard)
+}
+
+// Fermer la modale en cliquant à l'extérieur
+document.getElementById('overlay-paiement').addEventListener('click', e => {
+  if (e.target.id === 'overlay-paiement') fermerPaiement();
+});
+
+// Lancer
+init();
+</script>
+</body>
+</html>
