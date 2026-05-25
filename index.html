@@ -1701,10 +1701,9 @@ html, body {
         <!-- HERO -->
         <div class="hero">
           <div class="hero-label">Chiffre d'affaires · Aujourd'hui</div>
-          <div class="hero-amount"><span id="hero-amount">847</span><span class="currency">€</span></div>
+          <div class="hero-amount"><span id="hero-amount">0</span><span class="currency">€</span></div>
           <div class="hero-delta">
-            <span class="up">↑ +12,4%</span>
-            <span class="label">vs hier · objectif 950€</span>
+            <span class="label" id="hero-delta-label">Données en direct de la caisse</span>
           </div>
           <svg class="hero-spark" viewBox="0 0 320 50" preserveAspectRatio="none">
             <defs>
@@ -1722,13 +1721,13 @@ html, body {
         <div class="kpi-row">
           <div class="kpi">
             <div class="kpi-label">Commandes</div>
-            <div class="kpi-value">52</div>
-            <div class="kpi-sub up">↑ 8</div>
+            <div class="kpi-value" id="kpi-commandes">0</div>
+            <div class="kpi-sub" id="kpi-commandes-sub">aujourd'hui</div>
           </div>
           <div class="kpi">
             <div class="kpi-label">Ticket moy.</div>
-            <div class="kpi-value">16,30€</div>
-            <div class="kpi-sub up">↑ 0,80€</div>
+            <div class="kpi-value" id="kpi-ticket-moyen">0,00€</div>
+            <div class="kpi-sub" id="kpi-ticket-sub">par commande</div>
           </div>
           <div class="kpi">
             <div class="kpi-label">Note</div>
@@ -1895,10 +1894,9 @@ html, body {
         <!-- Big CA card -->
         <div class="hero" style="margin-bottom: 16px;">
           <div class="hero-label">Chiffre d'affaires</div>
-          <div class="hero-amount">847<span class="currency">€</span></div>
+          <div class="hero-amount"><span id="ventes-ca">0</span><span class="currency">€</span></div>
           <div class="hero-delta">
-            <span class="up">↑ +12,4%</span>
-            <span class="label">vs même jour semaine dernière</span>
+            <span class="label" id="ventes-ca-label">Aujourd'hui · en direct de la caisse</span>
           </div>
         </div>
 
@@ -1910,8 +1908,8 @@ html, body {
           </div>
           <div class="kpi">
             <div class="kpi-label">Couverts</div>
-            <div class="kpi-value">52</div>
-            <div class="kpi-sub up">↑ 18%</div>
+            <div class="kpi-value" id="ventes-couverts">0</div>
+            <div class="kpi-sub" id="ventes-couverts-sub">aujourd'hui</div>
           </div>
           <div class="kpi">
             <div class="kpi-label">Annul.</div>
@@ -2956,6 +2954,61 @@ async function seDeconnecter() {
 
 // Vérifie la session au chargement
 verifierSession();
+
+// ============================================
+//  STATS DU JOUR EN DIRECT (depuis la caisse)
+//  Lit la table "ventes" et met à jour le hero.
+// ============================================
+async function chargerStatsJour() {
+  try {
+    // Début de la journée locale au format ISO (minuit aujourd'hui)
+    const debut = new Date();
+    debut.setHours(0, 0, 0, 0);
+
+    const { data, error } = await sbClient.from('ventes')
+      .select('total, statut, cree_le')
+      .eq('restaurant_id', RESTO_ID)
+      .eq('statut', 'validee')
+      .gte('cree_le', debut.toISOString());
+
+    if (error) { console.warn('Stats indisponibles :', error.message); return; }
+
+    const ventes = data || [];
+    const nb = ventes.length;
+    const ca = ventes.reduce((s, v) => s + Number(v.total || 0), 0);
+    const ticketMoyen = nb > 0 ? ca / nb : 0;
+
+    // Mise à jour du hero (dashboard d'accueil)
+    const elCA = document.getElementById('hero-amount');
+    const elNb = document.getElementById('kpi-commandes');
+    const elTM = document.getElementById('kpi-ticket-moyen');
+    if (elCA) elCA.textContent = Math.round(ca);
+    if (elNb) elNb.textContent = nb;
+    if (elTM) elTM.textContent = ticketMoyen.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '€';
+
+    // Mise à jour de la page Ventes (CA + couverts)
+    const elVCA = document.getElementById('ventes-ca');
+    const elVCouv = document.getElementById('ventes-couverts');
+    if (elVCA) elVCA.textContent = Math.round(ca);
+    if (elVCouv) elVCouv.textContent = nb;
+
+    // Petit libellé d'état
+    const lbl = document.getElementById('hero-delta-label');
+    if (lbl) {
+      const h = new Date();
+      lbl.textContent = nb === 0
+        ? 'Aucune vente pour l\'instant aujourd\'hui'
+        : 'En direct · ' + nb + ' vente' + (nb > 1 ? 's' : '') + ' · maj ' + String(h.getHours()).padStart(2,'0') + ':' + String(h.getMinutes()).padStart(2,'0');
+    }
+  } catch (e) {
+    console.warn('Erreur stats du jour :', e);
+  }
+}
+
+// Charge au démarrage, puis rafraîchit toutes les 30 secondes
+chargerStatsJour();
+setInterval(chargerStatsJour, 30000);
+
 
 // Touche Entrée pour se connecter
 ['login-email', 'login-password'].forEach(id => {
