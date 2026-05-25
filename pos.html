@@ -677,7 +677,7 @@ html, body {
     </div>
 
     <div class="ticket-lignes" id="ticket-lignes">
-      <div class="ticket-vide" id="ticket-vide">
+      <div class="ticket-vide">
         <div class="ic">🧾</div>
         <p>Touchez un produit<br>pour l'ajouter à la commande</p>
       </div>
@@ -911,18 +911,18 @@ function modifierQte(produitId, delta) {
 
 function afficherTicket() {
   const zone = document.getElementById('ticket-lignes');
-  const vide = document.getElementById('ticket-vide');
   const btn = document.getElementById('btn-encaisser');
 
   if (ticket.length === 0) {
-    zone.innerHTML = '';
-    zone.appendChild(vide);
-    vide.style.display = 'flex';
+    zone.innerHTML = `
+      <div class="ticket-vide">
+        <div class="ic">🧾</div>
+        <p>Touchez un produit<br>pour l'ajouter à la commande</p>
+      </div>`;
     btn.disabled = true;
     majTotal();
     return;
   }
-  vide.style.display = 'none';
 
   zone.innerHTML = ticket.map(l => `
     <div class="ligne">
