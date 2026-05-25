@@ -433,6 +433,24 @@ html, body {
 
 /* ===== TOP PLATS LIST ===== */
 .plats-list { display: flex; flex-direction: column; gap: 10px; }
+.histo-app-vente {
+  display: flex; align-items: center; gap: 12px;
+  padding: 13px 14px; border-radius: 14px;
+  background: var(--surface-2, #251F19); border: 1px solid var(--border, #2D261E);
+}
+.histo-app-vente.annulee { opacity: 0.5; }
+.histo-app-vente.annulee .hav-total { text-decoration: line-through; }
+.hav-num { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text-mute, #8B7E6F); min-width: 34px; font-weight: 600; }
+.hav-info { flex: 1; min-width: 0; }
+.hav-heure { font-size: 13px; font-weight: 600; color: var(--text, #F5EDE2); }
+.hav-detail { font-size: 11px; color: var(--text-mute, #8B7E6F); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hav-total { font-family: var(--display, serif); font-size: 16px; font-weight: 500; color: var(--gold, #E4B860); min-width: 60px; text-align: right; }
+.hav-annuler {
+  background: transparent; border: 1px solid var(--border, #2D261E); color: var(--text-mute, #8B7E6F);
+  font-size: 11px; font-weight: 600; padding: 7px 10px; border-radius: 8px; cursor: pointer; transition: all 0.15s; white-space: nowrap;
+}
+.hav-annuler:hover { color: var(--sriracha, #E63946); border-color: var(--sriracha, #E63946); }
+.hav-badge { font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--sriracha, #E63946); border: 1px solid var(--sriracha, #E63946); padding: 5px 9px; border-radius: 8px; }
 .plat-row {
   display: flex;
   align-items: center;
@@ -1684,7 +1702,7 @@ html, body {
         <header class="app-header">
           <div class="greeting-block">
             <div class="hello">Mardi 19 mai · 14h12</div>
-            <div class="name">Bonjour Omar</div>
+            <div class="name">Bonjour Lucas</div>
             <div class="resto">Gin Khao · Saint Just</div>
           </div>
           <div style="display:flex; gap:8px; align-items:center;">
@@ -2022,11 +2040,18 @@ html, body {
           </div>
         </div>
 
+        <!-- Historique des ventes du jour (réel, depuis la caisse) -->
+        <div class="section">
+          <div class="section-head">
+            <h3 class="section-title">Historique des ventes · aujourd'hui</h3>
+          </div>
+          <div class="plats-list" id="histo-ventes-liste">
+            <div style="text-align:center; padding:24px; color: var(--text-mute); font-size:13px;">Chargement…</div>
+          </div>
+        </div>
+
         <div style="height: 40px;"></div>
       </section>
-
-      <!-- ====== SCREEN: REVIEWS ====== -->
-      <section class="screen" id="screen-reviews">
         <header class="app-header">
           <div>
             <h1 class="screen-title">Avis clients</h1>
@@ -2594,7 +2619,7 @@ html, body {
 
           <div class="chat-messages" id="chat-messages">
             <div class="msg ai">
-              <strong style="font-family: var(--display); color: var(--gold);">Bonjour Omar 👋</strong><br>
+              <strong style="font-family: var(--display); color: var(--gold);">Bonjour Lucas 👋</strong><br>
               Je suis ton directeur IA. Je suis connecté à ta caisse, Uber Eats, Deliveroo, Google Avis et tes fournisseurs. Pose-moi n'importe quelle question business, ou demande-moi une analyse.
             </div>
 
@@ -3008,6 +3033,74 @@ async function chargerStatsJour() {
 // Charge au démarrage, puis rafraîchit toutes les 30 secondes
 chargerStatsJour();
 setInterval(chargerStatsJour, 30000);
+
+// ============================================
+//  HISTORIQUE DES VENTES DU JOUR (écran Ventes) + ANNULATION
+// ============================================
+async function chargerHistoriqueApp() {
+  const liste = document.getElementById('histo-ventes-liste');
+  if (!liste) return;
+  try {
+    const debut = new Date();
+    debut.setHours(0, 0, 0, 0);
+
+    const { data: ventes, error } = await sbClient.from('ventes')
+      .select('id, numero, total, mode_paiement, statut, cree_le, lignes_vente(nom_produit, quantite)')
+      .eq('restaurant_id', RESTO_ID)
+      .gte('cree_le', debut.toISOString())
+      .order('numero', { ascending: false });
+
+    if (error) throw error;
+
+    if (!ventes || ventes.length === 0) {
+      liste.innerHTML = '<div style="text-align:center; padding:24px; color:#8B7E6F; font-size:13px;">Aucune vente aujourd\'hui pour l\'instant</div>';
+      return;
+    }
+
+    liste.innerHTML = ventes.map(v => {
+      const h = new Date(v.cree_le);
+      const heure = String(h.getHours()).padStart(2,'0') + ':' + String(h.getMinutes()).padStart(2,'0');
+      const articles = (v.lignes_vente || []).map(l => l.quantite + '× ' + l.nom_produit).join(', ') || '—';
+      const modeLbl = v.mode_paiement === 'carte' ? 'Carte' : (v.mode_paiement === 'especes' ? 'Espèces' : v.mode_paiement);
+      const annulee = v.statut === 'annulee';
+      const totalFmt = Number(v.total).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '€';
+      return `
+        <div class="histo-app-vente ${annulee ? 'annulee' : ''}">
+          <div class="hav-num">#${v.numero}</div>
+          <div class="hav-info">
+            <div class="hav-heure">${heure} · ${modeLbl}</div>
+            <div class="hav-detail">${articles}</div>
+          </div>
+          <div class="hav-total">${totalFmt}</div>
+          ${annulee
+            ? '<div class="hav-badge">Annulée</div>'
+            : `<button class="hav-annuler" onclick="annulerVenteApp('${v.id}', ${v.numero})">Annuler</button>`}
+        </div>`;
+    }).join('');
+  } catch (e) {
+    liste.innerHTML = '<div style="text-align:center; padding:24px; color:#8B7E6F; font-size:13px;">Erreur : ' + e.message + '</div>';
+  }
+}
+
+async function annulerVenteApp(venteId, numero) {
+  if (!confirm(`Annuler le ticket #${numero} ?\n\nLa vente sera marquée annulée et les produits remis en stock. Action tracée et irréversible.`)) return;
+  try {
+    const { data, error } = await sbClient.rpc('annuler_vente', {
+      p_vente_id: venteId,
+      p_restaurant_id: RESTO_ID
+    });
+    if (error) throw error;
+    if (data && data.ok === false) throw new Error(data.erreur || 'Annulation impossible');
+    await chargerHistoriqueApp();
+    await chargerStatsJour();  // recalcule le CA/couverts tout de suite
+  } catch (e) {
+    alert('Erreur lors de l\'annulation : ' + e.message);
+  }
+}
+
+// Charge l'historique au démarrage + à chaque rafraîchissement des stats
+chargerHistoriqueApp();
+setInterval(chargerHistoriqueApp, 30000);
 
 
 // Touche Entrée pour se connecter
