@@ -366,6 +366,79 @@ html, body {
   text-align: right;
 }
 
+/* ===== BLOC CLIENT FIDÉLITÉ (dans le pied) ===== */
+.fid-bloc {
+  margin-bottom: 14px;
+}
+.btn-fid {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 13px;
+  border-radius: var(--radius-sm);
+  border: 1px dashed var(--gold-soft);
+  background: rgba(228,184,96,0.06);
+  color: var(--gold);
+  font-size: 14px;
+  font-weight: 700;
+  font-family: var(--body);
+  cursor: pointer;
+  transition: all 0.18s;
+}
+.btn-fid:hover { background: rgba(228,184,96,0.12); border-style: solid; }
+.btn-fid svg { width: 18px; height: 18px; }
+
+/* Carte client attaché */
+.fid-client {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, #2d2218 0%, #1a1410 100%);
+  border: 1px solid rgba(228,184,96,0.35);
+}
+.fid-avatar {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold), var(--gold-soft));
+  color: var(--bg-deep);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 15px;
+  flex-shrink: 0;
+}
+.fid-client-info { flex: 1; min-width: 0; }
+.fid-client-nom { font-size: 14px; font-weight: 700; color: var(--text); }
+.fid-client-tampons { font-size: 12px; color: var(--gold); font-weight: 600; margin-top: 2px; }
+.fid-client-tampons.reward { color: var(--sriracha); }
+.fid-detacher {
+  background: none; border: none; color: var(--text-mute);
+  font-size: 20px; cursor: pointer; padding: 4px 8px; line-height: 1;
+  transition: color 0.15s;
+}
+.fid-detacher:hover { color: var(--danger); }
+
+/* Modale scanner QR */
+.scan-modal-inner { text-align: center; }
+#pos-qr-reader {
+  width: 100%;
+  max-width: 320px;
+  margin: 0 auto 16px;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+.scan-status {
+  font-size: 13px;
+  color: var(--text-mute);
+  margin-bottom: 16px;
+  min-height: 20px;
+}
+.scan-status.ok { color: var(--lime); font-weight: 600; }
+.scan-status.err { color: var(--danger); font-weight: 600; }
+
 /* Pied ticket */
 .ticket-foot {
   padding: 18px 24px 24px;
@@ -684,6 +757,12 @@ html, body {
     </div>
 
     <div class="ticket-foot">
+      <div class="fid-bloc" id="fid-bloc">
+        <button class="btn-fid" id="btn-fid" onclick="ouvrirScanFid()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/><line x1="3" y1="12" x2="21" y2="12"/></svg>
+          Carte fidélité
+        </button>
+      </div>
       <div class="total-row">
         <span class="lbl">Total</span>
         <span class="val" id="total-aff">0<span>,00 €</span></span>
@@ -730,6 +809,21 @@ html, body {
   </div>
 </div>
 
+<!-- ===== MODALE SCANNER FIDÉLITÉ ===== -->
+<div class="overlay" id="overlay-scan">
+  <div class="modal">
+    <div class="scan-modal-inner">
+      <h3>Scanner la carte fidélité</h3>
+      <div class="modal-total">Visez le QR code de la carte du client</div>
+      <div id="pos-qr-reader"></div>
+      <div class="scan-status" id="scan-status">Ouverture de la caméra…</div>
+      <div class="modal-actions">
+        <button class="btn-annuler" onclick="fermerScanFid()">Annuler</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ===== TOAST ===== -->
 <div class="toast" id="toast">
   <div class="ic">✓</div>
@@ -739,6 +833,7 @@ html, body {
   </div>
 </div>
 
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 // ============================================
@@ -757,6 +852,13 @@ let categories = [];      // catégories
 let catActive = 'tout';   // filtre catégorie actif
 let ticket = [];          // [{produit_id, nom, prix, quantite, stock_actif, stock}]
 let modePaiement = 'especes';
+
+// --- Fidélité ---
+const OBJECTIF_FID = 10;        // 10 tampons = plat offert (même règle que le scanner)
+const MIN_TAMPON = 12.90;       // minimum de commande pour gagner un tampon
+let clientFid = null;           // client attaché au ticket {id, nom, points, ...}
+let scannerFid = null;          // instance Html5Qrcode
+let scanEnCours = false;
 
 // ============================================
 //  HORLOGE
@@ -1065,11 +1167,24 @@ async function validerVente() {
     });
     if (error) throw error;
 
-    // Succès
+    // Succès — la vente est enregistrée
     const numero = data?.numero ?? '?';
+    const totalVente = data?.total ?? totalTicket();
+
+    // Applique le tampon fidélité si un client est attaché
+    const infoFid = await appliquerTampon(totalVente);
+
     fermerPaiement();
-    afficherToast(numero);
+    if (infoFid) {
+      afficherToast(numero, infoFid.titre, infoFid.sous);
+    } else {
+      afficherToast(numero);
+    }
+
+    // Réinitialise pour la commande suivante
     ticket = [];
+    clientFid = null;
+    afficherClientFid();
     afficherTicket();
     await chargerMenu(); // recharge le stock à jour
   } catch (e) {
@@ -1081,11 +1196,160 @@ async function validerVente() {
   }
 }
 
-function afficherToast(numero) {
+function afficherToast(numero, titre, sousTitre) {
   const toast = document.getElementById('toast');
-  document.getElementById('toast-sub').textContent = 'Ticket #' + numero;
+  document.getElementById('toast-title').textContent = titre || 'Vente enregistrée';
+  document.getElementById('toast-sub').textContent = sousTitre || ('Ticket #' + numero);
   toast.classList.add('show');
-  setTimeout(() => toast.classList.remove('show'), 3000);
+  setTimeout(() => toast.classList.remove('show'), 4000);
+}
+
+// ============================================
+//  FIDÉLITÉ — scan QR + attache client au ticket
+// ============================================
+function ouvrirScanFid() {
+  document.getElementById('overlay-scan').classList.add('show');
+  const status = document.getElementById('scan-status');
+  status.textContent = 'Ouverture de la caméra…';
+  status.className = 'scan-status';
+  scanEnCours = false;
+
+  scannerFid = new Html5Qrcode('pos-qr-reader');
+  scannerFid.start(
+    { facingMode: 'environment' },
+    { fps: 10, qrbox: { width: 220, height: 220 } },
+    onScanFid,
+    () => {}
+  ).then(() => {
+    status.textContent = 'Visez le QR de la carte du client…';
+  }).catch(err => {
+    status.textContent = 'Impossible d\'ouvrir la caméra : ' + err;
+    status.className = 'scan-status err';
+  });
+}
+
+function fermerScanFid() {
+  if (scannerFid) {
+    scannerFid.stop().then(() => scannerFid.clear()).catch(() => {});
+    scannerFid = null;
+  }
+  document.getElementById('overlay-scan').classList.remove('show');
+}
+
+async function onScanFid(texte) {
+  if (scanEnCours) return;
+  const status = document.getElementById('scan-status');
+
+  if (!texte.startsWith('GINKHAO:')) {
+    status.textContent = 'QR non reconnu — utilisez une carte Gin Khao';
+    status.className = 'scan-status err';
+    return;
+  }
+  scanEnCours = true;
+  status.textContent = 'Chargement du client…';
+  status.className = 'scan-status';
+
+  const clientId = texte.replace('GINKHAO:', '').trim();
+  try {
+    const { data: c, error } = await sb.from('clients').select('*').eq('id', clientId).single();
+    if (error || !c) throw new Error('Client introuvable');
+
+    clientFid = c;
+    status.textContent = c.nom + ' attaché ✓';
+    status.className = 'scan-status ok';
+    afficherClientFid();
+    setTimeout(fermerScanFid, 700);
+  } catch (e) {
+    status.textContent = 'Erreur : ' + e.message;
+    status.className = 'scan-status err';
+    setTimeout(() => { scanEnCours = false; }, 2000);
+  }
+}
+
+function detacherClientFid() {
+  clientFid = null;
+  afficherClientFid();
+}
+
+function afficherClientFid() {
+  const bloc = document.getElementById('fid-bloc');
+  if (!clientFid) {
+    bloc.innerHTML = `
+      <button class="btn-fid" id="btn-fid" onclick="ouvrirScanFid()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/><line x1="3" y1="12" x2="21" y2="12"/></svg>
+        Carte fidélité
+      </button>`;
+    return;
+  }
+  const pts = clientFid.points || 0;
+  const aDejaTampon = clientFid.derniere_visite === ymdAujourdhui();
+  let tamponTxt, tamponCls = '';
+  if (pts >= OBJECTIF_FID) {
+    tamponTxt = '🎁 Plat offert disponible !';
+    tamponCls = 'reward';
+  } else if (aDejaTampon) {
+    tamponTxt = `${pts}/10 · tampon déjà ajouté aujourd'hui`;
+  } else {
+    tamponTxt = `${pts}/10 tampons · +1 si commande ≥ ${fmt(MIN_TAMPON)}`;
+  }
+  bloc.innerHTML = `
+    <div class="fid-client">
+      <div class="fid-avatar">${initialesFid(clientFid.nom)}</div>
+      <div class="fid-client-info">
+        <div class="fid-client-nom">${clientFid.nom}</div>
+        <div class="fid-client-tampons ${tamponCls}">${tamponTxt}</div>
+      </div>
+      <button class="fid-detacher" onclick="detacherClientFid()" title="Retirer le client">×</button>
+    </div>`;
+}
+
+function initialesFid(nom) {
+  return (nom || '?').split(' ').map(m => m[0]).join('').slice(0, 2).toUpperCase();
+}
+
+function ymdAujourdhui() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+// Applique le tampon fidélité après une vente validée.
+// Reproduit EXACTEMENT la règle du scanner : +1 point/visite/total,
+// 1 seul tampon par jour, retour à 1 après 10. Conditionné au minimum de commande.
+// Renvoie un message à afficher, ou null si rien à signaler.
+async function appliquerTampon(totalVente) {
+  if (!clientFid) return null;
+
+  // Condition minimum de commande
+  if (totalVente < MIN_TAMPON) {
+    return { titre: 'Vente enregistrée', sous: `${clientFid.nom} : pas de tampon (min. ${fmt(MIN_TAMPON)})` };
+  }
+
+  // Anti-doublon : 1 tampon par jour max
+  const aujourdhui = ymdAujourdhui();
+  if (clientFid.derniere_visite === aujourdhui) {
+    return { titre: 'Vente enregistrée', sous: `${clientFid.nom} : tampon déjà ajouté aujourd'hui` };
+  }
+
+  // Calcul du nouveau total de points (même logique que le scanner)
+  let points = (clientFid.points || 0) + 1;
+  if (points > OBJECTIF_FID) points = 1;
+  const recompense = (points === OBJECTIF_FID);
+
+  try {
+    const { error } = await sb.from('clients').update({
+      points,
+      total_points_gagnes: (clientFid.total_points_gagnes || 0) + 1,
+      nb_visites: (clientFid.nb_visites || 0) + 1,
+      derniere_visite: aujourdhui
+    }).eq('id', clientFid.id);
+    if (error) throw error;
+
+    if (recompense) {
+      return { titre: '🎉 Plat offert débloqué !', sous: `${clientFid.nom} a atteint 10 tampons` };
+    }
+    return { titre: 'Vente enregistrée', sous: `${clientFid.nom} : +1 tampon (${points}/10)` };
+  } catch (e) {
+    return { titre: 'Vente enregistrée', sous: 'Tampon non ajouté : ' + e.message };
+  }
 }
 
 // ============================================
@@ -1103,6 +1367,9 @@ function flashStock() {
 // Fermer la modale en cliquant à l'extérieur
 document.getElementById('overlay-paiement').addEventListener('click', e => {
   if (e.target.id === 'overlay-paiement') fermerPaiement();
+});
+document.getElementById('overlay-scan').addEventListener('click', e => {
+  if (e.target.id === 'overlay-scan') fermerScanFid();
 });
 
 // Lancer
