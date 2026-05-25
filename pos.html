@@ -1730,6 +1730,21 @@ async function validerVente() {
     const numero = data?.numero ?? '?';
     const totalVente = data?.total ?? totalTicket();
 
+    // Construit un objet "vente" local pour l'aperçu du ticket (avant réinitialisation)
+    const venteLocale = {
+      numero: numero,
+      total: totalVente,
+      mode_paiement: modePaiement,
+      statut: 'validee',
+      cree_le: new Date().toISOString(),
+      lignes_vente: lignes.map(l => ({
+        nom_produit: l.nom,
+        prix_unitaire: l.prix,
+        quantite: l.quantite,
+        sous_total: l.prix * l.quantite
+      }))
+    };
+
     // Applique le tampon fidélité si un client est attaché
     const infoFid = await appliquerTampon(totalVente);
 
@@ -1748,6 +1763,10 @@ async function validerVente() {
     afficherClientFid();
     afficherTicket();
     await chargerMenu(); // recharge le stock à jour
+
+    // Affiche l'aperçu du ticket de la vente qu'on vient d'encaisser
+    document.getElementById('ticket-contenu').innerHTML = genererTicketHTML(venteLocale);
+    document.getElementById('overlay-ticket').classList.add('show');
   } catch (e) {
     alert('Erreur lors de l\'enregistrement : ' + e.message);
   } finally {
