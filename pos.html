@@ -422,6 +422,41 @@ html, body {
 
 /* Modale scanner QR */
 .scan-modal-inner { text-align: center; }
+
+/* Cible visuelle scanner physique */
+.scan-target {
+  position: relative;
+  width: 130px;
+  height: 130px;
+  margin: 8px auto 18px;
+  border-radius: 24px;
+  border: 2px solid var(--gold-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gold);
+}
+.scan-target svg { width: 56px; height: 56px; position: relative; z-index: 2; }
+.scan-pulse {
+  position: absolute;
+  inset: -2px;
+  border-radius: 24px;
+  border: 2px solid var(--gold);
+  animation: scanPulse 1.8s ease-out infinite;
+}
+@keyframes scanPulse {
+  0%   { transform: scale(1);   opacity: 0.8; }
+  100% { transform: scale(1.35); opacity: 0; }
+}
+/* Champ qui capte la douchette : invisible mais focusable */
+.scan-hidden-input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+  pointer-events: none;
+}
+
 #pos-qr-reader {
   width: 100%;
   max-width: 320px;
@@ -813,13 +848,36 @@ html, body {
 <div class="overlay" id="overlay-scan">
   <div class="modal">
     <div class="scan-modal-inner">
-      <h3>Scanner la carte fidélité</h3>
-      <div class="modal-total">Visez le QR code de la carte du client</div>
-      <div id="pos-qr-reader"></div>
-      <div class="scan-status" id="scan-status">Ouverture de la caméra…</div>
-      <div class="modal-actions">
-        <button class="btn-annuler" onclick="fermerScanFid()">Annuler</button>
+
+      <!-- MODE 1 : SCANNER PHYSIQUE (par défaut) -->
+      <div id="mode-physique">
+        <h3>Prêt à scanner</h3>
+        <div class="modal-total">Scannez le QR de la carte du client avec la douchette</div>
+        <div class="scan-target">
+          <div class="scan-pulse"></div>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/><line x1="3" y1="12" x2="21" y2="12"/></svg>
+        </div>
+        <!-- champ caché qui capte la frappe du scanner -->
+        <input type="text" id="scan-input" class="scan-hidden-input" autocomplete="off" inputmode="none">
+        <div class="scan-status" id="scan-status">En attente du scan…</div>
+        <div class="modal-actions">
+          <button class="btn-annuler" onclick="fermerScanFid()">Annuler</button>
+          <button class="btn-annuler" onclick="basculerCamera()">📷 Utiliser la caméra</button>
+        </div>
       </div>
+
+      <!-- MODE 2 : CAMÉRA (secours) -->
+      <div id="mode-camera" style="display:none;">
+        <h3>Scanner avec la caméra</h3>
+        <div class="modal-total">Visez le QR code de la carte du client</div>
+        <div id="pos-qr-reader"></div>
+        <div class="scan-status" id="scan-status-cam">Ouverture de la caméra…</div>
+        <div class="modal-actions">
+          <button class="btn-annuler" onclick="fermerScanFid()">Annuler</button>
+          <button class="btn-annuler" onclick="basculerPhysique()">⌨️ Scanner physique</button>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
@@ -1206,10 +1264,75 @@ function afficherToast(numero, titre, sousTitre) {
 
 // ============================================
 //  FIDÉLITÉ — scan QR + attache client au ticket
+//  Deux modes : scanner physique (douchette USB) + caméra (secours)
 // ============================================
+
+// --- Ouverture : par défaut, mode scanner physique ---
 function ouvrirScanFid() {
   document.getElementById('overlay-scan').classList.add('show');
+  basculerPhysique();
+}
+
+function fermerScanFid() {
+  arreterCamera();
+  arreterEcoutePhysique();
+  document.getElementById('overlay-scan').classList.remove('show');
+}
+
+// --- MODE SCANNER PHYSIQUE ---
+// Le scanner USB se comporte comme un clavier : il "tape" le contenu du QR
+// très vite puis envoie Entrée. On capte ça dans un champ caché.
+function basculerPhysique() {
+  arreterCamera();
+  document.getElementById('mode-physique').style.display = 'block';
+  document.getElementById('mode-camera').style.display = 'none';
   const status = document.getElementById('scan-status');
+  status.textContent = 'En attente du scan…';
+  status.className = 'scan-status';
+  scanEnCours = false;
+  demarrerEcoutePhysique();
+}
+
+let inputScanHandler = null;
+function demarrerEcoutePhysique() {
+  const input = document.getElementById('scan-input');
+  input.value = '';
+  // garde le focus sur le champ caché pour capter la douchette
+  input.focus();
+  // si le focus se perd (clic ailleurs), on le rétablit tant que la modale est ouverte
+  clearInterval(window._focusKeeper);
+  window._focusKeeper = setInterval(() => {
+    if (document.getElementById('overlay-scan').classList.contains('show')
+        && document.getElementById('mode-physique').style.display !== 'none') {
+      if (document.activeElement !== input) input.focus();
+    }
+  }, 400);
+
+  if (inputScanHandler) input.removeEventListener('keydown', inputScanHandler);
+  inputScanHandler = function(e) {
+    // La douchette termine par "Entrée" → on valide le contenu accumulé
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const code = input.value.trim();
+      input.value = '';
+      if (code) traiterCodeFid(code);
+    }
+  };
+  input.addEventListener('keydown', inputScanHandler);
+}
+
+function arreterEcoutePhysique() {
+  clearInterval(window._focusKeeper);
+  const input = document.getElementById('scan-input');
+  if (input && inputScanHandler) input.removeEventListener('keydown', inputScanHandler);
+}
+
+// --- MODE CAMÉRA (secours) ---
+function basculerCamera() {
+  arreterEcoutePhysique();
+  document.getElementById('mode-physique').style.display = 'none';
+  document.getElementById('mode-camera').style.display = 'block';
+  const status = document.getElementById('scan-status-cam');
   status.textContent = 'Ouverture de la caméra…';
   status.className = 'scan-status';
   scanEnCours = false;
@@ -1218,7 +1341,7 @@ function ouvrirScanFid() {
   scannerFid.start(
     { facingMode: 'environment' },
     { fps: 10, qrbox: { width: 220, height: 220 } },
-    onScanFid,
+    (texte) => traiterCodeFid(texte, true),
     () => {}
   ).then(() => {
     status.textContent = 'Visez le QR de la carte du client…';
@@ -1228,21 +1351,24 @@ function ouvrirScanFid() {
   });
 }
 
-function fermerScanFid() {
+function arreterCamera() {
   if (scannerFid) {
     scannerFid.stop().then(() => scannerFid.clear()).catch(() => {});
     scannerFid = null;
   }
-  document.getElementById('overlay-scan').classList.remove('show');
 }
 
-async function onScanFid(texte) {
+// --- Traitement commun du code scanné (physique OU caméra) ---
+async function traiterCodeFid(texte, camera = false) {
   if (scanEnCours) return;
-  const status = document.getElementById('scan-status');
+  const status = document.getElementById(camera ? 'scan-status-cam' : 'scan-status');
 
   if (!texte.startsWith('GINKHAO:')) {
     status.textContent = 'QR non reconnu — utilisez une carte Gin Khao';
     status.className = 'scan-status err';
+    setTimeout(() => {
+      if (!camera) { status.textContent = 'En attente du scan…'; status.className = 'scan-status'; }
+    }, 2000);
     return;
   }
   scanEnCours = true;
