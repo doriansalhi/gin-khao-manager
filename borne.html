@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#0A0908">
+<title>Gin Khao · Borne de commande</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-deep: #0A0908;
+  --bg-soft: #14110E;
+  --surface: #1C1814;
+  --surface-2: #251F19;
+  --border: #2D261E;
+  --border-soft: #221C16;
+  --sriracha: #E63946;
+  --sriracha-soft: #C42E3B;
+  --gold: #E4B860;
+  --gold-soft: #B8924E;
+  --lime: #A8E10C;
+  --lime-soft: #82B509;
+  --text: #F5EDE2;
+  --text-soft: #C7B9A5;
+  --text-mute: #8B7E6F;
+  --text-dim: #5A5045;
+  --display: 'Fraunces', Georgia, serif;
+  --body: 'Manrope', system-ui, sans-serif;
+  --mono: 'JetBrains Mono', monospace;
+  --radius: 22px;
+  --radius-sm: 16px;
+  --radius-xs: 10px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; user-select: none; }
+html, body { height: 100%; }
+body {
+  height: 100vh;
+  overflow: hidden;
+  background: var(--bg-deep);
+  font-family: var(--body);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ===== ÉCRANS ===== */
+.ecran { display: none; height: 100vh; flex-direction: column; }
+.ecran.actif { display: flex; animation: fadeIn 0.35s ease; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* ===== ÉCRAN ACCUEIL ===== */
+#ecran-accueil {
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  cursor: pointer;
+  background:
+    radial-gradient(circle at 50% 35%, rgba(230,57,70,0.14), transparent 55%),
+    radial-gradient(circle at 50% 90%, rgba(228,184,96,0.10), transparent 50%),
+    var(--bg-deep);
+  position: relative;
+  overflow: hidden;
+}
+.accueil-mark {
+  font-family: var(--display);
+  font-size: 16px;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--gold);
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+.accueil-logo {
+  font-family: var(--display);
+  font-size: clamp(64px, 14vw, 130px);
+  font-weight: 500;
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+}
+.accueil-logo span { color: var(--sriracha); }
+.accueil-sub { font-size: 18px; color: var(--text-mute); margin-top: 18px; letter-spacing: 0.05em; }
+.accueil-cta {
+  margin-top: 70px;
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  padding: 22px 44px;
+  border: 2px solid var(--gold);
+  border-radius: 999px;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--gold);
+  animation: pulse 2.2s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(228,184,96,0.3); }
+  50% { transform: scale(1.04); box-shadow: 0 0 0 18px rgba(228,184,96,0); }
+}
+.accueil-bowl {
+  font-size: clamp(80px, 18vw, 180px);
+  margin-bottom: 30px;
+  filter: drop-shadow(0 20px 40px rgba(0,0,0,0.5));
+}
+
+/* ===== ÉCRAN MODE (sur place / emporter) ===== */
+#ecran-mode { align-items: center; justify-content: center; padding: 40px; }
+.mode-titre { font-family: var(--display); font-size: 40px; font-weight: 500; margin-bottom: 50px; text-align: center; }
+.mode-choix { display: flex; gap: 28px; flex-wrap: wrap; justify-content: center; }
+.mode-card {
+  width: 280px;
+  height: 320px;
+  background: linear-gradient(160deg, var(--surface-2), var(--surface));
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.mode-card:active { transform: scale(0.96); }
+.mode-card:hover { border-color: var(--gold); }
+.mode-card .ic { font-size: 90px; }
+.mode-card .nm { font-size: 26px; font-weight: 700; }
+
+/* ===== ÉCRAN MENU ===== */
+#ecran-menu { background: var(--bg-soft); }
+.menu-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 28px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.menu-top .logo { font-family: var(--display); font-size: 26px; font-weight: 500; }
+.menu-top .logo span { color: var(--sriracha); }
+.menu-mode-badge {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--gold);
+  border: 1px solid var(--gold-soft);
+  padding: 8px 16px;
+  border-radius: 999px;
+}
+.menu-cats {
+  display: flex;
+  gap: 12px;
+  padding: 18px 28px;
+  overflow-x: auto;
+  flex-shrink: 0;
+  scrollbar-width: none;
+}
+.menu-cats::-webkit-scrollbar { display: none; }
+.menu-cat {
+  flex-shrink: 0;
+  padding: 14px 26px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-soft);
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.18s;
+}
+.menu-cat.actif { background: var(--sriracha); border-color: var(--sriracha); color: #fff; }
+.menu-grille {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 28px 28px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 18px;
+  align-content: start;
+}
+.menu-grille::-webkit-scrollbar { width: 8px; }
+.menu-grille::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+.plat-card {
+  background: linear-gradient(160deg, var(--surface-2), var(--surface));
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 22px 18px;
+  cursor: pointer;
+  transition: all 0.18s;
+  display: flex;
+  flex-direction: column;
+  min-height: 150px;
+  position: relative;
+}
+.plat-card:active { transform: scale(0.97); }
+.plat-card:hover { border-color: var(--gold-soft); }
+.plat-card.rupture { opacity: 0.4; pointer-events: none; }
+.plat-emoji { font-size: 44px; margin-bottom: 12px; }
+.plat-nom { font-size: 18px; font-weight: 700; line-height: 1.2; }
+.plat-bas { margin-top: auto; padding-top: 14px; display: flex; align-items: center; justify-content: space-between; }
+.plat-prix { font-family: var(--display); font-size: 24px; font-weight: 500; color: var(--gold); }
+.plat-plus {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: var(--sriracha);
+  color: #fff;
+  font-size: 26px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+}
+.plat-rupture-badge {
+  position: absolute; top: 12px; right: 12px;
+  background: var(--text-dim); color: var(--bg-deep);
+  font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 999px;
+  text-transform: uppercase;
+}
+
+/* Barre panier en bas */
+.panier-bar {
+  flex-shrink: 0;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+  padding: 18px 28px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+.panier-info { flex: 1; }
+.panier-count { font-size: 14px; color: var(--text-mute); }
+.panier-total { font-family: var(--display); font-size: 30px; font-weight: 500; }
+.panier-total span { color: var(--gold); }
+.btn-voir-panier {
+  padding: 18px 36px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, var(--sriracha), var(--sriracha-soft));
+  color: #fff;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+.btn-voir-panier:active { transform: scale(0.96); }
+.btn-voir-panier:disabled { opacity: 0.4; }
+
+/* ===== ÉCRAN PANIER ===== */
+#ecran-panier { background: var(--bg-soft); }
+.panier-head {
+  padding: 24px 28px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  flex-shrink: 0;
+}
+.panier-head h2 { font-family: var(--display); font-size: 30px; font-weight: 500; }
+.btn-retour {
+  background: var(--surface-2); border: 1px solid var(--border); color: var(--text-soft);
+  padding: 12px 22px; border-radius: var(--radius-xs); font-size: 15px; font-weight: 600;
+  cursor: pointer; font-family: var(--body);
+}
+.panier-liste { flex: 1; overflow-y: auto; padding: 18px 28px; }
+.panier-ligne {
+  display: flex; align-items: center; gap: 16px;
+  background: var(--surface); border: 1px solid var(--border-soft);
+  border-radius: var(--radius-sm); padding: 16px 18px; margin-bottom: 12px;
+}
+.pl-emoji { font-size: 32px; }
+.pl-info { flex: 1; }
+.pl-nom { font-size: 17px; font-weight: 700; }
+.pl-prix { font-size: 14px; color: var(--text-mute); font-family: var(--mono); margin-top: 2px; }
+.pl-qte { display: flex; align-items: center; gap: 12px; }
+.pl-qbtn {
+  width: 40px; height: 40px; border-radius: 50%; border: none;
+  background: var(--surface-2); color: var(--text); font-size: 22px; font-weight: 700;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+}
+.pl-qbtn:active { transform: scale(0.9); }
+.pl-qval { font-size: 18px; font-weight: 700; font-family: var(--mono); min-width: 24px; text-align: center; }
+.pl-st { font-family: var(--display); font-size: 20px; color: var(--gold); min-width: 70px; text-align: right; }
+
+.panier-foot { flex-shrink: 0; border-top: 1px solid var(--border); background: var(--surface); padding: 22px 28px; }
+.panier-foot-total { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 18px; }
+.panier-foot-total .lbl { font-size: 16px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-mute); font-weight: 600; }
+.panier-foot-total .val { font-family: var(--display); font-size: 42px; font-weight: 500; }
+.panier-foot-total .val span { color: var(--gold); }
+.btn-commander {
+  width: 100%; padding: 22px; border: none; border-radius: var(--radius);
+  background: linear-gradient(135deg, var(--lime), var(--lime-soft)); color: var(--bg-deep);
+  font-size: 20px; font-weight: 800; cursor: pointer; transition: transform 0.15s;
+}
+.btn-commander:active { transform: scale(0.98); }
+
+/* ===== ÉCRAN PAIEMENT ===== */
+#ecran-paiement { align-items: center; justify-content: center; padding: 40px; }
+.paie-titre { font-family: var(--display); font-size: 36px; font-weight: 500; margin-bottom: 12px; text-align: center; }
+.paie-montant { font-family: var(--display); font-size: 28px; color: var(--gold); margin-bottom: 50px; }
+.paie-choix { display: flex; gap: 24px; flex-wrap: wrap; justify-content: center; }
+.paie-card {
+  width: 260px; height: 280px;
+  background: linear-gradient(160deg, var(--surface-2), var(--surface));
+  border: 1.5px solid var(--border); border-radius: var(--radius);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px;
+  cursor: pointer; transition: all 0.2s;
+}
+.paie-card:active { transform: scale(0.96); }
+.paie-card:hover { border-color: var(--gold); }
+.paie-card.bientot { opacity: 0.55; }
+.paie-card .ic { font-size: 70px; }
+.paie-card .nm { font-size: 22px; font-weight: 700; }
+.paie-card .badge { font-size: 12px; color: var(--text-mute); text-transform: uppercase; letter-spacing: 0.05em; }
+.paie-annuler { margin-top: 40px; background: none; border: none; color: var(--text-mute); font-size: 15px; cursor: pointer; text-decoration: underline; font-family: var(--body); }
+
+/* ===== ÉCRAN CONFIRMATION ===== */
+#ecran-fin { align-items: center; justify-content: center; text-align: center; padding: 40px;
+  background: radial-gradient(circle at 50% 40%, rgba(168,225,12,0.12), transparent 55%), var(--bg-deep); }
+.fin-check {
+  width: 120px; height: 120px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--lime), var(--lime-soft));
+  color: var(--bg-deep); font-size: 64px;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 30px; animation: popCheck 0.5s cubic-bezier(0.16,1,0.3,1);
+}
+@keyframes popCheck { from { transform: scale(0); } to { transform: scale(1); } }
+.fin-titre { font-family: var(--display); font-size: 38px; font-weight: 500; margin-bottom: 10px; }
+.fin-sub { font-size: 17px; color: var(--text-soft); margin-bottom: 36px; }
+.fin-numero-box {
+  background: var(--surface); border: 1px solid var(--gold-soft); border-radius: var(--radius);
+  padding: 28px 50px; margin-bottom: 36px;
+}
+.fin-numero-lbl { font-size: 14px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-mute); }
+.fin-numero { font-family: var(--display); font-size: 80px; font-weight: 600; color: var(--gold); line-height: 1; margin-top: 6px; }
+.fin-mode { font-size: 15px; color: var(--text-mute); }
+
+.spinner {
+  width: 40px; height: 40px; border: 4px solid var(--border);
+  border-top-color: var(--sriracha); border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Gate connexion */
+.gate { position: fixed; inset: 0; background: var(--bg-deep); display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 16px; z-index: 5000; padding: 24px; text-align: center; }
+.gate .logo { font-family: var(--display); font-size: 32px; }
+.gate .logo span { color: var(--sriracha); }
+.gate p { color: var(--text-mute); font-size: 14px; max-width: 320px; line-height: 1.6; }
+.gate a { color: var(--gold); }
+.gate.hidden { display: none; }
+</style>
+</head>
+<body>
+
+<!-- GATE connexion -->
+<div class="gate" id="gate">
+  <div class="logo">Gin <span>Khao</span></div>
+  <div class="spinner"></div>
+  <p id="gate-msg">Connexion…</p>
+</div>
+
+<!-- ===== ÉCRAN 1 : ACCUEIL ===== -->
+<div class="ecran actif" id="ecran-accueil" onclick="allerMode()">
+  <div class="accueil-bowl">🍜</div>
+  <div class="accueil-mark">Street Food Thaï</div>
+  <div class="accueil-logo">Gin <span>Khao</span></div>
+  <div class="accueil-sub">Commandez en quelques secondes</div>
+  <div class="accueil-cta">👆 Touchez pour commander</div>
+</div>
+
+<!-- ===== ÉCRAN 2 : MODE ===== -->
+<div class="ecran" id="ecran-mode">
+  <div class="mode-titre">Vous mangez…</div>
+  <div class="mode-choix">
+    <div class="mode-card" onclick="choisirMode('sur_place')">
+      <div class="ic">🍽️</div>
+      <div class="nm">Sur place</div>
+    </div>
+    <div class="mode-card" onclick="choisirMode('emporter')">
+      <div class="ic">🥡</div>
+      <div class="nm">À emporter</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== ÉCRAN 3 : MENU ===== -->
+<div class="ecran" id="ecran-menu">
+  <div class="menu-top">
+    <div class="logo">Gin <span>Khao</span></div>
+    <div class="menu-mode-badge" id="menu-mode-badge">Sur place</div>
+  </div>
+  <div class="menu-cats" id="menu-cats"></div>
+  <div class="menu-grille" id="menu-grille"></div>
+  <div class="panier-bar">
+    <div class="panier-info">
+      <div class="panier-count" id="panier-count">Panier vide</div>
+      <div class="panier-total" id="panier-total-mini">0<span>,00 €</span></div>
+    </div>
+    <button class="btn-voir-panier" id="btn-voir-panier" disabled onclick="allerPanier()">Voir le panier</button>
+  </div>
+</div>
+
+<!-- ===== ÉCRAN 4 : PANIER ===== -->
+<div class="ecran" id="ecran-panier">
+  <div class="panier-head">
+    <h2>Votre commande</h2>
+    <button class="btn-retour" onclick="allerEcran('ecran-menu')">← Ajouter des plats</button>
+  </div>
+  <div class="panier-liste" id="panier-liste"></div>
+  <div class="panier-foot">
+    <div class="panier-foot-total">
+      <span class="lbl">Total</span>
+      <span class="val" id="panier-total-final">0<span>,00 €</span></span>
+    </div>
+    <button class="btn-commander" onclick="allerPaiement()">Valider et payer</button>
+  </div>
+</div>
+
+<!-- ===== ÉCRAN 5 : PAIEMENT ===== -->
+<div class="ecran" id="ecran-paiement">
+  <div class="paie-titre">Comment réglez-vous ?</div>
+  <div class="paie-montant" id="paie-montant">0,00 €</div>
+  <div class="paie-choix">
+    <div class="paie-card" onclick="payer('comptoir')">
+      <div class="ic">🏪</div>
+      <div class="nm">Payer au comptoir</div>
+      <div class="badge">Disponible</div>
+    </div>
+    <div class="paie-card bientot" onclick="payerCarte()">
+      <div class="ic">💳</div>
+      <div class="nm">Carte bancaire</div>
+      <div class="badge">Bientôt (myPOS)</div>
+    </div>
+  </div>
+  <button class="paie-annuler" onclick="allerEcran('ecran-panier')">Retour au panier</button>
+</div>
+
+<!-- ===== ÉCRAN 6 : CONFIRMATION ===== -->
+<div class="ecran" id="ecran-fin">
+  <div class="fin-check">✓</div>
+  <div class="fin-titre">Commande envoyée !</div>
+  <div class="fin-sub" id="fin-sub">Votre commande est en préparation</div>
+  <div class="fin-numero-box">
+    <div class="fin-numero-lbl">Votre numéro</div>
+    <div class="fin-numero" id="fin-numero">—</div>
+  </div>
+  <div class="fin-mode" id="fin-mode"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// ===== CONFIG (même base que la caisse et l'appli) =====
+const SB_URL = 'https://szpgbdnijyoquqmjhhjj.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN6cGdiZG5panlvcXVxbWpoaGpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2MTMwNDUsImV4cCI6MjA5NTE4OTA0NX0.fKarVKMIOc4Ez2kOvE6xyvVibuENSGev6RsouYDb8ak';
+const RESTO_ID = 'gin-khao';
+const sb = supabase.createClient(SB_URL, SB_KEY);
+
+// Emojis par catégorie (cosmétique, basé sur le nom)
+function emojiCat(nomCat) {
+  const n = (nomCat || '').toLowerCase();
+  if (/boisson/.test(n)) return '🥤';
+  if (/dessert/.test(n)) return '🍮';
+  if (/plat/.test(n)) return '🍜';
+  return '🍽️';
+}
+
+// ===== ÉTAT =====
+let produits = [];
+let categories = [];
+let catActive = 'tout';
+let panier = [];          // [{produit_id, nom, prix, quantite, emoji}]
+let modeService = 'sur_place';
+
+// ===== NAVIGATION ENTRE ÉCRANS =====
+function allerEcran(id) {
+  document.querySelectorAll('.ecran').forEach(e => e.classList.remove('actif'));
+  document.getElementById(id).classList.add('actif');
+}
+
+function allerMode() { allerEcran('ecran-mode'); }
+
+function choisirMode(mode) {
+  modeService = mode;
+  document.getElementById('menu-mode-badge').textContent = mode === 'sur_place' ? '🍽️ Sur place' : '🥡 À emporter';
+  allerEcran('ecran-menu');
+}
+
+function allerPanier() {
+  if (panier.length === 0) return;
+  afficherPanier();
+  allerEcran('ecran-panier');
+}
+
+function allerPaiement() {
+  if (panier.length === 0) return;
+  document.getElementById('paie-montant').textContent = fmt(totalPanier());
+  allerEcran('ecran-paiement');
+}
+
+// ===== INIT =====
+async function init() {
+  const gate = document.getElementById('gate');
+  const gateMsg = document.getElementById('gate-msg');
+  try {
+    // La borne lit le menu en lecture seule (clé anon).
+    await chargerMenu();
+    gate.classList.add('hidden');
+  } catch (e) {
+    gateMsg.textContent = 'Erreur de connexion : ' + e.message;
+    gate.querySelector('.spinner').style.display = 'none';
+  }
+}
+
+async function chargerMenu() {
+  const { data: cats } = await sb.from('categories')
+    .select('*').eq('restaurant_id', RESTO_ID).order('ordre');
+  categories = cats || [];
+
+  const { data: prods, error } = await sb.from('produits')
+    .select('*').eq('restaurant_id', RESTO_ID).eq('actif', true).order('ordre');
+  if (error) throw error;
+  produits = prods || [];
+
+  afficherCats();
+  afficherMenu();
+}
+
+function afficherCats() {
+  const zone = document.getElementById('menu-cats');
+  let html = `<div class="menu-cat ${catActive==='tout'?'actif':''}" onclick="filtrerCat('tout')">Tout</div>`;
+  categories.forEach(c => {
+    html += `<div class="menu-cat ${catActive===c.id?'actif':''}" onclick="filtrerCat('${c.id}')">${c.nom}</div>`;
+  });
+  zone.innerHTML = html;
+}
+
+function filtrerCat(id) { catActive = id; afficherCats(); afficherMenu(); }
+
+function afficherMenu() {
+  const grille = document.getElementById('menu-grille');
+  let liste = produits;
+  if (catActive !== 'tout') liste = produits.filter(p => p.categorie_id === catActive);
+
+  if (liste.length === 0) {
+    grille.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px;color:var(--text-mute);">Aucun produit dans cette catégorie</div>';
+    return;
+  }
+
+  grille.innerHTML = liste.map(p => {
+    const cat = categories.find(c => c.id === p.categorie_id);
+    const emoji = emojiCat(cat ? cat.nom : '');
+    const rupture = p.stock_actif && p.stock <= 0;
+    return `
+      <div class="plat-card ${rupture?'rupture':''}" onclick="ajouter('${p.id}')">
+        ${rupture ? '<div class="plat-rupture-badge">Épuisé</div>' : ''}
+        <div class="plat-emoji">${emoji}</div>
+        <div class="plat-nom">${p.nom}</div>
+        <div class="plat-bas">
+          <div class="plat-prix">${fmt(p.prix)}</div>
+          <div class="plat-plus">+</div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// ===== PANIER =====
+function ajouter(produitId) {
+  const p = produits.find(x => x.id === produitId);
+  if (!p) return;
+  const cat = categories.find(c => c.id === p.categorie_id);
+  const emoji = emojiCat(cat ? cat.nom : '');
+
+  const ligne = panier.find(l => l.produit_id === produitId);
+  if (p.stock_actif) {
+    const deja = ligne ? ligne.quantite : 0;
+    if (deja >= p.stock) return; // pas plus que le stock
+  }
+  if (ligne) ligne.quantite++;
+  else panier.push({ produit_id: p.id, nom: p.nom, prix: parseFloat(p.prix), quantite: 1, emoji });
+  majBarrePanier();
+}
+
+function modifierQte(produitId, delta) {
+  const ligne = panier.find(l => l.produit_id === produitId);
+  if (!ligne) return;
+  if (delta > 0) {
+    const p = produits.find(x => x.id === produitId);
+    if (p && p.stock_actif && ligne.quantite >= p.stock) return;
+  }
+  ligne.quantite += delta;
+  if (ligne.quantite <= 0) panier = panier.filter(l => l.produit_id !== produitId);
+  afficherPanier();
+  majBarrePanier();
+  if (panier.length === 0) allerEcran('ecran-menu');
+}
+
+function totalPanier() {
+  return panier.reduce((s, l) => s + l.prix * l.quantite, 0);
+}
+
+function nbArticles() {
+  return panier.reduce((s, l) => s + l.quantite, 0);
+}
+
+function majBarrePanier() {
+  const n = nbArticles();
+  document.getElementById('panier-count').textContent =
+    n === 0 ? 'Panier vide' : n + ' article' + (n > 1 ? 's' : '');
+  const [e, c] = totalPanier().toFixed(2).split('.');
+  document.getElementById('panier-total-mini').innerHTML = `${e}<span>,${c} €</span>`;
+  document.getElementById('btn-voir-panier').disabled = (n === 0);
+}
+
+function afficherPanier() {
+  const liste = document.getElementById('panier-liste');
+  liste.innerHTML = panier.map(l => `
+    <div class="panier-ligne">
+      <div class="pl-emoji">${l.emoji}</div>
+      <div class="pl-info">
+        <div class="pl-nom">${l.nom}</div>
+        <div class="pl-prix">${fmt(l.prix)} / unité</div>
+      </div>
+      <div class="pl-qte">
+        <button class="pl-qbtn" onclick="modifierQte('${l.produit_id}', -1)">−</button>
+        <span class="pl-qval">${l.quantite}</span>
+        <button class="pl-qbtn" onclick="modifierQte('${l.produit_id}', 1)">+</button>
+      </div>
+      <div class="pl-st">${fmt(l.prix * l.quantite)}</div>
+    </div>`).join('');
+  const [e, c] = totalPanier().toFixed(2).split('.');
+  document.getElementById('panier-total-final').innerHTML = `${e}<span>,${c} €</span>`;
+}
+
+// ===== PAIEMENT =====
+function payerCarte() {
+  alert('💳 Paiement par carte bientôt disponible.\n\nIl sera activé une fois l\'accès à l\'API myPOS configuré. Pour l\'instant, choisissez "Payer au comptoir".');
+}
+
+let envoiEnCours = false;
+async function payer(methode) {
+  if (envoiEnCours || panier.length === 0) return;
+  envoiEnCours = true;
+
+  // mode_paiement : 'comptoir' = à régler au comptoir
+  const lignes = panier.map(l => ({
+    produit_id: l.produit_id,
+    nom: l.nom,
+    prix: l.prix,
+    quantite: l.quantite
+  }));
+
+  try {
+    const { data, error } = await sb.rpc('enregistrer_vente', {
+      p_restaurant_id: RESTO_ID,
+      p_mode_paiement: methode === 'comptoir' ? 'comptoir' : 'carte',
+      p_lignes: lignes,
+      p_origine: 'borne',
+      p_mode_service: modeService
+    });
+    if (error) throw error;
+
+    const numero = data?.numero ?? '?';
+    afficherConfirmation(numero);
+  } catch (e) {
+    alert('Erreur lors de l\'envoi : ' + e.message);
+    envoiEnCours = false;
+  }
+}
+
+function afficherConfirmation(numero) {
+  document.getElementById('fin-numero').textContent = numero;
+  document.getElementById('fin-mode').textContent =
+    (modeService === 'sur_place' ? '🍽️ Sur place' : '🥡 À emporter') + ' · Réglez au comptoir';
+  document.getElementById('fin-sub').textContent = 'Présentez ce numéro au comptoir';
+  allerEcran('ecran-fin');
+
+  // Reset auto au bout de 8 secondes pour le client suivant
+  setTimeout(() => {
+    panier = [];
+    catActive = 'tout';
+    modeService = 'sur_place';
+    envoiEnCours = false;
+    majBarrePanier();
+    afficherCats();
+    afficherMenu();
+    allerEcran('ecran-accueil');
+    chargerMenu(); // recharge le stock à jour
+  }, 8000);
+}
+
+// ===== UTILITAIRE =====
+function fmt(n) {
+  return Number(n).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+}
+
+init();
+</script>
+</body>
+</html>
