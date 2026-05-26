@@ -984,6 +984,52 @@ html, body {
   min-width: 34px;
 }
 .bc-vide { text-align: center; color: #888; font-size: 13px; padding: 16px 0; }
+
+/* ===== RAPPORT CLÔTURE Z ===== */
+.cz-rapport {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 18px 20px;
+  margin-bottom: 20px;
+}
+.cz-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--border-soft);
+}
+.cz-row:last-child { border-bottom: none; }
+.cz-row .lbl { font-size: 13px; color: var(--text-soft); }
+.cz-row .val { font-size: 15px; font-weight: 600; color: var(--text); font-family: var(--mono); }
+.cz-row.total { padding-top: 14px; margin-top: 6px; border-top: 2px solid var(--border); }
+.cz-row.total .lbl { font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text); }
+.cz-row.total .val { font-family: var(--display); font-size: 24px; font-weight: 500; color: var(--gold); }
+.cz-paie { display: flex; gap: 10px; margin-top: 12px; }
+.cz-paie-card {
+  flex: 1;
+  background: var(--bg-deep);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+  padding: 12px;
+  text-align: center;
+}
+.cz-paie-card .ic { font-size: 18px; }
+.cz-paie-card .lbl { font-size: 11px; color: var(--text-mute); text-transform: uppercase; margin-top: 4px; }
+.cz-paie-card .val { font-family: var(--mono); font-size: 15px; font-weight: 700; color: var(--text); margin-top: 4px; }
+.cz-confirme {
+  text-align: center;
+  padding: 16px;
+  background: rgba(168,225,12,0.08);
+  border: 1px solid rgba(168,225,12,0.3);
+  border-radius: var(--radius-sm);
+  color: var(--lime);
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+.cz-confirme .num { font-family: var(--display); font-size: 22px; display: block; margin-top: 4px; }
 .hv-badge-annulee {
   font-size: 10px;
   font-weight: 700;
@@ -1066,6 +1112,7 @@ html, body {
       <div class="topbar-right">
         <div class="clock" id="clock">--:--</div>
         <button class="link-btn" onclick="ouvrirHistorique()">🧾 Historique</button>
+        <button class="link-btn" onclick="ouvrirCloture()">🔒 Clôture Z</button>
         <a href="index.html" class="link-btn">← Gestion</a>
       </div>
     </div>
@@ -1246,6 +1293,23 @@ html, body {
     <div class="modal-actions">
       <button class="btn-annuler" onclick="fermerTicket()">Fermer</button>
       <button class="btn-valider" onclick="imprimerTicket()">🖨️ Imprimer</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODALE CLÔTURE Z ===== -->
+<div class="overlay" id="overlay-cloture">
+  <div class="modal">
+    <h3>Clôture de caisse (Z)</h3>
+    <div class="modal-total" id="cloture-sous">Récapitulatif de la période en cours</div>
+    <div id="cloture-contenu">
+      <div style="text-align:center; padding:24px; color: var(--text-mute);">
+        <div class="spinner" style="margin:0 auto 12px;"></div>Calcul en cours…
+      </div>
+    </div>
+    <div class="modal-actions" id="cloture-actions" style="display:none;">
+      <button class="btn-annuler" onclick="fermerCloture()">Fermer</button>
+      <button class="btn-valider" id="btn-cloturer" onclick="confirmerCloture()">🔒 Clôturer la journée</button>
     </div>
   </div>
 </div>
@@ -2303,6 +2367,123 @@ function imprimerTicket() {
 }
 
 // ============================================
+//  CLÔTURE DE CAISSE (Z)
+// ============================================
+function ouvrirCloture() {
+  document.getElementById('overlay-cloture').classList.add('show');
+  document.getElementById('cloture-actions').style.display = 'none';
+  document.getElementById('cloture-sous').textContent = 'Récapitulatif de la période en cours';
+  document.getElementById('cloture-contenu').innerHTML =
+    '<div style="text-align:center; padding:24px; color: var(--text-mute);"><div class="spinner" style="margin:0 auto 12px;"></div>Calcul en cours…</div>';
+  calculerApercuCloture();
+}
+
+function fermerCloture() {
+  document.getElementById('overlay-cloture').classList.remove('show');
+}
+
+// Calcule un aperçu (sans figer) des ventes depuis la dernière clôture / début de journée
+async function calculerApercuCloture() {
+  try {
+    // Trouve la dernière clôture pour connaître le début de période
+    const { data: dernieres } = await sb.from('clotures')
+      .select('periode_fin')
+      .eq('restaurant_id', RESTO_ID)
+      .order('periode_fin', { ascending: false })
+      .limit(1);
+
+    let debut;
+    if (dernieres && dernieres.length > 0) {
+      debut = new Date(dernieres[0].periode_fin);
+    } else {
+      debut = new Date();
+      debut.setHours(0, 0, 0, 0);
+    }
+
+    const { data: ventes, error } = await sb.from('ventes')
+      .select('total, mode_paiement, statut, cree_le')
+      .eq('restaurant_id', RESTO_ID)
+      .gte('cree_le', debut.toISOString());
+
+    if (error) throw error;
+
+    const valides = (ventes || []).filter(v => v.statut === 'validee');
+    const nbAnnulees = (ventes || []).length - valides.length;
+    const total = valides.reduce((s, v) => s + Number(v.total || 0), 0);
+    const especes = valides.filter(v => v.mode_paiement === 'especes').reduce((s, v) => s + Number(v.total || 0), 0);
+    const carte = valides.filter(v => v.mode_paiement === 'carte').reduce((s, v) => s + Number(v.total || 0), 0);
+
+    const heureDebut = debut.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+    document.getElementById('cloture-sous').innerHTML =
+      `Période depuis le dernier Z (${heureDebut})`;
+
+    document.getElementById('cloture-contenu').innerHTML = `
+      <div class="cz-rapport">
+        <div class="cz-row"><span class="lbl">Ventes validées</span><span class="val">${valides.length}</span></div>
+        <div class="cz-row"><span class="lbl">Ventes annulées</span><span class="val">${nbAnnulees}</span></div>
+        <div class="cz-paie">
+          <div class="cz-paie-card">
+            <div class="ic">💵</div><div class="lbl">Espèces</div><div class="val">${fmt(especes)}</div>
+          </div>
+          <div class="cz-paie-card">
+            <div class="ic">💳</div><div class="lbl">Carte</div><div class="val">${fmt(carte)}</div>
+          </div>
+        </div>
+        <div class="cz-row total"><span class="lbl">Total encaissé</span><span class="val">${fmt(total)}</span></div>
+      </div>`;
+
+    document.getElementById('cloture-actions').style.display = 'flex';
+  } catch (e) {
+    document.getElementById('cloture-contenu').innerHTML =
+      `<div style="text-align:center; padding:24px; color: var(--danger);">Erreur : ${e.message}</div>`;
+  }
+}
+
+let clotureEnCours = false;
+async function confirmerCloture() {
+  if (clotureEnCours) return;
+  if (!confirm('Clôturer la journée ?\n\nUn Z sera généré et archivé de façon définitive. Les ventes après clôture compteront pour le prochain Z.')) return;
+  clotureEnCours = true;
+  const btn = document.getElementById('btn-cloturer');
+  btn.disabled = true;
+  btn.textContent = 'Clôture…';
+
+  try {
+    const { data, error } = await sb.rpc('cloturer_journee', { p_restaurant_id: RESTO_ID });
+    if (error) throw error;
+    if (data && data.ok === false) throw new Error(data.erreur || 'Clôture impossible');
+
+    // Affiche le Z figé
+    const d = new Date(data.periode_fin);
+    document.getElementById('cloture-sous').textContent = 'Clôture effectuée ✓';
+    document.getElementById('cloture-contenu').innerHTML = `
+      <div class="cz-confirme">
+        🔒 Journée clôturée
+        <span class="num">Z n°${data.numero_z}</span>
+      </div>
+      <div class="cz-rapport">
+        <div class="cz-row"><span class="lbl">Date</span><span class="val">${d.toLocaleString('fr-FR')}</span></div>
+        <div class="cz-row"><span class="lbl">Ventes validées</span><span class="val">${data.nb_ventes}</span></div>
+        <div class="cz-row"><span class="lbl">Ventes annulées</span><span class="val">${data.nb_annulees}</span></div>
+        <div class="cz-paie">
+          <div class="cz-paie-card"><div class="ic">💵</div><div class="lbl">Espèces</div><div class="val">${fmt(data.total_especes)}</div></div>
+          <div class="cz-paie-card"><div class="ic">💳</div><div class="lbl">Carte</div><div class="val">${fmt(data.total_carte)}</div></div>
+        </div>
+        <div class="cz-row total"><span class="lbl">Total Z</span><span class="val">${fmt(data.total_ttc)}</span></div>
+      </div>`;
+    // Remplace les actions par un simple bouton fermer
+    document.getElementById('cloture-actions').innerHTML =
+      '<button class="btn-valider" onclick="fermerCloture()">Terminé</button>';
+  } catch (e) {
+    alert('Erreur lors de la clôture : ' + e.message);
+    btn.disabled = false;
+    btn.textContent = '🔒 Clôturer la journée';
+  } finally {
+    clotureEnCours = false;
+  }
+}
+
+// ============================================
 //  UTILITAIRES
 // ============================================
 function fmt(n) {
@@ -2329,6 +2510,9 @@ document.getElementById('overlay-remise').addEventListener('click', e => {
 });
 document.getElementById('overlay-ticket').addEventListener('click', e => {
   if (e.target.id === 'overlay-ticket') fermerTicket();
+});
+document.getElementById('overlay-cloture').addEventListener('click', e => {
+  if (e.target.id === 'overlay-cloture') fermerCloture();
 });
 
 // Lancer
