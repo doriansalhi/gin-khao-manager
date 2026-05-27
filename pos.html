@@ -1888,6 +1888,9 @@ async function validerVente() {
     const bonHTML = genererBonCuisineHTML(lignesPourCuisine, numero, modePaiement);
     document.getElementById('ticket-contenu').innerHTML = bonHTML + genererTicketHTML(venteLocale);
     document.getElementById('overlay-ticket').classList.add('show');
+
+    // Prépare les données pour l'impression auto (le bouton "Imprimer" appellera le relais)
+    preparerImpression(lignesPourCuisine, venteLocale);
   } catch (e) {
     alert('Erreur lors de l\'enregistrement : ' + e.message);
   } finally {
@@ -2360,10 +2363,87 @@ function genererBonCuisineHTML(lignesTicket, numero, modePaiement, modeService) 
     </div>`;
 }
 
-// Impression : pour l'instant en attente de l'API myPOS.
-// Quand l'API sera dispo, on remplacera cette fonction par l'appel d'impression thermique.
-function imprimerTicket() {
-  alert('🖨️ Impression sur imprimante myPOS bientôt disponible.\n\nL\'impression sera activée une fois l\'accès à l\'API myPOS configuré.');
+// ============================================
+//  IMPRESSION via serveur relais local (Node.js)
+// ============================================
+// Le serveur relais (serveur-impression.js) tourne sur le PC du comptoir
+// et fait le pont entre la caisse web (HTTPS) et les imprimantes thermiques
+// réseau (TCP/ESC-POS). Il route automatiquement :
+//   - bon cuisine   -> imprimante cuisine (SAGA)
+//   - ticket client -> imprimante comptoir (Epson)
+const RELAIS_URL = 'http://localhost:9100/imprimer';
+
+// Données préparées pour le relais après chaque vente validée
+let derniereImpression = null;
+
+async function imprimerTicket() {
+  if (!derniereImpression) {
+    alert('Aucun ticket à imprimer.');
+    return;
+  }
+  try {
+    const reponse = await fetch(RELAIS_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(derniereImpression)
+    });
+    const data = await reponse.json();
+
+    if (data.ok) {
+      fermerTicket();
+      const num = derniereImpression.bonCuisine?.numero || derniereImpression.ticketClient?.numero || '—';
+      afficherToast(num, 'Tickets imprimés ✓', 'Cuisine + Comptoir');
+    } else {
+      // Impression partielle ou totalement ratée : on affiche le détail
+      const msgs = (data.resultats || []).map(r =>
+        r.ok ? `✓ ${r.type}` : `✗ ${r.type} : ${r.erreur}`
+      ).join('\n');
+      alert('Problème d\'impression :\n\n' + (msgs || (data.erreur || 'Erreur inconnue')));
+    }
+  } catch (e) {
+    alert(
+      'Le relais d\'impression ne répond pas.\n\n' +
+      'Vérifie que serveur-impression.js tourne bien sur ce PC ' +
+      '(fenêtre noire visible avec "RELAIS D\'IMPRESSION GIN KHAO").\n\n' +
+      'Détail : ' + e.message
+    );
+  }
+}
+
+// Prépare les données d'impression pour la prochaine vente.
+// Appelé à la fin de validerVente() avec les lignes de la commande.
+function preparerImpression(lignesTicket, venteLocale) {
+  const idsBoissons = categories
+    .filter(c => /boisson/i.test(c.nom))
+    .map(c => c.id);
+  // Bon cuisine : on n'envoie que les plats à préparer (exclut remises, boissons, etc.)
+  const items = lignesTicket
+    .filter(l => l.produit_id && !idsBoissons.includes(l.categorie_id))
+    .map(l => ({ quantite: l.quantite, nom: l.nom }));
+
+  const d = new Date(venteLocale.cree_le);
+  const heure = String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+  const dateStr = d.toLocaleDateString('fr-FR') + ' à ' + heure;
+
+  derniereImpression = {
+    bonCuisine: {
+      numero: venteLocale.numero,
+      heure: heure,
+      items: items
+      // modeService: tu peux ajouter 'sur place' / 'à emporter' ici quand tu auras le sélecteur
+    },
+    ticketClient: {
+      numero: venteLocale.numero,
+      date: dateStr,
+      lignes: venteLocale.lignes_vente,
+      total: venteLocale.total,
+      modePaiement: venteLocale.mode_paiement,
+      restoNom: RESTO_INFOS.nom,
+      restoSousTitre: RESTO_INFOS.sousTitre,
+      restoAdresse: RESTO_INFOS.adresse,
+      annulee: venteLocale.statut === 'annulee'
+    }
+  };
 }
 
 // ============================================
