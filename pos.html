@@ -749,6 +749,64 @@ html, body {
 .plateforme-info .pf-txt b { display: block; font-size: 14px; color: var(--lime); }
 .plateforme-info .pf-txt span { font-size: 12px; color: var(--text-mute); }
 
+/* Zone saisie montant + commission pour Uber/Deliveroo */
+.uber-zone { display: none; margin-bottom: 22px; }
+.uber-zone.show { display: block; }
+.commission-choix { display: flex; gap: 10px; }
+.comm-btn {
+  flex: 1;
+  padding: 14px 12px;
+  border: 1.5px solid var(--border);
+  background: var(--surface-2);
+  border-radius: var(--radius-sm);
+  color: var(--text-soft);
+  font-size: 18px;
+  font-weight: 700;
+  font-family: var(--body);
+  cursor: pointer;
+  transition: all 0.18s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+.comm-btn span {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-mute);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.comm-btn.active {
+  border-color: var(--gold);
+  background: rgba(228,184,96,0.1);
+  color: var(--gold);
+}
+.comm-btn.active span { color: var(--gold-soft); }
+.uber-apercu {
+  margin-top: 16px;
+  padding: 14px 16px;
+  background: var(--bg-deep);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+.uber-apercu .ua-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: var(--text-soft);
+  padding: 4px 0;
+}
+.uber-apercu .ua-row.net {
+  font-family: var(--display);
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--lime);
+  border-top: 1px solid var(--border);
+  margin-top: 6px;
+  padding-top: 10px;
+}
+
 .pay-modes { display: flex; gap: 10px; margin-bottom: 22px; }
 .pay-mode {
   flex: 1;
@@ -1261,6 +1319,23 @@ html, body {
       <div class="pf-txt">
         <b id="pf-titre">Déjà payé en ligne</b>
         <span id="pf-sous">Commande encaissée par la plateforme</span>
+      </div>
+    </div>
+
+    <!-- Zone plateforme : montant réel du ticket + taux de commission -->
+    <div class="uber-zone" id="uber-zone">
+      <div class="cash-label">Montant total du ticket (avec promos)</div>
+      <input type="number" class="cash-input" id="uber-montant" placeholder="0,00" inputmode="decimal" oninput="majUberApercu()">
+
+      <div class="cash-label" style="margin-top:16px;">Commission prélevée</div>
+      <div class="commission-choix">
+        <button type="button" class="comm-btn active" id="comm-18" onclick="choisirCommission(18)">18 %<span>ma livraison</span></button>
+        <button type="button" class="comm-btn" id="comm-38" onclick="choisirCommission(38)">38 %<span>livraison plateforme</span></button>
+      </div>
+
+      <div class="uber-apercu" id="uber-apercu">
+        <div class="ua-row"><span>Commission</span><span id="ua-comm">—</span></div>
+        <div class="ua-row net"><span>Net encaissé</span><span id="ua-net">—</span></div>
       </div>
     </div>
 
@@ -1806,11 +1881,13 @@ function fermerPaiement() {
 
 // Canaux "plateforme" = déjà payés en ligne (pas d'encaissement physique)
 const CANAUX_PLATEFORME = ['uber_eats', 'deliveroo', 'just_eat', 'cc_enligne'];
+// Canaux avec saisie du montant réel + taux de commission (prix majorés + promos)
+const CANAUX_COMMISSION = ['uber_eats', 'deliveroo'];
 
 // Libellés des bandeaux selon le canal plateforme
 const CANAL_LABELS = {
-  uber_eats:  { titre: 'Payé via Uber Eats',  sous: 'Commande encaissée par Uber Eats' },
-  deliveroo:  { titre: 'Payé via Deliveroo',  sous: 'Commande encaissée par Deliveroo' },
+  uber_eats:  { titre: 'Payé via Uber Eats',  sous: 'Saisis le montant réel du ticket' },
+  deliveroo:  { titre: 'Payé via Deliveroo',  sous: 'Saisis le montant réel du ticket' },
   just_eat:   { titre: 'Payé via Just Eat',   sous: 'Commande encaissée par Just Eat' },
   cc_enligne: { titre: 'Click & Collect payé en ligne', sous: 'Commande déjà réglée en ligne' }
 };
@@ -1824,12 +1901,30 @@ function choisirCanal(canal) {
   const payZone = document.getElementById('pay-modes-zone');
   const cashZone = document.getElementById('cash-zone');
   const pfInfo = document.getElementById('plateforme-info');
+  const uberZone = document.getElementById('uber-zone');
   const btnValider = document.getElementById('btn-valider');
 
-  if (CANAUX_PLATEFORME.includes(canal)) {
-    // Canal déjà payé : on cache le choix de paiement et la saisie monnaie
+  // Reset zones
+  cashZone.classList.remove('show');
+  uberZone.classList.remove('show');
+  pfInfo.classList.remove('show');
+
+  if (CANAUX_COMMISSION.includes(canal)) {
+    // Uber Eats / Deliveroo : saisie montant réel + commission
     payZone.style.display = 'none';
-    cashZone.classList.remove('show');
+    pfInfo.classList.add('show');
+    const lbl = CANAL_LABELS[canal];
+    document.getElementById('pf-titre').textContent = lbl.titre;
+    document.getElementById('pf-sous').textContent = lbl.sous;
+    uberZone.classList.add('show');
+    modePaiement = 'plateforme';
+    // pré-remplit le montant avec le total boutique comme base de départ
+    document.getElementById('uber-montant').value = totalTicket().toFixed(2);
+    choisirCommission(18);   // défaut : 18%
+    majUberApercu();
+  } else if (CANAUX_PLATEFORME.includes(canal)) {
+    // Autres plateformes déjà payées (Just Eat, C&C en ligne) : validation directe
+    payZone.style.display = 'none';
     pfInfo.classList.add('show');
     const lbl = CANAL_LABELS[canal] || { titre: 'Déjà payé', sous: 'Encaissé par la plateforme' };
     document.getElementById('pf-titre').textContent = lbl.titre;
@@ -1839,9 +1934,28 @@ function choisirCanal(canal) {
   } else {
     // Canal à encaisser (sur place, C&C comptoir, livraison) : choix espèces/carte
     payZone.style.display = 'flex';
-    pfInfo.classList.remove('show');
     choisirMode('especes');
   }
+}
+
+// Taux de commission choisi pour la vente plateforme en cours (18 ou 38)
+let tauxCommission = 18;
+
+function choisirCommission(taux) {
+  tauxCommission = taux;
+  document.getElementById('comm-18').classList.toggle('active', taux === 18);
+  document.getElementById('comm-38').classList.toggle('active', taux === 38);
+  majUberApercu();
+}
+
+// Met à jour l'aperçu commission/net et l'état du bouton valider
+function majUberApercu() {
+  const montant = parseFloat(document.getElementById('uber-montant').value) || 0;
+  const comm = montant * tauxCommission / 100;
+  const net = montant - comm;
+  document.getElementById('ua-comm').textContent = montant > 0 ? '−' + fmt(comm) + ` (${tauxCommission}%)` : '—';
+  document.getElementById('ua-net').textContent = montant > 0 ? fmt(net) : '—';
+  document.getElementById('btn-valider').disabled = !(montant > 0);
 }
 
 function choisirMode(mode) {
@@ -1917,12 +2031,31 @@ async function validerVente() {
   // Prépare les lignes pour la fonction SQL
   // On garde tous les articles à leur prix normal (le stock se décrémente correctement,
   // car le plat offert sort bien du stock même s'il est gratuit).
-  const lignes = ticket.map(l => ({
+  let lignes = ticket.map(l => ({
     produit_id: l.produit_id,
     nom: l.nom,
     prix: l.prix,
     quantite: l.quantite
   }));
+
+  // ===== CAS UBER EATS / DELIVEROO : montant réel saisi + ajustement proportionnel =====
+  // Le caissier a tapé le vrai total du ticket (avec majoration + promos).
+  // On ajuste chaque ligne proportionnellement pour que la somme = montant saisi,
+  // tout en gardant le détail produits (pour le stock).
+  let montantPlateforme = null;
+  if (CANAUX_COMMISSION.includes(canalVente)) {
+    montantPlateforme = parseFloat(document.getElementById('uber-montant').value) || 0;
+    const totalBoutique = ticket.reduce((s, l) => s + l.prix * l.quantite, 0);
+    if (totalBoutique > 0 && montantPlateforme > 0) {
+      const ratio = montantPlateforme / totalBoutique;
+      lignes = lignes.map(l => ({
+        produit_id: l.produit_id,
+        nom: l.nom,
+        prix: Math.round(l.prix * ratio * 100) / 100,  // prix ajusté au prorata
+        quantite: l.quantite
+      }));
+    }
+  }
 
   // Si plat offert appliqué : on ajoute une ligne de remise négative
   // pour que le total enregistré reflète le montant réellement payé.
@@ -1970,7 +2103,8 @@ async function validerVente() {
       p_restaurant_id: RESTO_ID,
       p_mode_paiement: modePaiement,
       p_lignes: lignes,
-      p_canal: canalPourBase
+      p_canal: canalPourBase,
+      p_taux_commission: CANAUX_COMMISSION.includes(canalVente) ? tauxCommission : null
     });
     if (error) throw error;
 
