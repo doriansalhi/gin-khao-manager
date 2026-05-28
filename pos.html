@@ -670,12 +670,23 @@ html, body {
 .modal {
   width: 100%;
   max-width: 440px;
+  max-height: 90vh;
+  overflow-y: auto;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 28px;
   padding: 28px;
   box-shadow: 0 40px 80px -20px rgba(0,0,0,0.7);
   animation: rise 0.25s cubic-bezier(0.16,1,0.3,1);
+}
+/* Barre de boutons collante en bas de la modale ticket (toujours accessible) */
+.actions-ticket {
+  position: sticky;
+  bottom: -28px;
+  background: var(--surface);
+  padding-top: 16px;
+  padding-bottom: 4px;
+  margin-top: 8px;
 }
 @keyframes rise { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 .modal h3 {
@@ -1447,7 +1458,7 @@ html, body {
 <div class="overlay" id="overlay-ticket">
   <div class="modal">
     <div id="ticket-contenu"></div>
-    <div class="modal-actions">
+    <div class="modal-actions actions-ticket">
       <button class="btn-annuler" onclick="fermerTicket()">Fermer</button>
       <button class="btn-valider" onclick="imprimerTicket()">🖨️ Imprimer</button>
     </div>
