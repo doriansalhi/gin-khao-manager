@@ -1855,7 +1855,7 @@ html, body {
         <header class="app-header">
           <div>
             <h1 class="screen-title">Ventes</h1>
-            <p class="screen-sub">Analyse en temps réel · 19 mai 2026</p>
+            <p class="screen-sub" id="ventes-screen-sub">Analyse en temps réel</p>
           </div>
           <button class="bell" aria-label="Filtres">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="7" y1="12" x2="17" y2="12"/><line x1="10" y1="18" x2="14" y2="18"/></svg>
@@ -1878,10 +1878,10 @@ html, body {
         </div>
 
         <div class="kpi-row">
-          <div class="kpi">
+          <div class="kpi" style="display:none;">
             <div class="kpi-label">Marge brute</div>
-            <div class="kpi-value">589€</div>
-            <div class="kpi-sub up">69,5%</div>
+            <div class="kpi-value">—</div>
+            <div class="kpi-sub">à venir</div>
           </div>
           <div class="kpi">
             <div class="kpi-label">Couverts</div>
@@ -1890,8 +1890,8 @@ html, body {
           </div>
           <div class="kpi">
             <div class="kpi-label">Annul.</div>
-            <div class="kpi-value">2</div>
-            <div class="kpi-sub down">3,8%</div>
+            <div class="kpi-value" id="ventes-annulees">0</div>
+            <div class="kpi-sub" id="ventes-annulees-sub">aujourd'hui</div>
           </div>
         </div>
 
@@ -1900,26 +1900,12 @@ html, body {
           <div class="section-head">
             <h3 class="section-title">Répartition canaux</h3>
           </div>
-          <div class="donut-card">
-            <svg class="donut-svg" viewBox="0 0 42 42">
+          <div class="donut-card" id="ventes-donut-card">
+            <svg class="donut-svg" viewBox="0 0 42 42" id="ventes-donut-svg">
               <circle cx="21" cy="21" r="15.9" fill="transparent" stroke="#251F19" stroke-width="6"/>
-              <circle cx="21" cy="21" r="15.9" fill="transparent" stroke="#E63946" stroke-width="6" stroke-dasharray="45 100" stroke-dashoffset="25" transform="rotate(-90 21 21)"/>
-              <circle cx="21" cy="21" r="15.9" fill="transparent" stroke="#E4B860" stroke-width="6" stroke-dasharray="30 100" stroke-dashoffset="-20" transform="rotate(-90 21 21)"/>
-              <circle cx="21" cy="21" r="15.9" fill="transparent" stroke="#A8E10C" stroke-width="6" stroke-dasharray="25 100" stroke-dashoffset="-50" transform="rotate(-90 21 21)"/>
             </svg>
-            <div class="donut-legend">
-              <div class="legend-row">
-                <span><span class="dot" style="background:#E63946"></span><span class="name">Sur place</span></span>
-                <span class="val">381€ · 45%</span>
-              </div>
-              <div class="legend-row">
-                <span><span class="dot" style="background:#E4B860"></span><span class="name">Uber Eats</span></span>
-                <span class="val">254€ · 30%</span>
-              </div>
-              <div class="legend-row">
-                <span><span class="dot" style="background:#A8E10C"></span><span class="name">Deliveroo</span></span>
-                <span class="val">212€ · 25%</span>
-              </div>
+            <div class="donut-legend" id="ventes-donut-legend">
+              <div style="padding:12px; color: var(--text-mute, #8B7E6F); font-size:12px;">Chargement…</div>
             </div>
           </div>
         </div>
@@ -1927,74 +1913,11 @@ html, body {
         <!-- Top plats avec marges -->
         <div class="section">
           <div class="section-head">
-            <h3 class="section-title">Tous les plats du jour</h3>
+            <h3 class="section-title" id="ventes-plats-titre">Tous les plats du jour</h3>
           </div>
-          <div class="plats-list">
-            <div class="plat-row">
-              <div class="plat-rank">01</div>
-              <div class="plat-info">
-                <div class="plat-name">Pad Thaï poulet</div>
-                <div class="plat-meta">18 vendus · marge 8,84€/unité</div>
-              </div>
-              <div>
-                <div class="plat-amount">234€</div>
-                <div class="plat-margin">68%</div>
-              </div>
-            </div>
-            <div class="plat-row">
-              <div class="plat-rank">02</div>
-              <div class="plat-info">
-                <div class="plat-name">Bo Bun crevettes</div>
-                <div class="plat-meta">11 vendus · marge 7,56€/unité</div>
-              </div>
-              <div>
-                <div class="plat-amount">154€</div>
-                <div class="plat-margin warn">54%</div>
-              </div>
-            </div>
-            <div class="plat-row">
-              <div class="plat-rank">03</div>
-              <div class="plat-info">
-                <div class="plat-name">Curry vert poulet</div>
-                <div class="plat-meta">9 vendus · marge 9,58€/unité</div>
-              </div>
-              <div>
-                <div class="plat-amount">121€</div>
-                <div class="plat-margin">71%</div>
-              </div>
-            </div>
-            <div class="plat-row">
-              <div class="plat-rank">04</div>
-              <div class="plat-info">
-                <div class="plat-name">Mango sticky rice</div>
-                <div class="plat-meta">14 vendus · marge 4,56€/unité</div>
-              </div>
-              <div>
-                <div class="plat-amount">84€</div>
-                <div class="plat-margin">76%</div>
-              </div>
-            </div>
-            <div class="plat-row">
-              <div class="plat-rank">05</div>
-              <div class="plat-info">
-                <div class="plat-name">Nems poulet (x4)</div>
-                <div class="plat-meta">10 vendus · marge 3,90€/unité</div>
-              </div>
-              <div>
-                <div class="plat-amount">65€</div>
-                <div class="plat-margin warn">60%</div>
-              </div>
-            </div>
-            <div class="plat-row" style="border-color: rgba(230, 57, 70, 0.3);">
-              <div class="plat-rank" style="color: var(--sriracha);">⚠</div>
-              <div class="plat-info">
-                <div class="plat-name">Salade papaye (Som Tam)</div>
-                <div class="plat-meta">1 vendu en 14 jours</div>
-              </div>
-              <div>
-                <div class="plat-amount">9€</div>
-                <div class="plat-margin bad">à retirer</div>
-              </div>
+          <div class="plats-list" id="ventes-plats-liste">
+            <div style="padding: 24px; text-align: center; color: var(--text-mute, #8B7E6F); font-size: 13px;">
+              Chargement…
             </div>
           </div>
         </div>
@@ -3518,6 +3441,285 @@ if (document.readyState !== 'loading') {
   attendreSessionPuisInitHome();
 } else {
   document.addEventListener('DOMContentLoaded', attendreSessionPuisInitHome);
+}
+
+// ============================================================
+//  ÉCRAN VENTES — KPIs, donut canaux, top plats, période variable
+// ============================================================
+
+// Période active sur l'écran Ventes : 'today', '7d', '30d'
+let ventesPeriode = 'today';
+
+// Couleurs des canaux pour le donut (cohérent avec la caisse)
+const COULEURS_CANAL = {
+  sur_place:     '#E63946',
+  uber_eats:     '#E4B860',
+  deliveroo:     '#A8E10C',
+  just_eat:      '#5BBF8A',
+  click_collect: '#60A5E4',
+  livraison:     '#7C5BC2'
+};
+const LIBELLES_CANAL = {
+  sur_place:     'Sur place',
+  uber_eats:     'Uber Eats',
+  deliveroo:     'Deliveroo',
+  just_eat:      'Just Eat',
+  click_collect: 'Click & Collect',
+  livraison:     'Livraison'
+};
+
+// Renvoie la date de début ISO pour la période choisie
+function dateDebutPeriode(periode) {
+  const d = new Date();
+  if (periode === 'today') {
+    d.setHours(0, 0, 0, 0);
+  } else if (periode === '7d') {
+    d.setDate(d.getDate() - 7);
+    d.setHours(0, 0, 0, 0);
+  } else if (periode === '30d') {
+    d.setDate(d.getDate() - 30);
+    d.setHours(0, 0, 0, 0);
+  }
+  return d;
+}
+
+function libellePeriode(periode) {
+  if (periode === 'today') return "Aujourd'hui";
+  if (periode === '7d')    return "7 derniers jours";
+  if (periode === '30d')   return "30 derniers jours";
+  return periode;
+}
+
+// Branche les tabs Aujourd'hui / 7j / 30j
+function brancherTabsVentes() {
+  document.querySelectorAll('#screen-sales .tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const p = btn.dataset.period;
+      if (!p) return;
+      ventesPeriode = p;
+      // Mise à jour visuelle des tabs
+      document.querySelectorAll('#screen-sales .tab').forEach(b => b.classList.toggle('active', b === btn));
+      // Recharger toutes les sections
+      rafraichirVentes();
+    });
+  });
+}
+
+// Charge tous les KPIs de l'écran Ventes selon la période
+async function chargerKpisVentes() {
+  try {
+    const debut = dateDebutPeriode(ventesPeriode);
+
+    const { data: ventes, error } = await sbClient.from('ventes')
+      .select('total, statut, canal, mode_paiement')
+      .eq('restaurant_id', RESTO_ID)
+      .gte('cree_le', debut.toISOString());
+
+    if (error) throw error;
+
+    const toutes = ventes || [];
+    const valides = toutes.filter(v => v.statut === 'validee');
+    const annulees = toutes.filter(v => v.statut === 'annulee');
+
+    const ca = valides.reduce((s, v) => s + Number(v.total || 0), 0);
+    const nb = valides.length;
+
+    // Mise à jour des éléments
+    const elCA = document.getElementById('ventes-ca');
+    if (elCA) elCA.textContent = Math.round(ca);
+
+    const elCouv = document.getElementById('ventes-couverts');
+    if (elCouv) elCouv.textContent = nb;
+
+    const elCouvSub = document.getElementById('ventes-couverts-sub');
+    if (elCouvSub) elCouvSub.textContent = libellePeriode(ventesPeriode).toLowerCase();
+
+    const elAnn = document.getElementById('ventes-annulees');
+    if (elAnn) elAnn.textContent = annulees.length;
+
+    const elAnnSub = document.getElementById('ventes-annulees-sub');
+    if (elAnnSub) {
+      const pct = toutes.length > 0 ? ((annulees.length / toutes.length) * 100).toFixed(1) : '0';
+      elAnnSub.textContent = pct + '% des ventes';
+    }
+
+    const elCALabel = document.getElementById('ventes-ca-label');
+    if (elCALabel) elCALabel.textContent = libellePeriode(ventesPeriode) + ' · en direct';
+  } catch (e) {
+    console.error('Erreur KPIs ventes:', e);
+  }
+}
+
+// Construit le donut SVG et la légende selon la période
+async function chargerDonutCanaux() {
+  try {
+    const debut = dateDebutPeriode(ventesPeriode);
+
+    const { data: ventes, error } = await sbClient.from('ventes')
+      .select('total, canal, statut')
+      .eq('restaurant_id', RESTO_ID)
+      .eq('statut', 'validee')
+      .gte('cree_le', debut.toISOString());
+
+    if (error) throw error;
+
+    // Agréger par canal
+    const parCanal = {};
+    (ventes || []).forEach(v => {
+      const c = v.canal || 'sur_place';
+      if (!parCanal[c]) parCanal[c] = 0;
+      parCanal[c] += Number(v.total || 0);
+    });
+
+    const total = Object.values(parCanal).reduce((s, n) => s + n, 0);
+    const svg = document.getElementById('ventes-donut-svg');
+    const legend = document.getElementById('ventes-donut-legend');
+    if (!svg || !legend) return;
+
+    if (total === 0) {
+      svg.innerHTML = '<circle cx="21" cy="21" r="15.9" fill="transparent" stroke="#251F19" stroke-width="6"/>';
+      legend.innerHTML = '<div style="padding:12px; color: var(--text-mute, #8B7E6F); font-size:12px;">Aucune vente sur cette période</div>';
+      return;
+    }
+
+    // Trier par montant décroissant
+    const entries = Object.entries(parCanal)
+      .filter(([_, v]) => v > 0)
+      .sort((a, b) => b[1] - a[1]);
+
+    // Construire les segments du donut SVG
+    let svgHtml = '<circle cx="21" cy="21" r="15.9" fill="transparent" stroke="#251F19" stroke-width="6"/>';
+    let offsetCumul = 25; // commence en haut (rotation -90°)
+    entries.forEach(([canal, montant]) => {
+      const pct = (montant / total) * 100;
+      const couleur = COULEURS_CANAL[canal] || '#8B7E6F';
+      svgHtml += `<circle cx="21" cy="21" r="15.9" fill="transparent" stroke="${couleur}" stroke-width="6" stroke-dasharray="${pct.toFixed(2)} 100" stroke-dashoffset="${offsetCumul.toFixed(2)}" transform="rotate(-90 21 21)"/>`;
+      offsetCumul -= pct;
+    });
+    svg.innerHTML = svgHtml;
+
+    // Construire la légende
+    legend.innerHTML = entries.map(([canal, montant]) => {
+      const pct = ((montant / total) * 100).toFixed(0);
+      const couleur = COULEURS_CANAL[canal] || '#8B7E6F';
+      const libelle = LIBELLES_CANAL[canal] || canal;
+      const montantFmt = Math.round(montant) + '€';
+      return `
+        <div class="legend-row">
+          <span><span class="dot" style="background:${couleur}"></span><span class="name">${libelle}</span></span>
+          <span class="val">${montantFmt} · ${pct}%</span>
+        </div>`;
+    }).join('');
+  } catch (e) {
+    console.error('Erreur donut canaux:', e);
+  }
+}
+
+// Charge le top des plats vendus sur la période
+async function chargerTopPlatsVentes() {
+  try {
+    const debut = dateDebutPeriode(ventesPeriode);
+
+    const { data: lignes, error } = await sbClient.from('lignes_ventes')
+      .select('nom_produit, prix_unitaire, quantite, sous_total, ventes!inner(restaurant_id, statut, cree_le)')
+      .eq('ventes.restaurant_id', RESTO_ID)
+      .eq('ventes.statut', 'validee')
+      .gte('ventes.cree_le', debut.toISOString());
+
+    if (error) throw error;
+
+    // Agréger
+    const agreg = {};
+    (lignes || []).forEach(l => {
+      const prix = Number(l.prix_unitaire);
+      if (prix <= 0) return;
+      const nom = l.nom_produit;
+      if (!agreg[nom]) agreg[nom] = { nom, prix_moyen: prix, quantite: 0, total: 0 };
+      agreg[nom].quantite += Number(l.quantite);
+      agreg[nom].total += Number(l.sous_total || 0);
+    });
+
+    const tous = Object.values(agreg).sort((a, b) => b.quantite - a.quantite);
+
+    // Mettre à jour le titre de la section
+    const elTitre = document.getElementById('ventes-plats-titre');
+    if (elTitre) elTitre.textContent = `Tous les plats · ${libellePeriode(ventesPeriode).toLowerCase()}`;
+
+    const zone = document.getElementById('ventes-plats-liste');
+    if (!zone) return;
+
+    if (tous.length === 0) {
+      zone.innerHTML = `<div style="padding: 24px; text-align: center; color: var(--text-mute, #8B7E6F); font-size: 13px;">Aucune vente sur cette période</div>`;
+      return;
+    }
+
+    zone.innerHTML = tous.map((p, i) => {
+      const rang = String(i + 1).padStart(2, '0');
+      return `
+        <div class="plat-row">
+          <div class="plat-rank">${rang}</div>
+          <div class="plat-info">
+            <div class="plat-name">${escapeHtmlSimple(p.nom)}</div>
+            <div class="plat-meta">${p.quantite} vendu${p.quantite > 1 ? 's' : ''} · ${p.prix_moyen.toFixed(2).replace('.', ',')}€ moy.</div>
+          </div>
+          <div>
+            <div class="plat-amount">${Math.round(p.total)}€</div>
+          </div>
+        </div>`;
+    }).join('');
+  } catch (e) {
+    console.error('Erreur top plats ventes:', e);
+  }
+}
+
+// Rafraichit tout l'écran Ventes
+async function rafraichirVentes() {
+  // Sous-titre avec la vraie date du jour
+  const sub = document.getElementById('ventes-screen-sub');
+  if (sub) {
+    const d = new Date();
+    const mois = ['janv.','févr.','mars','avr.','mai','juin','juil.','août','sept.','oct.','nov.','déc.'];
+    sub.textContent = `Analyse en temps réel · ${d.getDate()} ${mois[d.getMonth()]} ${d.getFullYear()}`;
+  }
+  await Promise.all([
+    chargerKpisVentes(),
+    chargerDonutCanaux(),
+    chargerTopPlatsVentes()
+  ]);
+  // Si la période = today, on charge aussi l'historique du jour
+  if (ventesPeriode === 'today' && typeof chargerHistoriqueApp === 'function') {
+    chargerHistoriqueApp();
+  }
+}
+
+// Realtime : à chaque vente créée/modifiée, on rafraichit
+function abonnerVentesScreenRealtime() {
+  sbClient.channel('ventes-screen-changes')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'ventes' },
+        () => { rafraichirVentes(); })
+    .subscribe();
+}
+
+// Initialisation
+let _ventesInitFait = false;
+function initVentes() {
+  if (_ventesInitFait) return;
+  _ventesInitFait = true;
+  brancherTabsVentes();
+  rafraichirVentes();
+  abonnerVentesScreenRealtime();
+}
+
+// Lance initVentes au clic sur l'onglet "Ventes"
+function brancherInitVentes() {
+  document.querySelectorAll('[data-screen="sales"]').forEach(btn => {
+    btn.addEventListener('click', initVentes);
+  });
+}
+if (document.readyState !== 'loading') {
+  brancherInitVentes();
+} else {
+  document.addEventListener('DOMContentLoaded', brancherInitVentes);
 }
 </script>
 </body>
