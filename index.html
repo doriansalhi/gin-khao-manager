@@ -3156,14 +3156,37 @@ async function scanFacture(input) {
 
   // 2) Archivage Drive + ligne dans le Sheet (avec les montants lus)
   const nomFichier = `facture-${new Date().toISOString().slice(0,10)}-${Date.now()}.jpg`;
-  fetch('/.netlify/functions/upload-facture', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ image: img.data, mediaType: img.type, nom: nomFichier, facture: factureLue })
-  })
-  .then(r => r.json())
-  .then(d => { if (d.ok) console.log('Archivée + tableau:', d.lien); else console.log('Réponse:', d); })
-  .catch(e => console.log('Échec archivage:', e));
+  let sheetOk = false;
+  try {
+    const resUpload = await fetch('/.netlify/functions/upload-facture', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ image: img.data, mediaType: img.type, nom: nomFichier, facture: factureLue })
+    });
+    const dUpload = await resUpload.json();
+    if (dUpload.ok) {
+      sheetOk = true;
+      console.log('✓ Archivée Drive + Sheet:', dUpload.lien);
+    } else {
+      console.warn('Réponse upload-facture:', dUpload);
+    }
+  } catch (e) {
+    console.warn('Échec archivage Drive/Sheet:', e);
+  }
+
+  // Affichage du statut Sheets sous la carte
+  const carteSheet = document.getElementById('invoice-demo');
+  if (carteSheet) {
+    const msgSheet = document.createElement('div');
+    msgSheet.style.cssText = sheetOk
+      ? 'margin-top:8px; padding:6px 10px; background:rgba(168,225,12,0.1); color:var(--lime); font-size:11px; border-radius:8px; border:1px solid rgba(168,225,12,0.3);'
+      : 'margin-top:8px; padding:6px 10px; background:rgba(230,57,70,0.1); color:var(--sriracha); font-size:11px; border-radius:8px; border:1px solid rgba(230,57,70,0.3);';
+    msgSheet.textContent = sheetOk
+      ? '✓ Archivée sur Google Drive + ligne dans Google Sheets'
+      : '⚠️ Échec archivage Drive/Sheets (voir console F12)';
+    carteSheet.appendChild(msgSheet);
+    setTimeout(() => msgSheet.remove(), 8000);
+  }
 
   // 3) [NOUVEAU] Insertion dans Supabase pour alimenter la compta de l'app
   if (factureLue && factureLue.montant_ttc != null && factureLue.montant_ttc > 0) {
@@ -3226,56 +3249,82 @@ function mapperCategorieIA(categorieIA) {
 // Insère une facture lue par l'IA dans la table Supabase `charges`
 // pour que la compta de l'app se mette à jour automatiquement
 async function insererFactureDansSupabase(facture) {
-  try {
-    // Valeurs nettoyées
-    const fournisseur = facture.fournisseur || 'Fournisseur inconnu';
-    const date_charge = facture.date || new Date().toISOString().slice(0, 10);
-    const montant_ht = Number(facture.montant_ht) || 0;
-    const tva = Number(facture.tva) || 0;
-    const montant_ttc = Number(facture.montant_ttc) || 0;
-    const categorie = mapperCategorieIA(facture.categorie);
+  const carte = document.getElementById('invoice-demo');
 
-    const { error } = await sbClient.from('charges').insert({
+  // Vérifier qu'on a une session active (sinon RLS bloquera)
+  const { data: { session } } = await sbClient.auth.getSession();
+  if (!session) {
+    if (carte) {
+      const msg = document.createElement('div');
+      msg.style.cssText = 'margin-top:8px; padding:8px 12px; background:rgba(230,57,70,0.1); color:var(--sriracha); font-size:11px; border-radius:8px; border:1px solid rgba(230,57,70,0.3);';
+      msg.textContent = '⚠️ Non connecté → facture pas ajoutée à la compta';
+      carte.appendChild(msg);
+    }
+    return;
+  }
+
+  // Valeurs nettoyées
+  const fournisseur = facture.fournisseur || 'Fournisseur inconnu';
+  const date_charge = facture.date || new Date().toISOString().slice(0, 10);
+  const montant_ht = Number(facture.montant_ht) || 0;
+  const tva = Number(facture.tva) || 0;
+  const montant_ttc = Number(facture.montant_ttc) || 0;
+  const categorie = mapperCategorieIA(facture.categorie);
+
+  try {
+    const { data, error } = await sbClient.from('charges').insert({
       restaurant_id: RESTO_ID,
       categorie,
       date_charge,
       fournisseur,
-      description: facture.description || facture.categorie || null, // garde la catégorie originale en description
+      description: facture.description || facture.categorie || null,
       montant_ht,
       tva,
       montant_ttc,
       source: 'scan_ia',
       recurrent: false
-    });
+    }).select();
 
     if (error) {
-      console.warn('Erreur insertion charge Supabase:', error.message);
-      // On affiche un toast discret pour informer
-      const carte = document.getElementById('invoice-demo');
+      console.error('❌ Erreur insertion charge Supabase:', error);
       if (carte) {
         const msg = document.createElement('div');
-        msg.style.cssText = 'margin-top:12px; padding:8px 12px; background:rgba(230,57,70,0.1); color:var(--sriracha); font-size:11px; border-radius:8px; border:1px solid rgba(230,57,70,0.3);';
-        msg.textContent = '⚠️ Facture non ajoutée à la compta : ' + error.message;
+        msg.style.cssText = 'margin-top:8px; padding:8px 12px; background:rgba(230,57,70,0.1); color:var(--sriracha); font-size:11px; border-radius:8px; border:1px solid rgba(230,57,70,0.3);';
+        msg.innerHTML = `⚠️ Non ajoutée à la compta : <strong>${error.message}</strong>`;
         carte.appendChild(msg);
       }
       return;
     }
 
-    // Succès → toast discret de confirmation
-    const carte = document.getElementById('invoice-demo');
-    if (carte) {
-      const msg = document.createElement('div');
-      msg.style.cssText = 'margin-top:12px; padding:8px 12px; background:rgba(168,225,12,0.1); color:var(--lime); font-size:11px; border-radius:8px; border:1px solid rgba(168,225,12,0.3); display:flex; align-items:center; gap:6px;';
-      msg.innerHTML = `✓ Ajoutée à la compta dans <strong>${CAT_LIBELLES[categorie] || categorie}</strong>`;
-      carte.appendChild(msg);
-
-      // Auto-suppression du toast après 5 secondes
-      setTimeout(() => msg.remove(), 5000);
+    if (!data || data.length === 0) {
+      console.warn('⚠️ Insertion silencieuse (RLS ?):', data);
+      if (carte) {
+        const msg = document.createElement('div');
+        msg.style.cssText = 'margin-top:8px; padding:8px 12px; background:rgba(228,184,96,0.1); color:var(--gold); font-size:11px; border-radius:8px; border:1px solid rgba(228,184,96,0.3);';
+        msg.textContent = '⚠️ Insertion bloquée (probablement par RLS — pas admin ?)';
+        carte.appendChild(msg);
+      }
+      return;
     }
 
-    console.log('✓ Facture insérée dans Supabase charges:', { fournisseur, categorie, montant_ttc });
+    // Succès → toast vert
+    console.log('✓ Facture insérée dans Supabase charges:', data[0]);
+    if (carte) {
+      const msg = document.createElement('div');
+      msg.style.cssText = 'margin-top:8px; padding:8px 12px; background:rgba(168,225,12,0.1); color:var(--lime); font-size:11px; border-radius:8px; border:1px solid rgba(168,225,12,0.3);';
+      msg.innerHTML = `✓ Ajoutée à la compta dans <strong>${CAT_LIBELLES[categorie] || categorie}</strong> (${montant_ttc.toFixed(2)}€)`;
+      carte.appendChild(msg);
+      setTimeout(() => msg.remove(), 8000);
+    }
+
   } catch (e) {
-    console.warn('Échec insertion Supabase:', e);
+    console.error('❌ Échec insertion Supabase:', e);
+    if (carte) {
+      const msg = document.createElement('div');
+      msg.style.cssText = 'margin-top:8px; padding:8px 12px; background:rgba(230,57,70,0.1); color:var(--sriracha); font-size:11px; border-radius:8px; border:1px solid rgba(230,57,70,0.3);';
+      msg.innerHTML = `⚠️ Erreur compta : <strong>${e.message}</strong>`;
+      carte.appendChild(msg);
+    }
   }
 }
 // Compresse et convertit l'image en base64
