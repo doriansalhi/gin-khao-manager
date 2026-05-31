@@ -3155,38 +3155,16 @@ async function scanFacture(input) {
   }
 
   // 2) Archivage Drive + ligne dans le Sheet (avec les montants lus)
+  // ⚠️ NE PAS MODIFIER : appel non-bloquant qui marchait avant
   const nomFichier = `facture-${new Date().toISOString().slice(0,10)}-${Date.now()}.jpg`;
-  let sheetOk = false;
-  try {
-    const resUpload = await fetch('/.netlify/functions/upload-facture', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ image: img.data, mediaType: img.type, nom: nomFichier, facture: factureLue })
-    });
-    const dUpload = await resUpload.json();
-    if (dUpload.ok) {
-      sheetOk = true;
-      console.log('✓ Archivée Drive + Sheet:', dUpload.lien);
-    } else {
-      console.warn('Réponse upload-facture:', dUpload);
-    }
-  } catch (e) {
-    console.warn('Échec archivage Drive/Sheet:', e);
-  }
-
-  // Affichage du statut Sheets sous la carte
-  const carteSheet = document.getElementById('invoice-demo');
-  if (carteSheet) {
-    const msgSheet = document.createElement('div');
-    msgSheet.style.cssText = sheetOk
-      ? 'margin-top:8px; padding:6px 10px; background:rgba(168,225,12,0.1); color:var(--lime); font-size:11px; border-radius:8px; border:1px solid rgba(168,225,12,0.3);'
-      : 'margin-top:8px; padding:6px 10px; background:rgba(230,57,70,0.1); color:var(--sriracha); font-size:11px; border-radius:8px; border:1px solid rgba(230,57,70,0.3);';
-    msgSheet.textContent = sheetOk
-      ? '✓ Archivée sur Google Drive + ligne dans Google Sheets'
-      : '⚠️ Échec archivage Drive/Sheets (voir console F12)';
-    carteSheet.appendChild(msgSheet);
-    setTimeout(() => msgSheet.remove(), 8000);
-  }
+  fetch('/.netlify/functions/upload-facture', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ image: img.data, mediaType: img.type, nom: nomFichier, facture: factureLue })
+  })
+  .then(r => r.json())
+  .then(d => { if (d.ok) console.log('Archivée + tableau:', d.lien); else console.log('Réponse:', d); })
+  .catch(e => console.log('Échec archivage:', e));
 
   // 3) [NOUVEAU] Insertion dans Supabase pour alimenter la compta de l'app
   if (factureLue && factureLue.montant_ttc != null && factureLue.montant_ttc > 0) {
