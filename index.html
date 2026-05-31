@@ -2521,7 +2521,7 @@ html, body {
         <header class="app-header">
           <div>
             <h1 class="screen-title">Compta</h1>
-            <p class="screen-sub">Mai 2026 · données arrêtées au 19/05</p>
+            <p class="screen-sub" id="compta-sub">Chargement…</p>
           </div>
           <button class="bell" aria-label="Exporter">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
@@ -2531,12 +2531,12 @@ html, body {
         <!-- 1. MARGE NETTE (le chiffre qui compte) -->
         <div class="finance-hero">
           <div class="hero-label">Marge nette estimée · ce mois</div>
-          <div class="hero-amount">3 240<span class="currency">€</span></div>
+          <div class="hero-amount" id="compta-marge-nette">0<span class="currency">€</span></div>
           <div class="hero-delta">
-            <span class="up">↑ +6,2%</span>
-            <span class="label">vs avril · soit 14,8% du CA</span>
+            <span class="up" id="compta-marge-delta">—</span>
+            <span class="label" id="compta-marge-pct">— du CA</span>
           </div>
-          <div class="sub-line">CA 21 900€ — Charges 18 660€. <strong style="color: var(--gold);">L'IA estime que tu pourrais atteindre 4 100€</strong> en corrigeant les 2 fuites ci-dessous.</div>
+          <div class="sub-line" id="compta-marge-sub">CA — Charges. Saisis tes charges pour voir la vraie marge.</div>
         </div>
 
         <!-- Cascade financière -->
@@ -2546,85 +2546,20 @@ html, body {
             <button class="btn-mini-action" onclick="ouvrirCharges()">+ Saisir une charge</button>
           </div>
           <div class="chart-card">
-            <div class="waterfall">
-              <div class="wf-row">
-                <div class="wf-bar-wrap">
-                  <div class="wf-top"><span class="wf-name">Chiffre d'affaires</span><span class="wf-val pos">+21 900€</span></div>
-                  <div class="wf-track"><div class="wf-fill ca" style="width: 100%"></div></div>
-                </div>
-              </div>
-              <div class="wf-row">
-                <div class="wf-bar-wrap">
-                  <div class="wf-top"><span class="wf-name">Matières premières</span><span class="wf-val neg">−6 350€</span></div>
-                  <div class="wf-track"><div class="wf-fill cost" style="width: 29%"></div></div>
-                </div>
-              </div>
-              <div class="wf-row">
-                <div class="wf-bar-wrap">
-                  <div class="wf-top"><span class="wf-name">Commissions Uber + Deliveroo</span><span class="wf-val neg">−3 420€</span></div>
-                  <div class="wf-track"><div class="wf-fill cost" style="width: 16%"></div></div>
-                </div>
-              </div>
-              <div class="wf-row">
-                <div class="wf-bar-wrap">
-                  <div class="wf-top"><span class="wf-name">Salaires</span><span class="wf-val neg">−4 800€</span></div>
-                  <div class="wf-track"><div class="wf-fill cost" style="width: 22%"></div></div>
-                </div>
-              </div>
-              <div class="wf-row">
-                <div class="wf-bar-wrap">
-                  <div class="wf-top"><span class="wf-name">Loyer + énergie</span><span class="wf-val neg">−2 650€</span></div>
-                  <div class="wf-track"><div class="wf-fill cost" style="width: 12%"></div></div>
-                </div>
-              </div>
-              <div class="wf-row">
-                <div class="wf-bar-wrap">
-                  <div class="wf-top"><span class="wf-name">Emballages + divers</span><span class="wf-val neg">−1 440€</span></div>
-                  <div class="wf-track"><div class="wf-fill cost" style="width: 7%"></div></div>
-                </div>
-              </div>
-              <div class="wf-divider"></div>
-              <div class="wf-row">
-                <div class="wf-bar-wrap">
-                  <div class="wf-top"><span class="wf-name total">Reste (marge nette)</span><span class="wf-val pos">+3 240€</span></div>
-                  <div class="wf-track"><div class="wf-fill net" style="width: 15%"></div></div>
-                </div>
-              </div>
+            <div class="waterfall" id="compta-waterfall">
+              <!-- Rempli dynamiquement -->
             </div>
           </div>
         </div>
 
         <!-- 2. FUITES D'ARGENT (alertes financières) -->
-        <div class="section">
+        <div class="section" id="compta-fuites-section">
           <div class="section-head">
             <h3 class="section-title">Fuites d'argent détectées</h3>
-            <span class="section-link" style="color: var(--sriracha);">2 actives</span>
+            <span class="section-link" id="compta-fuites-count" style="color: var(--sriracha);">0 actives</span>
           </div>
-
-          <div class="fin-alert">
-            <div class="fin-alert-head">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--sriracha)" stroke-width="2.5" stroke-linecap="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg>
-              <span class="tag">Alerte financière</span>
-              <span class="amount">−1 280€/mois</span>
-            </div>
-            <div class="fin-row"><span class="k">Problème</span><span class="v">Dépendance livraison : <strong>26% du CA</strong> part en commissions Uber/Deliveroo (norme saine : &lt;18%).</span></div>
-            <div class="fin-row"><span class="k">Impact</span><span class="v"><strong>−1 280€/mois</strong> vs un mix sain. Les plats livrés rapportent 2× moins que sur place.</span></div>
-            <div class="fin-row"><span class="k">Cause</span><span class="v">Pas d'incitation au retrait / sur place. Aucune commande directe (site, téléphone).</span></div>
-            <div class="fin-row"><span class="k">Action</span><span class="v">Lancer "Click & Collect" (0% commission) + offre −10% en retrait. Objectif : basculer 30% des commandes.</span></div>
-            <button class="fin-action">Voir le plan détaillé →</button>
-          </div>
-
-          <div class="fin-alert warn">
-            <div class="fin-alert-head">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-              <span class="tag">Alerte financière</span>
-              <span class="amount">−165€/mois</span>
-            </div>
-            <div class="fin-row"><span class="k">Problème</span><span class="v">Hausse <strong>+18% sur le boeuf</strong> chez Metro depuis avril. Marge Bo Bun tombée à 54%.</span></div>
-            <div class="fin-row"><span class="k">Impact</span><span class="v"><strong>−165€/mois</strong> sur les ventes de Bo Bun au rythme actuel.</span></div>
-            <div class="fin-row"><span class="k">Cause</span><span class="v">Prix fournisseur non renégocié + prix de vente Bo Bun figé à 12€ depuis l'ouverture.</span></div>
-            <div class="fin-row"><span class="k">Action</span><span class="v">Passer Bo Bun à 12,90€ (+0,90€) ou tester Promocash (−9% estimé sur le boeuf).</span></div>
-            <button class="fin-action">Appliquer le nouveau prix</button>
+          <div id="compta-fuites-liste">
+            <!-- Rempli dynamiquement -->
           </div>
         </div>
 
@@ -2632,7 +2567,7 @@ html, body {
         <div class="section">
           <div class="section-head">
             <h3 class="section-title">Factures fournisseurs</h3>
-            <span class="section-link" style="color: var(--text-mute);">14 ce mois</span>
+            <span class="section-link" style="color: var(--text-mute);" id="compta-factures-count">— ce mois</span>
           </div>
           <!-- Bouton scan réel : ouvre l'appareil photo -->
           <label class="scan-card" for="invoice-input" style="cursor:pointer; display:flex; flex-direction:column; align-items:center; text-align:center; width:100%;">
@@ -2659,29 +2594,26 @@ html, body {
               <div class="ie-field"><div class="lbl">Statut</div><div class="val" style="font-family: var(--body); font-size: 12px;">Lu par IA</div></div>
             </div>
           </div>
+        </div>
+
         <!-- 4. TRÉSORERIE -->
         <div class="section">
           <div class="section-head">
             <h3 class="section-title">Trésorerie</h3>
-            <span class="section-link" style="color: var(--lime);">saine</span>
+            <span class="section-link" id="compta-treso-status" style="color: var(--lime);">—</span>
           </div>
           <div class="treso-card">
-            <div class="treso-label">Solde estimé actuel</div>
-            <div class="treso-now">8 450€</div>
+            <div class="treso-label">CA encaissé sur 30 jours</div>
+            <div class="treso-now" id="compta-treso-now">0€</div>
             <div class="hero-delta" style="margin-top: 8px;">
-              <span class="up">↑ +1 240€</span>
-              <span class="label">sur 30 jours · ~42 jours d'avance de charges</span>
+              <span class="up" id="compta-treso-delta">—</span>
+              <span class="label" id="compta-treso-jours">—</span>
             </div>
-            <div class="treso-bars">
-              <div class="tb flat" style="height: 55%"></div>
-              <div class="tb flat" style="height: 48%"></div>
-              <div class="tb up" style="height: 62%"></div>
-              <div class="tb up" style="height: 70%"></div>
-              <div class="tb up" style="height: 78%"></div>
-              <div class="tb up" style="height: 88%"></div>
+            <div class="treso-bars" id="compta-treso-bars">
+              <!-- Rempli dynamiquement -->
             </div>
-            <div class="treso-bars-labels">
-              <span>déc</span><span>jan</span><span>fév</span><span>mar</span><span>avr</span><span>mai</span>
+            <div class="treso-bars-labels" id="compta-treso-labels">
+              <!-- Rempli dynamiquement -->
             </div>
           </div>
         </div>
@@ -2695,7 +2627,7 @@ html, body {
   Modifier l'email du comptable
 </button>
           <p style="font-size: 11px; color: var(--text-dim); text-align: center; margin-top: 10px; line-height: 1.5;">
-            TVA estimative du mois : <strong style="color: var(--text-mute);">~412€ à reverser</strong><br>
+            TVA estimative du mois : <strong style="color: var(--text-mute);" id="compta-tva-estim">~0€ à reverser</strong><br>
             L'IA prépare les données, mais ne remplace pas ton expert-comptable.
           </p>
         </div>
@@ -4221,6 +4153,402 @@ function abonnerChargesRealtime() {
 }
 // Lance l'abonnement au démarrage
 if (typeof sbClient !== 'undefined') abonnerChargesRealtime();
+
+
+// ============================================================
+//  ÉCRAN COMPTA — Vraies données + alertes IA
+// ============================================================
+
+// Libellés courts des catégories de charges pour la cascade
+const CAT_COURT = {
+  matieres_premieres: 'Matières premières',
+  salaires: 'Salaires',
+  loyer: 'Loyer',
+  energie: 'Énergie',
+  emballages: 'Emballages',
+  equipement: 'Équipement',
+  autres: 'Autres'
+};
+
+// Seuils d'alerte (% du CA) pour détecter les fuites d'argent
+const SEUILS_FUITES = {
+  matieres_premieres: { max: 32, lbl: 'Matières premières', icon: '🥩', conseil: 'Renégocier les prix fournisseur ou changer de fournisseur (Promocash vs Metro)' },
+  salaires:           { max: 35, lbl: 'Salaires',           icon: '👥', conseil: 'Optimiser les plannings, réduire les heures aux moments creux' },
+  commissions:        { max: 20, lbl: 'Commissions Uber+Deliveroo', icon: '🛵', conseil: 'Pousser le Click & Collect (0% commission) et la vente sur place' },
+  energie:            { max: 5,  lbl: 'Énergie',            icon: '⚡', conseil: 'Vérifier les factures EDF/eau, isolation, équipements anciens' },
+  emballages:         { max: 4,  lbl: 'Emballages',         icon: '📦', conseil: 'Optimiser les contenants, négocier en volume' },
+  loyer:              { max: 12, lbl: 'Loyer',              icon: '🏠', conseil: 'Difficile à réduire — augmenter le CA pour diluer le coût' }
+};
+
+// Récupère le mois en cours au format YYYY-MM
+function moisCourantStr() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+}
+
+// Récupère le mois précédent
+function moisPrecedentStr() {
+  const d = new Date();
+  d.setMonth(d.getMonth() - 1);
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+}
+
+// Récupère le CA et les commissions d'un mois donné depuis les ventes
+async function recupererCAetCommissions(moisYYYYMM) {
+  const [annee, mois] = moisYYYYMM.split('-').map(Number);
+  const debut = new Date(annee, mois - 1, 1).toISOString();
+  const fin = new Date(annee, mois, 1).toISOString();
+
+  const { data: ventes, error } = await sbClient.from('ventes')
+    .select('total, montant_net, mode_paiement, canal, statut')
+    .eq('restaurant_id', RESTO_ID)
+    .gte('cree_le', debut)
+    .lt('cree_le', fin)
+    .eq('statut', 'validee');
+
+  if (error) {
+    console.error('Erreur CA:', error);
+    return { ca: 0, commissions: 0, nbVentes: 0 };
+  }
+
+  const ca = (ventes || []).reduce((s, v) => s + Number(v.total || 0), 0);
+
+  // Commissions = différence entre total et montant_net pour les ventes plateforme
+  const commissions = (ventes || [])
+    .filter(v => v.mode_paiement === 'plateforme' && v.montant_net !== null)
+    .reduce((s, v) => s + (Number(v.total || 0) - Number(v.montant_net || 0)), 0);
+
+  return { ca, commissions, nbVentes: (ventes || []).length };
+}
+
+// Récupère les charges d'un mois groupées par catégorie
+async function recupererCharges(moisYYYYMM) {
+  const { data, error } = await sbClient.from('charges')
+    .select('categorie, montant_ttc, montant_ht, tva')
+    .eq('restaurant_id', RESTO_ID)
+    .eq('mois', moisYYYYMM);
+
+  if (error) {
+    console.error('Erreur charges:', error);
+    return { parCategorie: {}, total: 0, nbFactures: 0, tvaTotal: 0 };
+  }
+
+  const parCategorie = {};
+  let total = 0;
+  let tvaTotal = 0;
+  (data || []).forEach(c => {
+    const cat = c.categorie;
+    if (!parCategorie[cat]) parCategorie[cat] = 0;
+    parCategorie[cat] += Number(c.montant_ttc || 0);
+    total += Number(c.montant_ttc || 0);
+    tvaTotal += Number(c.tva || 0);
+  });
+
+  return { parCategorie, total, nbFactures: (data || []).length, tvaTotal };
+}
+
+// Formate un nombre en euros (style "12 345€")
+function fmtEur(n) {
+  return Math.round(n).toLocaleString('fr-FR') + '€';
+}
+
+// Rafraîchit toute la page Compta
+async function rafraichirCompta() {
+  try {
+    const moisActuel = moisCourantStr();
+    const moisPrec = moisPrecedentStr();
+
+    // Sous-titre dynamique
+    const sub = document.getElementById('compta-sub');
+    if (sub) {
+      const noms = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+      const d = new Date();
+      sub.textContent = `${noms[d.getMonth()]} ${d.getFullYear()} · données en direct`;
+    }
+
+    // Récupère mois actuel + précédent en parallèle
+    const [act, prec] = await Promise.all([
+      Promise.all([recupererCAetCommissions(moisActuel), recupererCharges(moisActuel)]),
+      Promise.all([recupererCAetCommissions(moisPrec), recupererCharges(moisPrec)])
+    ]);
+    const [{ ca, commissions, nbVentes }, charges] = act;
+    const [{ ca: caPrec }, chargesPrec] = prec;
+
+    const totalCharges = charges.total;
+    const totalChargesPrec = chargesPrec.total;
+    const margeNette = ca - commissions - totalCharges;
+    const margePrec = caPrec - prec[0].commissions - totalChargesPrec;
+    const pctMarge = ca > 0 ? (margeNette / ca) * 100 : 0;
+
+    // ===== Hero : marge nette =====
+    document.getElementById('compta-marge-nette').innerHTML =
+      `${Math.round(margeNette).toLocaleString('fr-FR')}<span class="currency">€</span>`;
+
+    const elDelta = document.getElementById('compta-marge-delta');
+    if (margePrec === 0 || !isFinite(margePrec)) {
+      elDelta.textContent = '—';
+      elDelta.className = '';
+    } else {
+      const variation = ((margeNette - margePrec) / Math.abs(margePrec)) * 100;
+      const fleche = variation >= 0 ? '↑' : '↓';
+      elDelta.textContent = `${fleche} ${variation >= 0 ? '+' : ''}${variation.toFixed(1)}%`;
+      elDelta.className = variation >= 0 ? 'up' : 'down';
+    }
+    document.getElementById('compta-marge-pct').textContent =
+      `vs ${moisLabel(moisPrec)} · soit ${pctMarge.toFixed(1)}% du CA`;
+    document.getElementById('compta-marge-sub').innerHTML =
+      `CA ${fmtEur(ca)} — Charges ${fmtEur(totalCharges + commissions)}. ${nbVentes > 0 ? `<strong style="color: var(--gold);">${nbVentes} ventes ce mois</strong>` : 'Pas encore de ventes ce mois.'}`;
+
+    // ===== Cascade "Où part l'argent" =====
+    afficherCascadeCompta(ca, commissions, charges.parCategorie, margeNette);
+
+    // ===== Fuites d'argent =====
+    afficherFuites(ca, commissions, charges.parCategorie);
+
+    // ===== Trésorerie (CA 6 derniers mois) =====
+    afficherTresorerie();
+
+    // ===== Factures count + TVA estimative =====
+    document.getElementById('compta-factures-count').textContent = `${charges.nbFactures} ce mois`;
+    // TVA collectée sur les ventes (estimation à 10% en restauration sur place)
+    // TVA déductible = TVA sur charges
+    const tvaCollectee = ca * 0.10 / 1.10; // si prix TTC, 10% reverse
+    const tvaAreverser = Math.max(0, tvaCollectee - charges.tvaTotal);
+    document.getElementById('compta-tva-estim').textContent = `~${fmtEur(tvaAreverser)} à reverser`;
+
+  } catch (e) {
+    console.error('Erreur rafraichirCompta:', e);
+  }
+}
+
+// Affiche la cascade financière
+function afficherCascadeCompta(ca, commissions, chargesParCat, margeNette) {
+  const zone = document.getElementById('compta-waterfall');
+  if (!zone) return;
+
+  // Si pas de CA, on affiche un message
+  if (ca === 0 && Object.keys(chargesParCat).length === 0) {
+    zone.innerHTML = `<div style="padding: 24px; text-align: center; color: var(--text-mute);">
+      <p style="font-size: 13px;">Aucune donnée ce mois.</p>
+      <p style="font-size: 11px; margin-top: 6px;">Saisis tes charges et fais des ventes pour voir la cascade.</p>
+    </div>`;
+    return;
+  }
+
+  let html = '';
+
+  // CA
+  html += `<div class="wf-row">
+    <div class="wf-bar-wrap">
+      <div class="wf-top"><span class="wf-name">Chiffre d'affaires</span><span class="wf-val pos">+${fmtEur(ca)}</span></div>
+      <div class="wf-track"><div class="wf-fill ca" style="width: 100%"></div></div>
+    </div>
+  </div>`;
+
+  // Commissions (si > 0)
+  if (commissions > 0) {
+    const pct = ca > 0 ? (commissions / ca) * 100 : 0;
+    html += `<div class="wf-row">
+      <div class="wf-bar-wrap">
+        <div class="wf-top"><span class="wf-name">Commissions Uber + Deliveroo</span><span class="wf-val neg">−${fmtEur(commissions)}</span></div>
+        <div class="wf-track"><div class="wf-fill cost" style="width: ${pct.toFixed(1)}%"></div></div>
+      </div>
+    </div>`;
+  }
+
+  // Charges par catégorie, triées par montant décroissant
+  const charges = Object.entries(chargesParCat).sort((a, b) => b[1] - a[1]);
+  charges.forEach(([cat, montant]) => {
+    const pct = ca > 0 ? (montant / ca) * 100 : 50;
+    const label = CAT_COURT[cat] || cat;
+    html += `<div class="wf-row">
+      <div class="wf-bar-wrap">
+        <div class="wf-top"><span class="wf-name">${label}</span><span class="wf-val neg">−${fmtEur(montant)}</span></div>
+        <div class="wf-track"><div class="wf-fill cost" style="width: ${pct.toFixed(1)}%"></div></div>
+      </div>
+    </div>`;
+  });
+
+  // Marge nette
+  const pctMarge = ca > 0 ? (margeNette / ca) * 100 : 0;
+  const cls = margeNette >= 0 ? 'pos' : 'neg';
+  const signe = margeNette >= 0 ? '+' : '−';
+  html += `<div class="wf-divider"></div>
+  <div class="wf-row">
+    <div class="wf-bar-wrap">
+      <div class="wf-top"><span class="wf-name total">Reste (marge nette)</span><span class="wf-val ${cls}">${signe}${fmtEur(Math.abs(margeNette))}</span></div>
+      <div class="wf-track"><div class="wf-fill net" style="width: ${Math.abs(pctMarge).toFixed(1)}%"></div></div>
+    </div>
+  </div>`;
+
+  zone.innerHTML = html;
+}
+
+// Détecte et affiche les fuites d'argent (ratios > seuils)
+function afficherFuites(ca, commissions, chargesParCat) {
+  const liste = document.getElementById('compta-fuites-liste');
+  const count = document.getElementById('compta-fuites-count');
+  const section = document.getElementById('compta-fuites-section');
+
+  if (ca === 0) {
+    section.style.display = 'none';
+    return;
+  }
+  section.style.display = '';
+
+  const fuites = [];
+
+  // Vérifier les charges par catégorie
+  Object.entries(chargesParCat).forEach(([cat, montant]) => {
+    const seuil = SEUILS_FUITES[cat];
+    if (!seuil) return;
+    const pct = (montant / ca) * 100;
+    if (pct > seuil.max) {
+      const excedent = montant - (ca * seuil.max / 100);
+      fuites.push({
+        type: cat,
+        icon: seuil.icon,
+        titre: seuil.lbl,
+        pct: pct.toFixed(1),
+        seuil: seuil.max,
+        impact: excedent,
+        conseil: seuil.conseil
+      });
+    }
+  });
+
+  // Vérifier les commissions
+  if (commissions > 0) {
+    const pctComm = (commissions / ca) * 100;
+    const sCom = SEUILS_FUITES.commissions;
+    if (pctComm > sCom.max) {
+      const excedent = commissions - (ca * sCom.max / 100);
+      fuites.push({
+        type: 'commissions',
+        icon: sCom.icon,
+        titre: sCom.lbl,
+        pct: pctComm.toFixed(1),
+        seuil: sCom.max,
+        impact: excedent,
+        conseil: sCom.conseil
+      });
+    }
+  }
+
+  // Tri par impact financier décroissant
+  fuites.sort((a, b) => b.impact - a.impact);
+
+  count.textContent = `${fuites.length} active${fuites.length > 1 ? 's' : ''}`;
+  count.style.color = fuites.length === 0 ? 'var(--lime)' : 'var(--sriracha)';
+
+  if (fuites.length === 0) {
+    liste.innerHTML = `<div class="fin-alert" style="border-color: var(--lime-soft); background: rgba(168,225,12,0.06);">
+      <div class="fin-alert-head">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--lime)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+        <span class="tag" style="color: var(--lime); border-color: var(--lime-soft);">Tout va bien</span>
+      </div>
+      <div class="fin-row"><span class="v">Ratios sains, bonne maîtrise des charges sur ce mois. Continue comme ça ! 🎉</span></div>
+    </div>`;
+    return;
+  }
+
+  liste.innerHTML = fuites.map(f => `
+    <div class="fin-alert">
+      <div class="fin-alert-head">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--sriracha)" stroke-width="2.5" stroke-linecap="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg>
+        <span class="tag">${f.icon} ${f.titre}</span>
+        <span class="amount">−${fmtEur(f.impact)}/mois</span>
+      </div>
+      <div class="fin-row"><span class="k">Problème</span><span class="v"><strong>${f.pct}% du CA</strong> en ${f.titre.toLowerCase()} (norme saine : &lt;${f.seuil}%).</span></div>
+      <div class="fin-row"><span class="k">Impact</span><span class="v"><strong>−${fmtEur(f.impact)}/mois</strong> au-dessus du seuil sain.</span></div>
+      <div class="fin-row"><span class="k">Conseil</span><span class="v">${f.conseil}</span></div>
+    </div>
+  `).join('');
+}
+
+// Affiche la trésorerie (CA des 6 derniers mois en barres)
+async function afficherTresorerie() {
+  const moisLabels = ['janv.','févr.','mars','avr.','mai','juin','juil.','août','sept.','oct.','nov.','déc.'];
+  const aujourd = new Date();
+
+  // Récupère le CA des 6 derniers mois
+  const promesses = [];
+  const labels = [];
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date(aujourd.getFullYear(), aujourd.getMonth() - i, 1);
+    const yyyymm = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+    promesses.push(recupererCAetCommissions(yyyymm));
+    labels.push(moisLabels[d.getMonth()]);
+  }
+  const resultats = await Promise.all(promesses);
+  const cas = resultats.map(r => r.ca);
+
+  // Affichage actuel
+  const caActuel = cas[cas.length - 1];
+  const caPrec30 = cas[cas.length - 2] || 0;
+  const variation = caActuel - caPrec30;
+
+  document.getElementById('compta-treso-now').textContent = fmtEur(caActuel);
+  const elDelta = document.getElementById('compta-treso-delta');
+  if (caPrec30 === 0) {
+    elDelta.textContent = '—';
+  } else {
+    const signe = variation >= 0 ? '↑ +' : '↓ ';
+    elDelta.textContent = `${signe}${fmtEur(Math.abs(variation))}`;
+    elDelta.className = variation >= 0 ? 'up' : 'down';
+  }
+  document.getElementById('compta-treso-jours').textContent = `sur 30 jours · vs mois précédent`;
+
+  // Statut santé : tendance positive sur 3 derniers mois ?
+  const elStatus = document.getElementById('compta-treso-status');
+  if (caActuel > caPrec30 && caActuel > 0) {
+    elStatus.textContent = 'en croissance';
+    elStatus.style.color = 'var(--lime)';
+  } else if (caActuel < caPrec30 * 0.8) {
+    elStatus.textContent = 'en baisse';
+    elStatus.style.color = 'var(--sriracha)';
+  } else {
+    elStatus.textContent = 'stable';
+    elStatus.style.color = 'var(--gold)';
+  }
+
+  // Barres
+  const maxCA = Math.max(...cas, 1);
+  const barsZone = document.getElementById('compta-treso-bars');
+  const labelsZone = document.getElementById('compta-treso-labels');
+  if (barsZone && labelsZone) {
+    barsZone.innerHTML = cas.map((ca, i) => {
+      const h = Math.max(8, (ca / maxCA) * 100);
+      const cls = i === cas.length - 1 ? 'up' : (ca > (cas[i - 1] || 0) ? 'up' : 'flat');
+      return `<div class="tb ${cls}" style="height: ${h.toFixed(0)}%"></div>`;
+    }).join('');
+    labelsZone.innerHTML = labels.map(l => `<span>${l}</span>`).join('');
+  }
+}
+
+// Realtime : recharge la compta quand une charge OU une vente change
+function abonnerComptaRealtime() {
+  sbClient.channel('compta-changes')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'charges' },
+        () => { if (document.getElementById('screen-compta').classList.contains('active')) rafraichirCompta(); })
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'ventes' },
+        () => { if (document.getElementById('screen-compta').classList.contains('active')) rafraichirCompta(); })
+    .subscribe();
+}
+
+// Hook : déclenche le chargement quand on clique sur l'onglet Compta
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('[data-screen="compta"]').forEach(btn => {
+    btn.addEventListener('click', () => setTimeout(rafraichirCompta, 100));
+  });
+  abonnerComptaRealtime();
+});
+if (document.readyState !== 'loading') {
+  document.querySelectorAll('[data-screen="compta"]').forEach(btn => {
+    btn.addEventListener('click', () => setTimeout(rafraichirCompta, 100));
+  });
+  if (typeof sbClient !== 'undefined') abonnerComptaRealtime();
+}
 
 
 function attendreSessionPuisInitHome() {
