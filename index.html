@@ -1642,7 +1642,193 @@ html, body {
   .chat-header { padding-top: calc(env(safe-area-inset-top, 0px) + 16px); }
   /* La barre du bas respecte la barre d'accueil iPhone */
   .bottom-nav { padding-bottom: calc(14px + env(safe-area-inset-bottom, 0px)); }
+}/* ===== MODALE CHARGES (plein écran) ===== */
+.charges-modal {
+  position: fixed;
+  inset: 0;
+  background: var(--bg-deep, #0A0908);
+  z-index: 9000;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.3s cubic-bezier(0.16,1,0.3,1);
 }
+.charges-modal.show { transform: translateX(0); }
+
+.charges-vue-liste, .charges-vue-editeur {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.charges-vue-editeur { display: none; }
+.charges-modal.show.editeur .charges-vue-liste { display: none; }
+.charges-modal.show.editeur .charges-vue-editeur { display: flex; }
+
+.charges-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 18px 18px 14px;
+  border-bottom: 1px solid var(--border, #2D261E);
+  flex-shrink: 0;
+}
+.charges-head h2 {
+  flex: 1;
+  font-family: var(--display, 'Fraunces', serif);
+  font-size: 18px;
+  font-weight: 500;
+  margin: 0;
+}
+.charges-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 18px 40px;
+}
+
+.charges-filtres {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.charges-filtres > div {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-bottom: 4px;
+}
+.charges-filtres > div::-webkit-scrollbar { display: none; }
+
+.charges-recap {
+  background: linear-gradient(135deg, var(--surface-2, #251F19) 0%, var(--surface, #1C1814) 100%);
+  border: 1px solid var(--border, #2D261E);
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+.charges-recap-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 12px;
+}
+.charges-recap-row .lbl {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-mute, #8B7E6F);
+  font-weight: 600;
+}
+.charges-recap-row .val {
+  font-family: var(--display, 'Fraunces', serif);
+  font-size: 22px;
+  font-weight: 500;
+  color: var(--sriracha, #E63946);
+}
+.charges-recap-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12px;
+}
+.charges-recap-bars .crb-row {
+  display: flex;
+  justify-content: space-between;
+  color: var(--text-soft, #C7B9A5);
+}
+.charges-recap-bars .crb-row .nm { display: flex; align-items: center; gap: 6px; }
+
+.charges-liste {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.charge-mois-titre {
+  font-family: var(--display, 'Fraunces', serif);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--gold, #E4B860);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin: 16px 4px 6px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border, #2D261E);
+}
+.charge-mois-titre:first-child { margin-top: 4px; }
+
+.charge-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 14px;
+  background: var(--surface, #1C1814);
+  border: 1px solid var(--border, #2D261E);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.charge-row:hover { border-color: var(--gold-soft, #B8924E); }
+.charge-row:active { transform: scale(0.98); }
+.charge-icone {
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  background: var(--surface-2, #251F19);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+.charge-info { flex: 1; min-width: 0; }
+.charge-fournisseur {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text, #F5EDE2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.charge-meta {
+  font-size: 11px;
+  color: var(--text-mute, #8B7E6F);
+  margin-top: 2px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.charge-recurrent-badge {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--gold, #E4B860);
+  border: 1px solid var(--gold-soft, #B8924E);
+  padding: 2px 6px;
+  border-radius: 999px;
+}
+.charge-montant {
+  font-family: var(--display, 'Fraunces', serif);
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--sriracha, #E63946);
+  white-space: nowrap;
+}
+
+.btn-mini-action {
+  background: transparent;
+  color: var(--gold, #E4B860);
+  border: 1px solid var(--gold-soft, #B8924E);
+  padding: 6px 12px;
+  font-size: 11px;
+  font-weight: 700;
+  border-radius: 999px;
+  cursor: pointer;
+  font-family: inherit;
+}
+.btn-mini-action:hover { background: rgba(228,184,96,0.1); }
+
 </style>
 </head>
 <body>
@@ -2215,7 +2401,7 @@ html, body {
         <div class="section">
           <div class="section-head">
             <h3 class="section-title">Où part l'argent</h3>
-            <span class="section-link" style="color: var(--text-mute);">ce mois</span>
+            <button class="btn-mini-action" onclick="ouvrirCharges()">+ Saisir une charge</button>
           </div>
           <div class="chart-card">
             <div class="waterfall">
@@ -2490,6 +2676,122 @@ html, body {
 
         <div style="height: 40px;"></div>
       </section>
+
+      <!-- ====== MODALE CHARGES (plein écran) ====== -->
+      <div class="charges-modal" id="charges-modal">
+        <!-- VUE LISTE -->
+        <div class="charges-vue-liste" id="charges-vue-liste">
+          <div class="charges-head">
+            <button class="prod-back" onclick="fermerCharges()" title="Retour">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+            </button>
+            <h2>Mes charges</h2>
+            <button class="prod-save" onclick="ouvrirEditeurCharge()">+ Ajouter</button>
+          </div>
+
+          <div class="charges-body">
+            <!-- Filtres mois -->
+            <div class="charges-filtres">
+              <div class="prod-cat-chip active" data-mois="all" onclick="filtrerChargesMois('all')">Tous</div>
+              <div id="charges-mois-list"></div>
+            </div>
+
+            <!-- Carte récap -->
+            <div class="charges-recap" id="charges-recap">
+              <div class="charges-recap-row">
+                <span class="lbl">Total ce mois</span>
+                <span class="val" id="charges-total-mois">— €</span>
+              </div>
+              <div class="charges-recap-bars" id="charges-recap-bars"></div>
+            </div>
+
+            <!-- Liste charges -->
+            <div class="charges-liste" id="charges-liste">
+              <div class="prod-empty">
+                <div class="spinner-mini"></div>
+                <p>Chargement…</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- VUE ÉDITEUR (formulaire ajout/modification) -->
+        <div class="charges-vue-editeur" id="charges-vue-editeur">
+          <div class="charges-head">
+            <button class="prod-back" onclick="retourListeCharges()" title="Retour">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+            </button>
+            <h2 id="charges-editeur-titre">Nouvelle charge</h2>
+            <button class="prod-save" id="charges-save-btn" onclick="sauverCharge()">💾 Enregistrer</button>
+          </div>
+
+          <div class="charges-body">
+            <div class="prod-field">
+              <label>Catégorie *</label>
+              <select id="ch-categorie" onchange="majIconeCategorie()">
+                <option value="matieres_premieres">🥩 Matières premières</option>
+                <option value="salaires">👥 Salaires</option>
+                <option value="loyer">🏠 Loyer</option>
+                <option value="energie">⚡ Énergie</option>
+                <option value="emballages">📦 Emballages</option>
+                <option value="equipement">🔧 Équipement</option>
+                <option value="autres">📋 Autres</option>
+              </select>
+            </div>
+
+            <div class="prod-field">
+              <label>Date de la charge *</label>
+              <input type="date" id="ch-date">
+            </div>
+
+            <div class="prod-field">
+              <label>Fournisseur</label>
+              <input type="text" id="ch-fournisseur" placeholder="Ex: Metro, EDF, Bouygues...">
+            </div>
+
+            <div class="prod-field">
+              <label>Description</label>
+              <input type="text" id="ch-description" placeholder="Détail libre (optionnel)">
+            </div>
+
+            <div class="prod-field">
+              <label>Montant HT (€) *</label>
+              <input type="number" id="ch-ht" step="0.01" min="0" placeholder="0.00" oninput="recalculerTTC()">
+            </div>
+
+            <div class="prod-field">
+              <label>TVA (€)</label>
+              <input type="number" id="ch-tva" step="0.01" min="0" placeholder="0.00" oninput="recalculerTTC()">
+            </div>
+
+            <div class="prod-field">
+              <label>Montant TTC (€) *</label>
+              <input type="number" id="ch-ttc" step="0.01" min="0" placeholder="0.00">
+              <span style="font-size: 11px; color: var(--text-mute, #8B7E6F); margin-top: 4px; display: block;">Calculé auto à partir de HT + TVA, ou saisi directement</span>
+            </div>
+
+            <div class="prod-toggle">
+              <div>
+                <label>Charge récurrente</label>
+                <span class="prod-toggle-help">Loyer, salaires, abonnements... (reproduite chaque mois)</span>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="ch-recurrent">
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="prod-field">
+              <label>Notes (optionnel)</label>
+              <input type="text" id="ch-notes" placeholder="Note interne (n'apparaît pas dans la compta)">
+            </div>
+
+            <button class="prod-delete-btn" id="ch-delete-btn" onclick="supprimerCharge()" style="display:none;">
+              🗑️ Supprimer cette charge
+            </button>
+          </div>
+        </div>
+      </div>
 
       <!-- ====== SCREEN: AI CHAT ====== -->
       <section class="screen" id="screen-ai" style="padding: 0; height: 100%;">
@@ -3419,6 +3721,347 @@ async function initHome() {
 
 // Lancer initHome quand la session est ouverte
 // On utilise un observer sur l'écran de login qui disparait
+// ============================================================
+//  GESTION DES CHARGES
+// ============================================================
+
+// Catégories : icônes et libellés
+const CAT_ICONES = {
+  matieres_premieres: '🥩',
+  salaires: '👥',
+  loyer: '🏠',
+  energie: '⚡',
+  emballages: '📦',
+  equipement: '🔧',
+  autres: '📋'
+};
+const CAT_LIBELLES = {
+  matieres_premieres: 'Matières premières',
+  salaires: 'Salaires',
+  loyer: 'Loyer',
+  energie: 'Énergie',
+  emballages: 'Emballages',
+  equipement: 'Équipement',
+  autres: 'Autres'
+};
+
+let chargesData = [];
+let chargesEnEdition = null;
+let chargesFiltreMois = 'all'; // 'all' ou 'YYYY-MM'
+
+// ========== OUVERTURE / FERMETURE DE LA MODALE ==========
+function ouvrirCharges() {
+  document.getElementById('charges-modal').classList.add('show');
+  chargerChargesData();
+  // Auto-duplique les charges récurrentes du mois précédent si nécessaire
+  autoDupliquerRecurrentes();
+}
+
+function fermerCharges() {
+  const m = document.getElementById('charges-modal');
+  m.classList.remove('show');
+  m.classList.remove('editeur');
+}
+
+function retourListeCharges() {
+  document.getElementById('charges-modal').classList.remove('editeur');
+  chargesEnEdition = null;
+}
+
+// ========== CHARGEMENT DES CHARGES ==========
+async function chargerChargesData() {
+  try {
+    const { data, error } = await sbClient.from('charges')
+      .select('*')
+      .eq('restaurant_id', RESTO_ID)
+      .order('date_charge', { ascending: false });
+    if (error) throw error;
+    chargesData = data || [];
+    afficherChargesListe();
+    afficherChargesMoisFiltre();
+    afficherChargesRecap();
+  } catch (e) {
+    console.error('Erreur charges:', e);
+    document.getElementById('charges-liste').innerHTML =
+      `<div class="prod-empty"><p>⚠️ Erreur : ${e.message}</p></div>`;
+  }
+}
+
+function moisLabel(yyyymm) {
+  if (!yyyymm) return '—';
+  const [annee, mois] = yyyymm.split('-');
+  const labels = ['janv.','févr.','mars','avr.','mai','juin','juil.','août','sept.','oct.','nov.','déc.'];
+  return labels[parseInt(mois, 10) - 1] + ' ' + annee;
+}
+
+function afficherChargesMoisFiltre() {
+  const moisUniques = [...new Set(chargesData.map(c => c.mois).filter(Boolean))];
+  const zone = document.getElementById('charges-mois-list');
+  if (!zone) return;
+  zone.innerHTML = moisUniques.map(m =>
+    `<div class="prod-cat-chip ${chargesFiltreMois === m ? 'active' : ''}" onclick="filtrerChargesMois('${m}')">${moisLabel(m)}</div>`
+  ).join('');
+  // Reset le bouton "Tous"
+  const allBtn = document.querySelector('[data-mois="all"]');
+  if (allBtn) allBtn.classList.toggle('active', chargesFiltreMois === 'all');
+}
+
+function filtrerChargesMois(mois) {
+  chargesFiltreMois = mois;
+  afficherChargesListe();
+  afficherChargesMoisFiltre();
+  afficherChargesRecap();
+}
+
+function afficherChargesListe() {
+  const liste = document.getElementById('charges-liste');
+  let toShow = chargesData;
+  if (chargesFiltreMois !== 'all') {
+    toShow = chargesData.filter(c => c.mois === chargesFiltreMois);
+  }
+  if (toShow.length === 0) {
+    liste.innerHTML = `<div class="prod-empty"><p>Aucune charge enregistrée.<br>Cliquez sur "+ Ajouter" pour commencer.</p></div>`;
+    return;
+  }
+
+  // Regrouper par mois
+  let html = '';
+  let moisCourant = null;
+  toShow.forEach(c => {
+    if (c.mois !== moisCourant) {
+      moisCourant = c.mois;
+      html += `<div class="charge-mois-titre">${moisLabel(moisCourant)}</div>`;
+    }
+    const date = new Date(c.date_charge);
+    const dateFmt = String(date.getDate()).padStart(2, '0') + '/' + String(date.getMonth() + 1).padStart(2, '0');
+    const ttc = Number(c.montant_ttc).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const icone = CAT_ICONES[c.categorie] || '📋';
+    const cat = CAT_LIBELLES[c.categorie] || c.categorie;
+    const nom = c.fournisseur || cat;
+    const recurrent = c.recurrent ? '<span class="charge-recurrent-badge">↻ récurrent</span>' : '';
+    html += `
+      <div class="charge-row" onclick="ouvrirEditeurCharge('${c.id}')">
+        <div class="charge-icone">${icone}</div>
+        <div class="charge-info">
+          <div class="charge-fournisseur">${escapeHtmlSimple(nom)}</div>
+          <div class="charge-meta">${cat} · ${dateFmt} ${recurrent}</div>
+        </div>
+        <div class="charge-montant">${ttc} €</div>
+      </div>`;
+  });
+  liste.innerHTML = html;
+}
+
+function afficherChargesRecap() {
+  // Calcul du total + détail par catégorie pour le mois sélectionné
+  const aujourdhui = new Date();
+  const moisActif = chargesFiltreMois !== 'all' ? chargesFiltreMois :
+    String(aujourdhui.getFullYear()) + '-' + String(aujourdhui.getMonth() + 1).padStart(2, '0');
+
+  const charges = chargesData.filter(c => c.mois === moisActif);
+  const total = charges.reduce((s, c) => s + Number(c.montant_ttc || 0), 0);
+
+  document.getElementById('charges-total-mois').textContent =
+    total.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+
+  // Détail par catégorie
+  const parCat = {};
+  charges.forEach(c => {
+    if (!parCat[c.categorie]) parCat[c.categorie] = 0;
+    parCat[c.categorie] += Number(c.montant_ttc || 0);
+  });
+  const sorted = Object.entries(parCat).sort((a, b) => b[1] - a[1]);
+
+  const bars = document.getElementById('charges-recap-bars');
+  if (sorted.length === 0) {
+    bars.innerHTML = '<div style="font-size:12px; color: var(--text-mute, #8B7E6F);">Aucune charge ce mois</div>';
+    return;
+  }
+  bars.innerHTML = sorted.map(([cat, montant]) => {
+    const icone = CAT_ICONES[cat] || '📋';
+    const lbl = CAT_LIBELLES[cat] || cat;
+    const fmt = montant.toLocaleString('fr-FR', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+    return `<div class="crb-row"><span class="nm">${icone} ${lbl}</span><span>${fmt} €</span></div>`;
+  }).join('');
+}
+
+// ========== ÉDITEUR ==========
+function ouvrirEditeurCharge(id) {
+  chargesEnEdition = id ? chargesData.find(c => c.id === id) : null;
+  document.getElementById('charges-editeur-titre').textContent =
+    chargesEnEdition ? 'Modifier la charge' : 'Nouvelle charge';
+
+  if (chargesEnEdition) {
+    document.getElementById('ch-categorie').value = chargesEnEdition.categorie;
+    document.getElementById('ch-date').value = chargesEnEdition.date_charge;
+    document.getElementById('ch-fournisseur').value = chargesEnEdition.fournisseur || '';
+    document.getElementById('ch-description').value = chargesEnEdition.description || '';
+    document.getElementById('ch-ht').value = chargesEnEdition.montant_ht || 0;
+    document.getElementById('ch-tva').value = chargesEnEdition.tva || 0;
+    document.getElementById('ch-ttc').value = chargesEnEdition.montant_ttc || 0;
+    document.getElementById('ch-recurrent').checked = !!chargesEnEdition.recurrent;
+    document.getElementById('ch-notes').value = chargesEnEdition.notes || '';
+    document.getElementById('ch-delete-btn').style.display = 'block';
+  } else {
+    // Nouveau : valeurs par défaut
+    document.getElementById('ch-categorie').value = 'matieres_premieres';
+    document.getElementById('ch-date').value = new Date().toISOString().slice(0, 10);
+    document.getElementById('ch-fournisseur').value = '';
+    document.getElementById('ch-description').value = '';
+    document.getElementById('ch-ht').value = '';
+    document.getElementById('ch-tva').value = '';
+    document.getElementById('ch-ttc').value = '';
+    document.getElementById('ch-recurrent').checked = false;
+    document.getElementById('ch-notes').value = '';
+    document.getElementById('ch-delete-btn').style.display = 'none';
+  }
+  document.getElementById('charges-modal').classList.add('editeur');
+}
+
+function recalculerTTC() {
+  const ht = parseFloat(document.getElementById('ch-ht').value) || 0;
+  const tva = parseFloat(document.getElementById('ch-tva').value) || 0;
+  const ttcInput = document.getElementById('ch-ttc');
+  // Si l'utilisateur n'a pas saisi de TTC manuellement, on le calcule
+  if (ht > 0 || tva > 0) {
+    ttcInput.value = (ht + tva).toFixed(2);
+  }
+}
+
+function majIconeCategorie() {
+  // (placeholder pour customisation future)
+}
+
+async function sauverCharge() {
+  const categorie = document.getElementById('ch-categorie').value;
+  const date_charge = document.getElementById('ch-date').value;
+  const fournisseur = document.getElementById('ch-fournisseur').value.trim();
+  const description = document.getElementById('ch-description').value.trim();
+  const montant_ht = parseFloat(document.getElementById('ch-ht').value) || 0;
+  const tva = parseFloat(document.getElementById('ch-tva').value) || 0;
+  const montant_ttc = parseFloat(document.getElementById('ch-ttc').value) || 0;
+  const recurrent = document.getElementById('ch-recurrent').checked;
+  const notes = document.getElementById('ch-notes').value.trim();
+
+  if (!date_charge) { alert('La date est obligatoire'); return; }
+  if (montant_ttc <= 0) { alert('Le montant TTC est obligatoire'); return; }
+
+  const btn = document.getElementById('charges-save-btn');
+  btn.disabled = true;
+  btn.textContent = 'Enregistrement…';
+
+  try {
+    if (chargesEnEdition) {
+      const { error } = await sbClient.from('charges').update({
+        categorie, date_charge, fournisseur, description,
+        montant_ht, tva, montant_ttc, recurrent, notes
+      }).eq('id', chargesEnEdition.id);
+      if (error) throw error;
+    } else {
+      const { error } = await sbClient.from('charges').insert({
+        restaurant_id: RESTO_ID,
+        categorie, date_charge, fournisseur, description,
+        montant_ht, tva, montant_ttc, recurrent, notes,
+        source: 'manuel'
+      });
+      if (error) throw error;
+    }
+    retourListeCharges();
+    await chargerChargesData();
+  } catch (e) {
+    alert('Erreur : ' + e.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '💾 Enregistrer';
+  }
+}
+
+async function supprimerCharge() {
+  if (!chargesEnEdition) return;
+  if (!confirm(`Supprimer cette charge ?\n${chargesEnEdition.fournisseur || CAT_LIBELLES[chargesEnEdition.categorie]} · ${chargesEnEdition.montant_ttc}€`)) return;
+
+  try {
+    const { error } = await sbClient.from('charges').delete().eq('id', chargesEnEdition.id);
+    if (error) throw error;
+    retourListeCharges();
+    await chargerChargesData();
+  } catch (e) {
+    alert('Erreur : ' + e.message);
+  }
+}
+
+// ========== CHARGES RÉCURRENTES : duplication automatique ==========
+// Au début de chaque mois, on vérifie si les charges récurrentes du mois
+// précédent ont été dupliquées sur le mois en cours. Si non, on les propose.
+async function autoDupliquerRecurrentes() {
+  try {
+    const aujourdhui = new Date();
+    const moisActuel = String(aujourdhui.getFullYear()) + '-' + String(aujourdhui.getMonth() + 1).padStart(2, '0');
+    const moisPrecedent = new Date(aujourdhui.getFullYear(), aujourdhui.getMonth() - 1, 1);
+    const moisPrecedentStr = String(moisPrecedent.getFullYear()) + '-' + String(moisPrecedent.getMonth() + 1).padStart(2, '0');
+
+    // Récupère les charges récurrentes du mois précédent
+    const { data: recurrentes, error } = await sbClient.from('charges')
+      .select('*')
+      .eq('restaurant_id', RESTO_ID)
+      .eq('recurrent', true)
+      .eq('mois', moisPrecedentStr);
+    if (error) return;
+    if (!recurrentes || recurrentes.length === 0) return;
+
+    // Récupère les charges récurrentes déjà créées ce mois-ci
+    const { data: dejaCe, error: e2 } = await sbClient.from('charges')
+      .select('fournisseur, categorie')
+      .eq('restaurant_id', RESTO_ID)
+      .eq('recurrent', true)
+      .eq('mois', moisActuel);
+    if (e2) return;
+
+    // Filtre celles à dupliquer (pas déjà créées ce mois)
+    const dejaSet = new Set((dejaCe || []).map(c => (c.fournisseur || '') + '|' + c.categorie));
+    const aDupliquer = recurrentes.filter(c => !dejaSet.has((c.fournisseur || '') + '|' + c.categorie));
+    if (aDupliquer.length === 0) return;
+
+    // Demande confirmation
+    const liste = aDupliquer.map(c => `• ${c.fournisseur || CAT_LIBELLES[c.categorie]} (${Number(c.montant_ttc).toFixed(2)}€)`).join('\n');
+    if (!confirm(`📅 ${aDupliquer.length} charge${aDupliquer.length > 1 ? 's' : ''} récurrente${aDupliquer.length > 1 ? 's' : ''} à dupliquer pour ce mois :\n\n${liste}\n\nVeux-tu les ajouter automatiquement ?`)) return;
+
+    // Insertion en masse, mêmes montants, date = aujourd'hui
+    const dateAuj = aujourdhui.toISOString().slice(0, 10);
+    const nouvelles = aDupliquer.map(c => ({
+      restaurant_id: RESTO_ID,
+      categorie: c.categorie,
+      date_charge: dateAuj,
+      fournisseur: c.fournisseur,
+      description: c.description,
+      montant_ht: c.montant_ht,
+      tva: c.tva,
+      montant_ttc: c.montant_ttc,
+      recurrent: true,
+      notes: c.notes,
+      source: 'manuel'
+    }));
+    const { error: e3 } = await sbClient.from('charges').insert(nouvelles);
+    if (e3) throw e3;
+
+    alert(`✓ ${aDupliquer.length} charge${aDupliquer.length > 1 ? 's' : ''} récurrente${aDupliquer.length > 1 ? 's' : ''} ajoutée${aDupliquer.length > 1 ? 's' : ''} pour ce mois.`);
+    await chargerChargesData();
+  } catch (e) {
+    console.warn('Duplication récurrentes:', e);
+  }
+}
+
+// Realtime : met à jour la liste si une charge change
+function abonnerChargesRealtime() {
+  sbClient.channel('charges-changes')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'charges' },
+        () => { if (document.getElementById('charges-modal').classList.contains('show')) chargerChargesData(); })
+    .subscribe();
+}
+// Lance l'abonnement au démarrage
+if (typeof sbClient !== 'undefined') abonnerChargesRealtime();
+
+
 function attendreSessionPuisInitHome() {
   // Si la session est déjà ouverte (login-screen est caché)
   const loginEl = document.getElementById('login-screen');
