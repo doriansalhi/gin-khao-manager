@@ -1767,55 +1767,148 @@ html, body {
   display: flex;
 }
 
-/* Lignes clients dans la modale liste */
+/* Lignes clients dans la modale liste — design pro aéré */
 .client-list-row {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 11px 12px;
-  background: var(--surface, #1C1814);
+  gap: 14px;
+  padding: 16px 14px;
+  background: linear-gradient(135deg, var(--surface, #1C1814) 0%, rgba(28,24,20,0.6) 100%);
   border: 1px solid var(--border, #2D261E);
-  border-radius: 12px;
+  border-radius: 16px;
   cursor: pointer;
-  margin-bottom: 6px;
-  transition: all 0.15s;
+  margin-bottom: 10px;
+  transition: all 0.2s cubic-bezier(0.16,1,0.3,1);
+  position: relative;
+  overflow: hidden;
 }
+.client-list-row::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: var(--border);
+  transition: background 0.2s;
+}
+.client-list-row.seg-fidele::before { background: var(--gold, #E4B860); }
+.client-list-row.seg-part::before { background: var(--gold, #E4B860); }
+.client-list-row.seg-endormi::before { background: #5B5BC2; }
 .client-list-row:active { transform: scale(0.98); }
+.client-list-row:hover { border-color: var(--gold-soft, #B8924E); }
+
 .client-list-avatar {
-  width: 36px; height: 36px;
-  border-radius: 50%;
+  width: 44px; height: 44px;
+  border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 700;
-  font-size: 13px;
+  font-size: 15px;
   flex-shrink: 0;
   color: var(--bg-deep);
+  position: relative;
 }
-.client-list-avatar.fidele { background: linear-gradient(135deg, var(--gold), var(--gold-soft)); }
-.client-list-avatar.occasionnel { background: linear-gradient(135deg, #C7B9A5, #8B7E6F); }
-.client-list-avatar.part { background: linear-gradient(135deg, #E4B860, #D77D55); }
-.client-list-avatar.endormi { background: linear-gradient(135deg, #5B5BC2, #8B7E6F); }
-.client-list-info { flex: 1; min-width: 0; }
+.client-list-avatar.fidele {
+  background: linear-gradient(135deg, var(--gold), var(--gold-soft));
+  box-shadow: 0 4px 12px rgba(228,184,96,0.25);
+}
+.client-list-avatar.occasionnel {
+  background: linear-gradient(135deg, #C7B9A5, #8B7E6F);
+}
+.client-list-avatar.part {
+  background: linear-gradient(135deg, #E4B860, #D77D55);
+  box-shadow: 0 4px 12px rgba(215,125,85,0.2);
+}
+.client-list-avatar.endormi {
+  background: linear-gradient(135deg, #5B5BC2, #8B7E6F);
+}
+
+.client-list-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.client-list-nom-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
 .client-list-nom {
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 700;
   color: var(--text, #F5EDE2);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  letter-spacing: -0.01em;
 }
-.client-list-meta {
-  font-size: 11px;
-  color: var(--text-mute, #8B7E6F);
-  margin-top: 2px;
-}
-.client-list-tampons {
-  font-size: 11px;
-  color: var(--gold);
+.client-list-mini-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 10px;
   font-weight: 700;
-  white-space: nowrap;
-  margin-left: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: rgba(228,184,96,0.12);
+  color: var(--gold);
+  border: 1px solid rgba(228,184,96,0.3);
+}
+.client-list-mini-tag.endormi {
+  background: rgba(91,91,194,0.12);
+  color: #8888d0;
+  border-color: rgba(91,91,194,0.3);
+}
+.client-list-mini-tag.anniv {
+  background: rgba(168,225,12,0.12);
+  color: var(--lime);
+  border-color: rgba(168,225,12,0.3);
+}
+
+.client-list-meta {
+  font-size: 12px;
+  color: var(--text-mute, #8B7E6F);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.client-list-meta .sep {
+  width: 3px; height: 3px;
+  background: var(--text-mute);
+  border-radius: 50%;
+  opacity: 0.5;
+}
+.client-list-meta strong { color: var(--text-soft, #C7B9A5); font-weight: 600; }
+
+.client-list-tampons-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+  padding: 6px 10px;
+  background: rgba(228,184,96,0.08);
+  border-radius: 10px;
+  border: 1px solid rgba(228,184,96,0.15);
+}
+.client-list-tampons-val {
+  font-family: var(--display, 'Fraunces', serif);
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--gold);
+  line-height: 1;
+}
+.client-list-tampons-lbl {
+  font-size: 9px;
+  color: var(--gold-soft, #B8924E);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
 }
 
 /* Fiche détail client */
@@ -1929,6 +2022,113 @@ html, body {
   border-color: var(--sriracha);
 }
 .cd-btn:active { transform: scale(0.97); }
+
+/* ===== INPUTS PREMIUM AVEC FLOATING LABEL ===== */
+.field-premium {
+  position: relative;
+  margin-bottom: 18px;
+}
+.field-premium input,
+.field-premium select {
+  width: 100%;
+  padding: 22px 16px 10px;
+  background: var(--surface, #1C1814);
+  border: 1.5px solid var(--border, #2D261E);
+  border-radius: 14px;
+  color: var(--text, #F5EDE2);
+  font-size: 16px;
+  font-family: inherit;
+  outline: none;
+  -webkit-appearance: none;
+  transition: border-color 0.2s, background 0.2s;
+}
+.field-premium input::placeholder { color: transparent; }
+.field-premium label {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 14px;
+  color: var(--text-mute, #8B7E6F);
+  pointer-events: none;
+  transition: all 0.18s cubic-bezier(0.16,1,0.3,1);
+  background: transparent;
+  padding: 0;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.field-premium input:focus,
+.field-premium input:not(:placeholder-shown),
+.field-premium input[type="date"] {
+  border-color: var(--gold, #E4B860);
+  background: rgba(228,184,96,0.03);
+}
+.field-premium input:focus + label,
+.field-premium input:not(:placeholder-shown) + label,
+.field-premium input[type="date"] + label {
+  top: 11px;
+  transform: translateY(0);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--gold, #E4B860);
+}
+
+.field-premium .field-icon {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-mute);
+  pointer-events: none;
+  width: 18px;
+  height: 18px;
+}
+
+.field-premium .field-optional {
+  position: absolute;
+  right: 16px;
+  top: 14px;
+  font-size: 9px;
+  color: var(--text-mute);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  pointer-events: none;
+}
+
+/* ===== HEADER PREMIUM DE LA CRÉATION CLIENT ===== */
+.create-client-hero {
+  text-align: center;
+  padding: 24px 14px 20px;
+  background: linear-gradient(180deg, rgba(228,184,96,0.08) 0%, transparent 100%);
+  margin: -14px -14px 20px;
+}
+.create-client-hero-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold), var(--gold-soft));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 12px;
+  font-size: 26px;
+  box-shadow: 0 8px 24px rgba(228,184,96,0.25);
+}
+.create-client-hero-title {
+  font-family: var(--display, 'Fraunces', serif);
+  font-size: 22px;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+.create-client-hero-sub {
+  font-size: 12px;
+  color: var(--text-mute);
+}
 
 
 .charges-modal {
@@ -3146,10 +3346,41 @@ html, body {
         </div>
 
         <div class="charges-body">
-          <div class="prod-field"><label>Prénom *</label><input type="text" id="nc-nom" placeholder="Ex: Karim"></div>
-          <div class="prod-field"><label>Téléphone *</label><input type="tel" id="nc-tel" placeholder="06 12 34 56 78"></div>
-          <div class="prod-field"><label>Email <span style="color:var(--text-mute);font-weight:400;">(optionnel)</span></label><input type="email" id="nc-email" placeholder="exemple@email.fr"></div>
-          <div class="prod-field"><label>Anniversaire <span style="color:var(--text-mute);font-weight:400;">(optionnel)</span></label><input type="date" id="nc-anniv"></div>
+          <!-- Hero avec icône -->
+          <div class="create-client-hero">
+            <div class="create-client-hero-icon">👤</div>
+            <div class="create-client-hero-title">Nouveau client</div>
+            <div class="create-client-hero-sub">Ajoute un client à ta base fidélité</div>
+          </div>
+
+          <!-- Champs avec floating labels premium -->
+          <div class="field-premium">
+            <input type="text" id="nc-nom" placeholder=" " autocomplete="given-name">
+            <label for="nc-nom">Prénom</label>
+            <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+
+          <div class="field-premium">
+            <input type="tel" id="nc-tel" placeholder=" " autocomplete="tel">
+            <label for="nc-tel">Téléphone</label>
+            <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          </div>
+
+          <div class="field-premium">
+            <input type="email" id="nc-email" placeholder=" " autocomplete="email">
+            <label for="nc-email">Email</label>
+            <span class="field-optional">Optionnel</span>
+          </div>
+
+          <div class="field-premium">
+            <input type="date" id="nc-anniv" placeholder=" ">
+            <label for="nc-anniv">Date d'anniversaire</label>
+            <span class="field-optional">Optionnel</span>
+          </div>
+
+          <p style="font-size:11px; color:var(--text-mute); text-align:center; margin-top:8px; line-height:1.5;">
+            🎂 L'anniversaire permet l'envoi automatique d'un SMS le jour J
+          </p>
         </div>
       </div>
 
@@ -4274,15 +4505,48 @@ function filtrerClientsModal() {
 
   zone.innerHTML = filtres.map(c => {
     const seg = segmentClient(c);
-    const j = c.derniere_visite ? joursDepuisVisiteApp(c.derniere_visite) : 'jamais';
+    const j = c.derniere_visite ? joursDepuisVisiteApp(c.derniere_visite) : 'jamais venu';
+    // Tag mini selon segment
+    let miniTag = '';
+    if (seg === 'fidele') miniTag = '<span class="client-list-mini-tag">🌟 Fidèle</span>';
+    else if (seg === 'part') miniTag = '<span class="client-list-mini-tag">⚠️ Part</span>';
+    else if (seg === 'endormi') miniTag = '<span class="client-list-mini-tag endormi">💤 Endormi</span>';
+
+    // Tag anniversaire si dans 7 jours
+    let annivTag = '';
+    if (c.date_anniversaire) {
+      const d = new Date(c.date_anniversaire);
+      const aujourd = new Date();
+      const cetteAnnee = new Date(aujourd.getFullYear(), d.getMonth(), d.getDate());
+      if (cetteAnnee < aujourd) cetteAnnee.setFullYear(aujourd.getFullYear() + 1);
+      const jours = Math.ceil((cetteAnnee - aujourd) / (1000 * 60 * 60 * 24));
+      if (jours <= 7) annivTag = '<span class="client-list-mini-tag anniv">🎂 ' + (jours === 0 ? "auj!" : "dans " + jours + "j") + '</span>';
+    }
+
+    const tel = formatTelephone(c.telephone) || '—';
+
     return `
-      <div class="client-list-row" onclick="ouvrirDetailClient('${c.id}')">
+      <div class="client-list-row seg-${seg}" onclick="ouvrirDetailClient('${c.id}')">
         <div class="client-list-avatar ${seg}">${initiales(c.nom || '?')}</div>
         <div class="client-list-info">
-          <div class="client-list-nom">${escapeHtmlSimple(c.nom || 'Sans nom')}</div>
-          <div class="client-list-meta">${c.nb_visites || 0} visites · ${j}</div>
+          <div class="client-list-nom-row">
+            <span class="client-list-nom">${escapeHtmlSimple(c.nom || 'Sans nom')}</span>
+            ${miniTag}
+            ${annivTag}
+          </div>
+          <div class="client-list-meta">
+            <span><strong>${c.nb_visites || 0}</strong> visite${(c.nb_visites || 0) > 1 ? 's' : ''}</span>
+            <span class="sep"></span>
+            <span>${j}</span>
+          </div>
+          <div class="client-list-meta" style="font-size:11px; margin-top:2px;">
+            <span>${tel}</span>
+          </div>
         </div>
-        <div class="client-list-tampons">${c.points || 0}/10</div>
+        <div class="client-list-tampons-block">
+          <span class="client-list-tampons-val">${c.points || 0}</span>
+          <span class="client-list-tampons-lbl">tampons</span>
+        </div>
       </div>`;
   }).join('');
 }
