@@ -57,7 +57,7 @@ html, body {
 .caisse {
   height: 100vh;
   display: grid;
-  grid-template-columns: 1fr 340px;
+  grid-template-columns: 1fr 380px;
   background:
     radial-gradient(circle at 15% 20%, rgba(230, 57, 70, 0.06), transparent 45%),
     radial-gradient(circle at 85% 80%, rgba(228, 184, 96, 0.05), transparent 45%),
@@ -124,41 +124,13 @@ html, body {
 .link-btn:hover { color: var(--text); border-color: var(--gold-soft); }
 
 /* Filtres catégories */
-.cats-wrap {
-  position: relative;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  padding: 0 20px;
-}
-.cat-arrow {
-  flex-shrink: 0;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  color: var(--text-soft);
-  font-size: 14px;
-  font-weight: 700;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.18s;
-  z-index: 3;
-  flex-shrink: 0;
-}
-.cat-arrow:hover { color: var(--gold); border-color: var(--gold-soft); }
-.cat-arrow:active { transform: scale(0.92); }
 .cats {
   display: flex;
   gap: 10px;
-  padding: 18px 12px;
+  padding: 18px 28px;
   overflow-x: auto;
-  flex: 1;
+  flex-shrink: 0;
   scrollbar-width: none;
-  scroll-behavior: smooth;
 }
 .cats::-webkit-scrollbar { display: none; }
 .cat-chip {
@@ -187,7 +159,7 @@ html, body {
   overflow-y: auto;
   padding: 4px 28px 28px;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   gap: 14px;
   align-content: start;
   scrollbar-width: thin;
@@ -200,13 +172,13 @@ html, body {
   background: linear-gradient(160deg, var(--surface-2) 0%, var(--surface) 100%);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 16px 14px;
+  padding: 18px 16px;
   cursor: pointer;
   transition: all 0.18s;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  min-height: 130px;
+  min-height: 110px;
   overflow: hidden;
 }
 .produit-card::after {
@@ -226,42 +198,32 @@ html, body {
   pointer-events: none;
 }
 .produit-nom {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 700;
-  line-height: 1.3;
+  line-height: 1.25;
   color: var(--text);
   position: relative;
   z-index: 1;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
 }
 .produit-bas {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: space-between;
-  gap: 6px;
-  margin-top: 12px;
+  margin-top: 14px;
   position: relative;
   z-index: 1;
-  flex-wrap: nowrap;
 }
 .produit-prix {
   font-family: var(--display);
-  font-size: 19px;
+  font-size: 20px;
   font-weight: 500;
   color: var(--gold);
-  white-space: nowrap;
-  flex-shrink: 0;
 }
 .produit-stock {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
   color: var(--text-mute);
   font-family: var(--mono);
-  text-align: right;
-  line-height: 1.2;
 }
 .produit-stock.warn { color: var(--warning); }
 .produit-stock.crit { color: var(--danger); }
@@ -559,6 +521,156 @@ html, body {
 }
 .scan-status.ok { color: var(--lime); font-weight: 600; }
 .scan-status.err { color: var(--danger); font-weight: 600; }
+
+/* ===== ONGLETS DE LA MODALE SCAN ===== */
+.scan-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 16px;
+  background: var(--bg-deep, #0a0908);
+  padding: 4px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+}
+.scan-tab {
+  flex: 1;
+  background: transparent;
+  border: none;
+  padding: 9px 8px;
+  border-radius: 8px;
+  color: var(--text-mute);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.scan-tab.active {
+  background: var(--surface-2);
+  color: var(--gold);
+}
+.scan-tab:hover:not(.active) { color: var(--text-soft); }
+
+/* ===== MODE TÉLÉPHONE ===== */
+.tel-search-input {
+  width: 100%;
+  padding: 16px 18px;
+  background: var(--bg-deep);
+  border: 1px solid var(--border);
+  border-radius: 13px;
+  color: var(--text);
+  font-size: 18px;
+  font-family: var(--mono, monospace);
+  letter-spacing: 0.05em;
+  outline: none;
+  margin: 12px 0 8px;
+  text-align: center;
+}
+.tel-search-input:focus { border-color: var(--gold-soft); }
+
+.tel-resultats {
+  max-height: 280px;
+  overflow-y: auto;
+  margin: 8px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.tel-resultat-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.tel-resultat-row:hover { border-color: var(--gold-soft); }
+.tel-resultat-row:active { transform: scale(0.98); }
+.tel-resultat-avatar {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold), var(--gold-soft));
+  color: var(--bg-deep);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+.tel-resultat-info { flex: 1; min-width: 0; }
+.tel-resultat-nom {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.tel-resultat-meta {
+  font-size: 11px;
+  color: var(--text-mute);
+  margin-top: 2px;
+}
+.tel-resultat-tampons {
+  font-size: 12px;
+  color: var(--gold);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.tel-pas-resultat {
+  background: var(--surface-2);
+  border: 1px dashed var(--border);
+  border-radius: 14px;
+  padding: 20px 16px;
+  text-align: center;
+}
+.tel-pas-resultat p {
+  font-size: 13px;
+  color: var(--text-mute);
+  margin-bottom: 12px;
+}
+.tel-btn-creer {
+  background: linear-gradient(135deg, var(--lime, #A8E10C), var(--lime-soft, #82B509));
+  color: var(--bg-deep);
+  border: none;
+  border-radius: 12px;
+  padding: 12px 18px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+}
+.tel-btn-creer:active { transform: scale(0.97); }
+
+.tel-field { margin-bottom: 12px; }
+.tel-field label {
+  display: block;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-mute);
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.tel-field input {
+  width: 100%;
+  padding: 13px 14px;
+  background: var(--bg-deep);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  color: var(--text);
+  font-size: 16px;
+  font-family: inherit;
+  outline: none;
+  -webkit-appearance: none;
+}
+.tel-field input:focus { border-color: var(--gold-soft); }
 
 /* Pied ticket */
 .ticket-foot {
@@ -1284,11 +1396,7 @@ html, body {
       </div>
     </div>
 
-    <div class="cats-wrap">
-      <button class="cat-arrow" id="cat-prev" onclick="scrollCats(-1)" title="Catégories précédentes">◄</button>
-      <div class="cats" id="cats"></div>
-      <button class="cat-arrow" id="cat-next" onclick="scrollCats(1)" title="Catégories suivantes">►</button>
-    </div>
+    <div class="cats" id="cats"></div>
 
     <div class="produits-grid" id="produits-grid">
       <div class="empty-state">
@@ -1416,6 +1524,13 @@ html, body {
   <div class="modal">
     <div class="scan-modal-inner">
 
+      <!-- ONGLETS DE NAVIGATION ENTRE MODES -->
+      <div class="scan-tabs">
+        <button class="scan-tab active" data-mode="physique" onclick="basculerPhysique()">🔫 Douchette</button>
+        <button class="scan-tab" data-mode="camera" onclick="basculerCamera()">📷 Caméra</button>
+        <button class="scan-tab" data-mode="telephone" onclick="basculerTelephone()">📞 Téléphone</button>
+      </div>
+
       <!-- MODE 1 : SCANNER PHYSIQUE (par défaut) -->
       <div id="mode-physique">
         <h3>Prêt à scanner</h3>
@@ -1429,7 +1544,6 @@ html, body {
         <div class="scan-status" id="scan-status">En attente du scan…</div>
         <div class="modal-actions">
           <button class="btn-annuler" onclick="fermerScanFid()">Annuler</button>
-          <button class="btn-annuler" onclick="basculerCamera()">📷 Utiliser la caméra</button>
         </div>
       </div>
 
@@ -1441,7 +1555,45 @@ html, body {
         <div class="scan-status" id="scan-status-cam">Ouverture de la caméra…</div>
         <div class="modal-actions">
           <button class="btn-annuler" onclick="fermerScanFid()">Annuler</button>
-          <button class="btn-annuler" onclick="basculerPhysique()">⌨️ Scanner physique</button>
+        </div>
+      </div>
+
+      <!-- MODE 3 : RECHERCHE PAR TÉLÉPHONE (commande téléphone) -->
+      <div id="mode-telephone" style="display:none;">
+        <h3>Recherche par téléphone</h3>
+        <div class="modal-total">Tapez le numéro du client</div>
+
+        <!-- VUE A : Recherche -->
+        <div id="tel-vue-recherche">
+          <input type="tel" id="tel-search" class="tel-search-input" placeholder="06 12 34 56 78" autocomplete="off">
+          <div class="scan-status" id="tel-status">Saisissez au moins 4 chiffres…</div>
+
+          <div class="tel-resultats" id="tel-resultats"></div>
+
+          <div class="modal-actions">
+            <button class="btn-annuler" onclick="fermerScanFid()">Annuler</button>
+          </div>
+        </div>
+
+        <!-- VUE B : Création rapide d'un nouveau client -->
+        <div id="tel-vue-creation" style="display:none;">
+          <div style="margin-bottom:12px; font-size:13px; color:var(--text-mute);">Nouveau client</div>
+          <div class="tel-field">
+            <label>Prénom</label>
+            <input type="text" id="new-client-nom" placeholder="Ex : Karim">
+          </div>
+          <div class="tel-field">
+            <label>Téléphone</label>
+            <input type="tel" id="new-client-tel" placeholder="06 12 34 56 78">
+          </div>
+          <div class="tel-field">
+            <label>Anniversaire <span style="color:var(--text-mute);font-weight:400;">(optionnel)</span></label>
+            <input type="date" id="new-client-anniv">
+          </div>
+          <div class="modal-actions" style="margin-top:14px;">
+            <button class="btn-annuler" onclick="retourRechercheTel()">← Retour</button>
+            <button class="btn-encaisser" onclick="creerClientRapide()" id="btn-creer-client">Créer et attacher</button>
+          </div>
         </div>
       </div>
 
@@ -1594,23 +1746,10 @@ async function init() {
     }
     gate.classList.add('hidden');
     await chargerMenu();
-    abonnerCatalogueRealtime();
   } catch (e) {
     gateMsg.textContent = 'Erreur de connexion : ' + e.message;
     gate.querySelector('.spinner').style.display = 'none';
   }
-}
-
-// Realtime : quand un produit ou une catégorie change dans Supabase
-// (par exemple modifié depuis l'app de gestion), on recharge le menu
-// automatiquement sans rafraîchir la page.
-function abonnerCatalogueRealtime() {
-  sb.channel('caisse-catalogue')
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'produits' },
-        () => { chargerMenu(); })
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'categories' },
-        () => { chargerMenu(); })
-    .subscribe();
 }
 
 // ============================================
@@ -1651,25 +1790,6 @@ function filtrerCat(id) {
   afficherProduits();
 }
 
-// Défilement de la barre des catégories (boutons fléchés)
-function scrollCats(direction) {
-  const cats = document.getElementById('cats');
-  cats.scrollBy({ left: direction * 250, behavior: 'smooth' });
-}
-
-// La molette de souris (verticale) fait défiler la barre des catégories horizontalement
-document.addEventListener('DOMContentLoaded', () => {
-  const cats = document.getElementById('cats');
-  if (cats) {
-    cats.addEventListener('wheel', (e) => {
-      if (e.deltaY !== 0) {
-        e.preventDefault();
-        cats.scrollBy({ left: e.deltaY < 0 ? -120 : 120, behavior: 'smooth' });
-      }
-    }, { passive: false });
-  }
-});
-
 function afficherProduits() {
   const grid = document.getElementById('produits-grid');
   let liste = produits;
@@ -1690,7 +1810,7 @@ function afficherProduits() {
       let cls = '';
       if (p.stock <= 0) cls = 'crit';
       else if (p.stock <= p.seuil_alerte) cls = 'warn';
-      stockHtml = `<div class="produit-stock ${cls}">${p.stock > 0 ? 'stock<br>' + p.stock : 'rupture'}</div>`;
+      stockHtml = `<div class="produit-stock ${cls}">${p.stock > 0 ? p.stock + ' en stock' : 'rupture'}</div>`;
     }
     return `
       <div class="produit-card ${rupture?'rupture':''}" onclick="ajouter('${p.id}')">
@@ -2271,6 +2391,7 @@ function ouvrirScanFid() {
 function fermerScanFid() {
   arreterCamera();
   arreterEcoutePhysique();
+  arreterRechercheTel();
   document.getElementById('overlay-scan').classList.remove('show');
 }
 
@@ -2279,13 +2400,23 @@ function fermerScanFid() {
 // très vite puis envoie Entrée. On capte ça dans un champ caché.
 function basculerPhysique() {
   arreterCamera();
+  arreterRechercheTel();
   document.getElementById('mode-physique').style.display = 'block';
   document.getElementById('mode-camera').style.display = 'none';
+  document.getElementById('mode-telephone').style.display = 'none';
+  majOngletActif('physique');
   const status = document.getElementById('scan-status');
   status.textContent = 'En attente du scan…';
   status.className = 'scan-status';
   scanEnCours = false;
   demarrerEcoutePhysique();
+}
+
+// Met en évidence l'onglet actif dans la barre de tabs
+function majOngletActif(mode) {
+  document.querySelectorAll('.scan-tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.mode === mode);
+  });
 }
 
 let inputScanHandler = null;
@@ -2325,8 +2456,11 @@ function arreterEcoutePhysique() {
 // --- MODE CAMÉRA (secours) ---
 function basculerCamera() {
   arreterEcoutePhysique();
+  arreterRechercheTel();
   document.getElementById('mode-physique').style.display = 'none';
   document.getElementById('mode-camera').style.display = 'block';
+  document.getElementById('mode-telephone').style.display = 'none';
+  majOngletActif('camera');
   const status = document.getElementById('scan-status-cam');
   status.textContent = 'Ouverture de la caméra…';
   status.className = 'scan-status';
@@ -2350,6 +2484,218 @@ function arreterCamera() {
   if (scannerFid) {
     scannerFid.stop().then(() => scannerFid.clear()).catch(() => {});
     scannerFid = null;
+  }
+}
+
+// --- MODE TÉLÉPHONE (recherche client par numéro / commande téléphone) ---
+let _telSearchTimer = null;
+
+function basculerTelephone() {
+  arreterCamera();
+  arreterEcoutePhysique();
+  document.getElementById('mode-physique').style.display = 'none';
+  document.getElementById('mode-camera').style.display = 'none';
+  document.getElementById('mode-telephone').style.display = 'block';
+  majOngletActif('telephone');
+
+  // Vue par défaut = recherche
+  document.getElementById('tel-vue-recherche').style.display = 'block';
+  document.getElementById('tel-vue-creation').style.display = 'none';
+
+  // Reset
+  const input = document.getElementById('tel-search');
+  input.value = '';
+  document.getElementById('tel-resultats').innerHTML = '';
+  document.getElementById('tel-status').textContent = 'Saisissez au moins 4 chiffres…';
+  document.getElementById('tel-status').className = 'scan-status';
+
+  // Focus auto + ouverture clavier mobile
+  setTimeout(() => input.focus(), 100);
+
+  // Listener qui déclenche la recherche en live
+  input.oninput = () => {
+    clearTimeout(_telSearchTimer);
+    _telSearchTimer = setTimeout(() => rechercherClientTel(input.value), 250);
+  };
+}
+
+function arreterRechercheTel() {
+  clearTimeout(_telSearchTimer);
+  const input = document.getElementById('tel-search');
+  if (input) input.oninput = null;
+}
+
+// Recherche les clients dont le téléphone contient la chaîne saisie
+async function rechercherClientTel(saisie) {
+  const status = document.getElementById('tel-status');
+  const zone = document.getElementById('tel-resultats');
+
+  // Nettoie : ne garde que les chiffres
+  const chiffres = (saisie || '').replace(/\D/g, '');
+
+  if (chiffres.length < 4) {
+    status.textContent = 'Saisissez au moins 4 chiffres…';
+    status.className = 'scan-status';
+    zone.innerHTML = '';
+    return;
+  }
+
+  status.textContent = 'Recherche…';
+  status.className = 'scan-status';
+
+  try {
+    // Recherche par "like" sur le téléphone (insensible aux espaces/tirets)
+    // On récupère un peu plus large et on filtre côté client pour gérer les formats variés
+    const { data, error } = await sb.from('clients')
+      .select('id, nom, telephone, points, nb_visites, derniere_visite')
+      .eq('restaurant_id', RESTO_ID)
+      .ilike('telephone', '%' + chiffres + '%')
+      .limit(10);
+
+    if (error) throw error;
+
+    // Re-filtre robuste en comparant uniquement les chiffres
+    const resultats = (data || []).filter(c => {
+      const telChiffres = String(c.telephone || '').replace(/\D/g, '');
+      return telChiffres.includes(chiffres);
+    });
+
+    if (resultats.length === 0) {
+      status.textContent = 'Aucun client trouvé';
+      status.className = 'scan-status';
+      zone.innerHTML = `
+        <div class="tel-pas-resultat">
+          <p>Aucun client avec ce numéro dans la base.</p>
+          <button class="tel-btn-creer" onclick="ouvrirCreationClient('${chiffres}')">+ Créer un nouveau client</button>
+        </div>`;
+      return;
+    }
+
+    status.textContent = resultats.length + ' résultat' + (resultats.length > 1 ? 's' : '');
+    status.className = 'scan-status ok';
+
+    zone.innerHTML = resultats.map(c => {
+      const initiale = (c.nom || '?').charAt(0).toUpperCase();
+      const points = Number(c.points || 0);
+      const dernier = c.derniere_visite ? joursDepuisVisite(c.derniere_visite) : '—';
+      return `
+        <div class="tel-resultat-row" onclick="attacherClientDepuisTel('${c.id}')">
+          <div class="tel-resultat-avatar">${initiale}</div>
+          <div class="tel-resultat-info">
+            <div class="tel-resultat-nom">${escapeHtmlPos(c.nom || 'Sans nom')}</div>
+            <div class="tel-resultat-meta">${formatTel(c.telephone)} · ${dernier}</div>
+          </div>
+          <div class="tel-resultat-tampons">${points}/10</div>
+        </div>`;
+    }).join('');
+  } catch (e) {
+    status.textContent = 'Erreur : ' + e.message;
+    status.className = 'scan-status err';
+  }
+}
+
+// Format téléphone pour affichage
+function formatTel(tel) {
+  if (!tel) return '';
+  const c = String(tel).replace(/\D/g, '');
+  if (c.length === 10) return c.replace(/(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, '$1 $2 $3 $4 $5');
+  return tel;
+}
+
+// Texte "il y a X jours" depuis une date
+function joursDepuisVisite(dateStr) {
+  if (!dateStr) return 'jamais';
+  const d = new Date(dateStr);
+  const diff = Math.floor((Date.now() - d.getTime()) / (1000 * 60 * 60 * 24));
+  if (diff <= 0) return 'aujourd\'hui';
+  if (diff === 1) return 'hier';
+  if (diff < 7) return 'il y a ' + diff + ' j';
+  if (diff < 30) return 'il y a ' + Math.floor(diff / 7) + ' sem';
+  return 'il y a ' + Math.floor(diff / 30) + ' mois';
+}
+
+// Echappement HTML
+function escapeHtmlPos(s) {
+  if (!s) return '';
+  return String(s).replace(/[&<>"']/g, c =>
+    ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+}
+
+// Attache un client trouvé via la recherche téléphone
+async function attacherClientDepuisTel(clientId) {
+  try {
+    const { data: c, error } = await sb.from('clients').select('*').eq('id', clientId).single();
+    if (error || !c) throw new Error('Client introuvable');
+    clientFid = c;
+    afficherClientFid();
+    fermerScanFid();
+  } catch (e) {
+    alert('Erreur : ' + e.message);
+  }
+}
+
+// Ouvre la vue de création rapide avec le numéro pré-rempli
+function ouvrirCreationClient(telephonePrefill) {
+  document.getElementById('tel-vue-recherche').style.display = 'none';
+  document.getElementById('tel-vue-creation').style.display = 'block';
+  document.getElementById('new-client-nom').value = '';
+  document.getElementById('new-client-tel').value = telephonePrefill || '';
+  document.getElementById('new-client-anniv').value = '';
+  // Date max anniversaire = aujourd'hui
+  document.getElementById('new-client-anniv').max = new Date().toISOString().slice(0, 10);
+  // Focus sur le nom
+  setTimeout(() => document.getElementById('new-client-nom').focus(), 100);
+}
+
+// Retour à la vue de recherche
+function retourRechercheTel() {
+  document.getElementById('tel-vue-creation').style.display = 'none';
+  document.getElementById('tel-vue-recherche').style.display = 'block';
+}
+
+// Crée un nouveau client + l'attache au ticket
+async function creerClientRapide() {
+  const nom = document.getElementById('new-client-nom').value.trim();
+  const tel = document.getElementById('new-client-tel').value.trim();
+  const anniv = document.getElementById('new-client-anniv').value || null;
+
+  if (!nom) { alert('Indiquez le prénom du client'); return; }
+  if (!tel || tel.replace(/\D/g, '').length < 8) { alert('Numéro de téléphone invalide'); return; }
+
+  const btn = document.getElementById('btn-creer-client');
+  btn.disabled = true;
+  const labelOrig = btn.textContent;
+  btn.textContent = 'Création…';
+
+  try {
+    // Déjà existant ?
+    const { data: existant } = await sb.from('clients')
+      .select('id').eq('telephone', tel).eq('restaurant_id', RESTO_ID).maybeSingle();
+
+    let nouveauClient;
+    if (existant) {
+      // Récupère le client existant
+      const { data: c, error } = await sb.from('clients').select('*').eq('id', existant.id).single();
+      if (error) throw error;
+      nouveauClient = c;
+    } else {
+      const insertData = {
+        nom, telephone: tel, restaurant_id: RESTO_ID,
+        points: 0, total_points_gagnes: 0, nb_visites: 0
+      };
+      if (anniv) insertData.date_anniversaire = anniv;
+      const { data, error } = await sb.from('clients').insert(insertData).select().single();
+      if (error) throw error;
+      nouveauClient = data;
+    }
+
+    clientFid = nouveauClient;
+    afficherClientFid();
+    fermerScanFid();
+  } catch (e) {
+    alert('Erreur : ' + e.message);
+    btn.disabled = false;
+    btn.textContent = labelOrig;
   }
 }
 
