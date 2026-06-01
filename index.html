@@ -4639,27 +4639,64 @@ function afficherAnniversaires() {
   }).join('');
 }
 
-// SMS d'anniversaire (utilise l'IA pour générer)
+// SMS d'anniversaire (utilise l'IA pour générer + Brevo pour envoyer)
 async function envoyerSMSAnniversaire(clientId, btn) {
   const client = clientsCache.find(c => c.id === clientId);
   if (!client) return;
+  if (!client.telephone) {
+    alert(`${client.nom} n'a pas de numéro de téléphone enregistré.`);
+    return;
+  }
   const labelOrig = btn.innerHTML;
   btn.innerHTML = '⏳';
   btn.disabled = true;
   try {
-    const res = await fetch('/.netlify/functions/chat', {
+    // 1) Générer le SMS d'anniversaire avec Claude IA
+    const resIA = await fetch('/.netlify/functions/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ message: `Rédige un SMS court (max 160 caractères) pour souhaiter un joyeux anniversaire à ${client.nom}, client du restaurant Gin Khao (street food thaï à Marseille). Offre : dessert offert pour fêter son anniversaire. Ton chaleureux. Réponds UNIQUEMENT avec le texte du SMS, sans guillemets ni commentaire.` })
     });
-    const data = await res.json();
-    const sms = (data.reponse || 'Erreur').trim();
-    alert('🎂 SMS anniversaire pour ' + client.nom + ' :\n\n' + sms);
+    const dataIA = await resIA.json();
+    const sms = (dataIA.reponse || '').trim();
+    if (!sms) throw new Error('IA n\'a pas pu générer le SMS');
+
+    // 2) Demande confirmation
+    const confirme = confirm(
+      `🎂 SMS d'anniversaire pour ${client.nom} (${client.telephone}) :\n\n` +
+      `"${sms}"\n\n` +
+      `Envoyer maintenant ?`
+    );
+    if (!confirme) {
+      btn.innerHTML = labelOrig;
+      btn.disabled = false;
+      return;
+    }
+
+    // 3) Envoyer via Brevo
+    btn.innerHTML = '📤';
+    const resSMS = await fetch('/.netlify/functions/envoyer-sms', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        numero: client.telephone,
+        texte: sms,
+        expediteur: 'GinKhao'
+      })
+    });
+    const dataSMS = await resSMS.json();
+
+    if (dataSMS.ok) {
+      btn.innerHTML = '✅';
+      alert(`✅ SMS d'anniversaire envoyé à ${client.nom} !\nNuméro : ${dataSMS.numero}`);
+    } else {
+      throw new Error(dataSMS.erreur || 'Erreur d\'envoi');
+    }
   } catch (e) {
+    btn.innerHTML = '❌';
     alert('Erreur : ' + e.message);
   }
-  btn.innerHTML = labelOrig;
-  btn.disabled = false;
+  setTimeout(() => { btn.innerHTML = labelOrig; btn.disabled = false; }, 2500);
 }
 
 // Override chargerClients pour appeler aussi le bandeau anniversaires
@@ -4940,7 +4977,7 @@ function afficherFicheClient(c) {
     <div class="cd-actions">
       <a href="tel:${c.telephone}" class="cd-btn" style="text-decoration:none; display:flex; align-items:center; justify-content:center;">📞 Appeler</a>
       <a href="sms:${c.telephone}" class="cd-btn" style="text-decoration:none; display:flex; align-items:center; justify-content:center;">💬 SMS</a>
-      <button class="cd-btn primary" onclick="envoyerSMS('${(c.nom || '').replace(/'/g, "\\'")}', this)">🤖 SMS IA</button>
+      <button class="cd-btn primary" onclick="envoyerSMS('${(c.nom || '').replace(/'/g, "\\'")}', this, '${c.id}')">🤖 SMS IA</button>
     </div>
     ` : ''}
   `;
@@ -5110,21 +5147,71 @@ if (typeof sbClient !== 'undefined') {
 }
 
 
-  // ===== CLIENTS : génération de SMS personnalisé par l'IA =====
-async function envoyerSMS(prenom, btn) {
+  // ===== CLIENTS : génération de SMS personnalisé par l'IA + envoi via Brevo =====
+async function envoyerSMS(prenom, btn, clientId) {
+  // Retrouve le client : par ID si fourni, sinon par nom
+  let client;
+  if (clientId) {
+    client = clientsCache.find(c => c.id === clientId);
+  } else {
+    client = clientsCache.find(c => c.nom === prenom);
+  }
+  if (!client) {
+    alert('Client introuvable');
+    return;
+  }
+  if (!client.telephone) {
+    alert(`${prenom} n'a pas de numéro de téléphone enregistré.\nImpossible d'envoyer un SMS.`);
+    return;
+  }
+
   const texteInitial = btn.innerHTML;
   btn.innerHTML = '⏳';
   btn.disabled = true;
+
   try {
-    const res = await fetch('/.netlify/functions/chat', {
+    // 1) L'IA génère le SMS personnalisé
+    const resIA = await fetch('/.netlify/functions/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ message: `Rédige un SMS court (max 160 caractères) pour relancer ${prenom}, un client du restaurant Gin Khao (street food thaï à Marseille) qui n'a pas commandé depuis quelques semaines. Offre à proposer : ${getOffre()}. Inclus un code promo. Ton chaleureux et direct. Réponds UNIQUEMENT avec le texte du SMS, sans guillemets ni commentaire.` })
     });
-    const data = await res.json();
-    const sms = (data.reponse || 'Erreur de génération').trim();
-    btn.innerHTML = '✅ Généré';
-    alert('📱 SMS généré par l\'IA pour ' + prenom + ' :\n\n' + sms + '\n\n— — —\n(Pour l\'envoyer vraiment, on branche Brevo à l\'étape suivante.)');
+    const dataIA = await resIA.json();
+    const sms = (dataIA.reponse || '').trim();
+    if (!sms) throw new Error('IA n\'a pas pu générer le SMS');
+
+    // 2) Demande la confirmation avant d'envoyer pour de vrai
+    const confirme = confirm(
+      `📱 SMS prêt à envoyer à ${prenom} (${client.telephone}) :\n\n` +
+      `"${sms}"\n\n` +
+      `Coût : ~0,05€ — Brevo gratuit jusqu'à 100 SMS\n\n` +
+      `Envoyer maintenant ?`
+    );
+    if (!confirme) {
+      btn.innerHTML = texteInitial;
+      btn.disabled = false;
+      return;
+    }
+
+    // 3) Envoi du SMS via Brevo
+    btn.innerHTML = '📤';
+    const resSMS = await fetch('/.netlify/functions/envoyer-sms', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        numero: client.telephone,
+        texte: sms,
+        expediteur: 'GinKhao'
+      })
+    });
+    const dataSMS = await resSMS.json();
+
+    if (dataSMS.ok) {
+      btn.innerHTML = '✅ Envoyé';
+      alert(`✅ SMS envoyé à ${prenom} !\n\nNuméro : ${dataSMS.numero}\nCoût : ${dataSMS.cout || 1} SMS`);
+    } else {
+      throw new Error(dataSMS.erreur || 'Erreur d\'envoi');
+    }
   } catch (e) {
     btn.innerHTML = '❌';
     alert('Erreur : ' + e.message);
