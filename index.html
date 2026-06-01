@@ -1642,7 +1642,264 @@ html, body {
   .chat-header { padding-top: calc(env(safe-area-inset-top, 0px) + 16px); }
   /* La barre du bas respecte la barre d'accueil iPhone */
   .bottom-nav { padding-bottom: calc(14px + env(safe-area-inset-bottom, 0px)); }
-}/* ===== MODALE CHARGES (mobile-first) ===== */
+}/* ===== BANDEAU ANNIVERSAIRES ===== */
+.anniv-banner {
+  background: linear-gradient(135deg, rgba(228,184,96,0.12) 0%, rgba(168,225,12,0.08) 100%);
+  border: 1px solid var(--gold-soft, #B8924E);
+  border-radius: 16px;
+  padding: 14px 14px 12px;
+  margin-bottom: 16px;
+}
+.anniv-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.anniv-emoji { font-size: 26px; }
+.anniv-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--gold, #E4B860);
+  letter-spacing: 0.02em;
+}
+.anniv-sub {
+  font-size: 11px;
+  color: var(--text-mute, #8B7E6F);
+  margin-top: 2px;
+}
+.anniv-liste {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.anniv-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  background: rgba(0,0,0,0.2);
+  border-radius: 10px;
+}
+.anniv-row-avatar {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: var(--gold, #E4B860);
+  color: var(--bg-deep, #0A0908);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 11px;
+  flex-shrink: 0;
+}
+.anniv-row-info { flex: 1; min-width: 0; }
+.anniv-row-nom {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text, #F5EDE2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.anniv-row-date {
+  font-size: 11px;
+  color: var(--text-mute, #8B7E6F);
+}
+.anniv-row-btn {
+  background: var(--gold, #E4B860);
+  color: var(--bg-deep, #0A0908);
+  border: none;
+  border-radius: 999px;
+  padding: 5px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+.anniv-row-btn:active { transform: scale(0.95); }
+
+/* ===== MODALES CLIENTS (réutilise styles charges-modal) ===== */
+.clients-modal {
+  position: fixed;
+  inset: 0;
+  background: var(--bg-deep, #0A0908);
+  z-index: 9000;
+  display: none;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.3s cubic-bezier(0.16,1,0.3,1);
+}
+.clients-modal.show {
+  display: flex;
+  transform: translateX(0);
+}
+
+/* Lignes clients dans la modale liste */
+.client-list-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 12px;
+  background: var(--surface, #1C1814);
+  border: 1px solid var(--border, #2D261E);
+  border-radius: 12px;
+  cursor: pointer;
+  margin-bottom: 6px;
+  transition: all 0.15s;
+}
+.client-list-row:active { transform: scale(0.98); }
+.client-list-avatar {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 13px;
+  flex-shrink: 0;
+  color: var(--bg-deep);
+}
+.client-list-avatar.fidele { background: linear-gradient(135deg, var(--gold), var(--gold-soft)); }
+.client-list-avatar.occasionnel { background: linear-gradient(135deg, #C7B9A5, #8B7E6F); }
+.client-list-avatar.part { background: linear-gradient(135deg, #E4B860, #D77D55); }
+.client-list-avatar.endormi { background: linear-gradient(135deg, #5B5BC2, #8B7E6F); }
+.client-list-info { flex: 1; min-width: 0; }
+.client-list-nom {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text, #F5EDE2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.client-list-meta {
+  font-size: 11px;
+  color: var(--text-mute, #8B7E6F);
+  margin-top: 2px;
+}
+.client-list-tampons {
+  font-size: 11px;
+  color: var(--gold);
+  font-weight: 700;
+  white-space: nowrap;
+  margin-left: 4px;
+}
+
+/* Fiche détail client */
+.cd-hero {
+  background: linear-gradient(135deg, var(--surface-2, #251F19) 0%, var(--surface, #1C1814) 100%);
+  border: 1px solid var(--border, #2D261E);
+  border-radius: 16px;
+  padding: 20px 16px;
+  margin-bottom: 14px;
+  text-align: center;
+}
+.cd-avatar-big {
+  width: 64px; height: 64px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold), var(--gold-soft));
+  color: var(--bg-deep);
+  font-weight: 700;
+  font-size: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 10px;
+}
+.cd-nom {
+  font-family: var(--display, 'Fraunces', serif);
+  font-size: 22px;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+.cd-segment {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.cd-segment.fidele { background: rgba(228,184,96,0.15); color: var(--gold); border:1px solid var(--gold-soft); }
+.cd-segment.occasionnel { background: rgba(199,185,165,0.1); color: var(--text-soft); border:1px solid var(--border); }
+.cd-segment.part { background: rgba(228,184,96,0.1); color: var(--gold); border:1px solid var(--gold-soft); }
+.cd-segment.endormi { background: rgba(91,91,194,0.12); color: #8888d0; border:1px solid #5B5BC2; }
+
+.cd-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.cd-stat {
+  background: var(--surface, #1C1814);
+  border: 1px solid var(--border, #2D261E);
+  border-radius: 12px;
+  padding: 12px;
+  text-align: center;
+}
+.cd-stat-val {
+  font-family: var(--display, 'Fraunces', serif);
+  font-size: 22px;
+  font-weight: 500;
+  color: var(--text);
+}
+.cd-stat-lbl {
+  font-size: 10px;
+  color: var(--text-mute);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-top: 4px;
+}
+
+.cd-info-block {
+  background: var(--surface, #1C1814);
+  border: 1px solid var(--border, #2D261E);
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 12px;
+}
+.cd-info-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+.cd-info-row:last-child { border-bottom: none; padding-bottom: 0; }
+.cd-info-row .lbl { color: var(--text-mute); }
+.cd-info-row .val { color: var(--text); font-weight: 600; }
+
+.cd-actions {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.cd-btn {
+  flex: 1;
+  padding: 12px;
+  border-radius: 12px;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text);
+  font-family: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+.cd-btn.primary {
+  background: linear-gradient(135deg, var(--sriracha), #C2521C);
+  color: white;
+  border-color: var(--sriracha);
+}
+.cd-btn:active { transform: scale(0.97); }
+
+
 .charges-modal {
   position: fixed;
   inset: 0;
@@ -2642,10 +2899,22 @@ html, body {
             <h1 class="screen-title">Clients</h1>
             <p class="screen-sub">Fidélité &amp; réactivation</p>
           </div>
-          <button class="bell" aria-label="Ajouter un client">
+          <button class="bell" aria-label="Ajouter un client" onclick="ouvrirCreationClientApp()">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
           </button>
         </header>
+
+        <!-- BANDEAU ANNIVERSAIRES DE LA SEMAINE -->
+        <div class="anniv-banner" id="anniv-banner" style="display:none;">
+          <div class="anniv-head">
+            <span class="anniv-emoji">🎂</span>
+            <div>
+              <div class="anniv-title">Anniversaires cette semaine</div>
+              <div class="anniv-sub" id="anniv-sub">— clients à célébrer</div>
+            </div>
+          </div>
+          <div class="anniv-liste" id="anniv-liste"></div>
+        </div>
 
         <!-- Configurateur d'offre -->
         <div class="activate-row" style="margin-bottom:16px;">
@@ -2669,25 +2938,25 @@ html, body {
         <div class="section">
           <div class="section-head">
             <h3 class="section-title">Ta base clients</h3>
-            <span class="section-link" style="color: var(--text-mute);"><span id="clients-total">0</span> clients</span>
+            <button class="btn-mini-action" onclick="ouvrirListeClients()"><span id="clients-total">0</span> clients →</button>
           </div>
           <div class="segment-grid">
-            <div class="segment-card star">
+            <div class="segment-card star" onclick="ouvrirListeClients('fidele')">
               <div class="seg-top"><span class="seg-emoji">🌟</span><span class="seg-count" id="seg-fidele">0</span></div>
               <div class="seg-name">Fidèles</div>
               <div class="seg-desc">20+ visites · ton trésor</div>
             </div>
-            <div class="segment-card">
+            <div class="segment-card" onclick="ouvrirListeClients('occasionnel')">
               <div class="seg-top"><span class="seg-emoji">👋</span><span class="seg-count" id="seg-occasionnel">0</span></div>
               <div class="seg-name">Occasionnels</div>
               <div class="seg-desc">viennent de temps en temps</div>
             </div>
-            <div class="segment-card risk">
+            <div class="segment-card risk" onclick="ouvrirListeClients('part')">
               <div class="seg-top"><span class="seg-emoji">⚠️</span><span class="seg-count" id="seg-part">0</span></div>
               <div class="seg-name">En train de partir</div>
               <div class="seg-desc">silence 3-7 sem · à relancer vite</div>
             </div>
-            <div class="segment-card">
+            <div class="segment-card" onclick="ouvrirListeClients('endormi')">
               <div class="seg-top"><span class="seg-emoji">💤</span><span class="seg-count" id="seg-endormi">0</span></div>
               <div class="seg-name">Endormis</div>
               <div class="seg-desc">+7 sem sans visite</div>
@@ -2726,15 +2995,15 @@ html, body {
           <div class="section-head"><h3 class="section-title">Automatisations clients</h3></div>
           <div class="activate-row">
             <div class="ar-info"><div class="ar-title">🎂 Offre anniversaire</div><div class="ar-desc">SMS auto avec dessert offert le jour J</div></div>
-            <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+            <div class="toggle" id="auto-anniv" onclick="toggleAutomatisation('anniversaire', this)"></div>
           </div>
           <div class="activate-row">
             <div class="ar-info"><div class="ar-title">😴 Relance client endormi</div><div class="ar-desc">SMS auto après 30 jours sans commande</div></div>
-            <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+            <div class="toggle" id="auto-endormi" onclick="toggleAutomatisation('endormi', this)"></div>
           </div>
           <div class="activate-row">
             <div class="ar-info"><div class="ar-title">⭐ Demande d'avis après commande</div><div class="ar-desc">Aux clients satisfaits uniquement</div></div>
-            <div class="toggle" onclick="this.classList.toggle('on')"></div>
+            <div class="toggle" id="auto-avis" onclick="toggleAutomatisation('avis', this)"></div>
           </div>
         </div>
 
@@ -2750,6 +3019,108 @@ html, body {
 
         <div style="height: 40px;"></div>
       </section>
+
+      <!-- ====== MODALE LISTE COMPLÈTE DES CLIENTS ====== -->
+      <div class="clients-modal" id="clients-modal">
+        <div class="charges-head">
+          <button class="prod-back" onclick="fermerListeClients()" title="Retour">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          </button>
+          <h2 id="clients-modal-titre">Tous mes clients</h2>
+          <button class="prod-save" onclick="ouvrirCreationClientApp()">+ Ajouter</button>
+        </div>
+
+        <div class="charges-body">
+          <!-- Recherche -->
+          <div class="prod-search" style="margin-bottom: 12px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="clients-search-input" placeholder="Rechercher par nom ou téléphone…" oninput="filtrerClientsModal()">
+          </div>
+
+          <!-- Filtres segments -->
+          <div class="charges-filtres" style="margin-bottom: 12px;">
+            <div style="display:flex; gap:6px; overflow-x:auto; padding-bottom:4px;">
+              <div class="prod-cat-chip active" data-seg="all" onclick="filtrerSegmentModal('all')">Tous</div>
+              <div class="prod-cat-chip" data-seg="fidele" onclick="filtrerSegmentModal('fidele')">🌟 Fidèles</div>
+              <div class="prod-cat-chip" data-seg="occasionnel" onclick="filtrerSegmentModal('occasionnel')">👋 Occasionnels</div>
+              <div class="prod-cat-chip" data-seg="part" onclick="filtrerSegmentModal('part')">⚠️ Partent</div>
+              <div class="prod-cat-chip" data-seg="endormi" onclick="filtrerSegmentModal('endormi')">💤 Endormis</div>
+            </div>
+          </div>
+
+          <!-- Tri -->
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:14px;">
+            <span style="font-size:11px; color:var(--text-mute); text-transform:uppercase; letter-spacing:0.06em;">Tri :</span>
+            <select id="clients-tri" onchange="filtrerClientsModal()" style="flex:1; padding:6px 10px; background:var(--surface); border:1px solid var(--border); border-radius:8px; color:var(--text); font-size:12px; font-family:inherit;">
+              <option value="recence">Récence (récent → ancien)</option>
+              <option value="visites">Plus de visites</option>
+              <option value="points">Plus de points</option>
+              <option value="alpha">A → Z</option>
+              <option value="inscription">Inscription récente</option>
+            </select>
+          </div>
+
+          <!-- Liste -->
+          <div id="clients-modal-liste"></div>
+        </div>
+      </div>
+
+      <!-- ====== MODALE FICHE CLIENT (détail + édition) ====== -->
+      <div class="clients-modal" id="client-detail-modal">
+        <!-- VUE FICHE -->
+        <div id="client-detail-vue-fiche" style="height:100%; display:flex; flex-direction:column; overflow:hidden;">
+          <div class="charges-head">
+            <button class="prod-back" onclick="fermerDetailClient()" title="Retour">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+            </button>
+            <h2 id="client-detail-titre">Client</h2>
+            <button class="prod-save" onclick="ouvrirEditionClient()">✎</button>
+          </div>
+
+          <div class="charges-body" id="client-detail-content">
+            <div class="prod-empty"><div class="spinner-mini"></div><p>Chargement…</p></div>
+          </div>
+        </div>
+
+        <!-- VUE ÉDITION -->
+        <div id="client-detail-vue-edit" style="display:none; height:100%; flex-direction:column; overflow:hidden;">
+          <div class="charges-head">
+            <button class="prod-back" onclick="retourFicheClient()" title="Retour">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+            </button>
+            <h2>Modifier le client</h2>
+            <button class="prod-save" onclick="sauverClient()" id="client-save-btn">💾</button>
+          </div>
+
+          <div class="charges-body">
+            <div class="prod-field"><label>Prénom *</label><input type="text" id="ed-client-nom" placeholder="Ex: Karim"></div>
+            <div class="prod-field"><label>Téléphone *</label><input type="tel" id="ed-client-tel" placeholder="06 12 34 56 78"></div>
+            <div class="prod-field"><label>Email</label><input type="email" id="ed-client-email" placeholder="exemple@email.fr"></div>
+            <div class="prod-field"><label>Anniversaire</label><input type="date" id="ed-client-anniv"></div>
+            <div class="prod-field"><label>Points fidélité (0-10)</label><input type="number" id="ed-client-points" min="0" max="10"></div>
+
+            <button class="prod-delete-btn" onclick="supprimerClient()">🗑️ Supprimer ce client</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ====== MODALE CRÉATION CLIENT (depuis l'app) ====== -->
+      <div class="clients-modal" id="creation-client-modal">
+        <div class="charges-head">
+          <button class="prod-back" onclick="fermerCreationClientApp()" title="Retour">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          </button>
+          <h2>Nouveau client</h2>
+          <button class="prod-save" onclick="creerClientApp()" id="new-client-app-btn">💾 Créer</button>
+        </div>
+
+        <div class="charges-body">
+          <div class="prod-field"><label>Prénom *</label><input type="text" id="nc-nom" placeholder="Ex: Karim"></div>
+          <div class="prod-field"><label>Téléphone *</label><input type="tel" id="nc-tel" placeholder="06 12 34 56 78"></div>
+          <div class="prod-field"><label>Email <span style="color:var(--text-mute);font-weight:400;">(optionnel)</span></label><input type="email" id="nc-email" placeholder="exemple@email.fr"></div>
+          <div class="prod-field"><label>Anniversaire <span style="color:var(--text-mute);font-weight:400;">(optionnel)</span></label><input type="date" id="nc-anniv"></div>
+        </div>
+      </div>
 
       <!-- ====== MODALE CHARGES (plein écran) ====== -->
       <div class="charges-modal" id="charges-modal">
@@ -3693,7 +4064,459 @@ function configurerOffre() {
 document.addEventListener('DOMContentLoaded', () => {
   const el = document.getElementById('offre-actuelle');
   if (el) el.textContent = getOffre();
+  // Charger toggles automatisations depuis localStorage
+  ['anniversaire','endormi','avis'].forEach(k => {
+    const t = document.getElementById('auto-' + k);
+    if (t && localStorage.getItem('auto-' + k) === 'on') t.classList.add('on');
+  });
 });
+
+// ============================================================
+//  CLIENTS — Bandeau anniversaires de la semaine
+// ============================================================
+function afficherAnniversaires() {
+  const banner = document.getElementById('anniv-banner');
+  if (!banner) return;
+  const aujourd = new Date();
+  const dans7j = new Date();
+  dans7j.setDate(dans7j.getDate() + 7);
+
+  // Filtre les clients dont l'anniversaire tombe dans les 7 prochains jours (peu importe l'année)
+  const anniversaires = clientsCache.filter(c => {
+    if (!c.date_anniversaire) return false;
+    const anniv = new Date(c.date_anniversaire);
+    // On regarde mois/jour cette année
+    const annivCetteAnnee = new Date(aujourd.getFullYear(), anniv.getMonth(), anniv.getDate());
+    // Si déjà passé cette année, on regarde l'année prochaine
+    if (annivCetteAnnee < aujourd) annivCetteAnnee.setFullYear(aujourd.getFullYear() + 1);
+    return annivCetteAnnee <= dans7j;
+  }).sort((a, b) => {
+    const da = new Date(a.date_anniversaire);
+    const db = new Date(b.date_anniversaire);
+    const cetteAnA = new Date(aujourd.getFullYear(), da.getMonth(), da.getDate());
+    const cetteAnB = new Date(aujourd.getFullYear(), db.getMonth(), db.getDate());
+    if (cetteAnA < aujourd) cetteAnA.setFullYear(aujourd.getFullYear() + 1);
+    if (cetteAnB < aujourd) cetteAnB.setFullYear(aujourd.getFullYear() + 1);
+    return cetteAnA - cetteAnB;
+  });
+
+  if (anniversaires.length === 0) {
+    banner.style.display = 'none';
+    return;
+  }
+
+  banner.style.display = 'block';
+  document.getElementById('anniv-sub').textContent =
+    `${anniversaires.length} client${anniversaires.length > 1 ? 's' : ''} à célébrer`;
+
+  document.getElementById('anniv-liste').innerHTML = anniversaires.slice(0, 5).map(c => {
+    const anniv = new Date(c.date_anniversaire);
+    const annivCet = new Date(aujourd.getFullYear(), anniv.getMonth(), anniv.getDate());
+    if (annivCet < aujourd) annivCet.setFullYear(aujourd.getFullYear() + 1);
+    const jours = Math.ceil((annivCet - aujourd) / (1000 * 60 * 60 * 24));
+    const noms = ['janv.','févr.','mars','avr.','mai','juin','juil.','août','sept.','oct.','nov.','déc.'];
+    const dateAffichage = `${anniv.getDate()} ${noms[anniv.getMonth()]}`;
+    let label;
+    if (jours === 0) label = `aujourd'hui ! 🎉`;
+    else if (jours === 1) label = `demain (${dateAffichage})`;
+    else label = `dans ${jours} jours (${dateAffichage})`;
+
+    return `
+      <div class="anniv-row" onclick="ouvrirDetailClient('${c.id}')">
+        <div class="anniv-row-avatar">${initiales(c.nom || '?')}</div>
+        <div class="anniv-row-info">
+          <div class="anniv-row-nom">${escapeHtmlSimple(c.nom || 'Sans nom')}</div>
+          <div class="anniv-row-date">${label}</div>
+        </div>
+        <button class="anniv-row-btn" onclick="event.stopPropagation(); envoyerSMSAnniversaire('${c.id}', this)">📱 SMS</button>
+      </div>`;
+  }).join('');
+}
+
+// SMS d'anniversaire (utilise l'IA pour générer)
+async function envoyerSMSAnniversaire(clientId, btn) {
+  const client = clientsCache.find(c => c.id === clientId);
+  if (!client) return;
+  const labelOrig = btn.innerHTML;
+  btn.innerHTML = '⏳';
+  btn.disabled = true;
+  try {
+    const res = await fetch('/.netlify/functions/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: `Rédige un SMS court (max 160 caractères) pour souhaiter un joyeux anniversaire à ${client.nom}, client du restaurant Gin Khao (street food thaï à Marseille). Offre : dessert offert pour fêter son anniversaire. Ton chaleureux. Réponds UNIQUEMENT avec le texte du SMS, sans guillemets ni commentaire.` })
+    });
+    const data = await res.json();
+    const sms = (data.reponse || 'Erreur').trim();
+    alert('🎂 SMS anniversaire pour ' + client.nom + ' :\n\n' + sms);
+  } catch (e) {
+    alert('Erreur : ' + e.message);
+  }
+  btn.innerHTML = labelOrig;
+  btn.disabled = false;
+}
+
+// Override chargerClients pour appeler aussi le bandeau anniversaires
+const _chargerClientsOriginal = chargerClients;
+chargerClients = async function() {
+  await _chargerClientsOriginal();
+  afficherAnniversaires();
+};
+
+// ============================================================
+//  MODALE LISTE COMPLÈTE DES CLIENTS
+// ============================================================
+let segmentFiltreModal = 'all';
+
+function ouvrirListeClients(segmentInitial) {
+  const m = document.getElementById('clients-modal');
+  m.classList.add('show');
+  segmentFiltreModal = segmentInitial || 'all';
+  // Met à jour les chips
+  document.querySelectorAll('#clients-modal .prod-cat-chip[data-seg]').forEach(chip => {
+    chip.classList.toggle('active', chip.dataset.seg === segmentFiltreModal);
+  });
+  // Reset recherche
+  const search = document.getElementById('clients-search-input');
+  if (search) search.value = '';
+  // Titre dynamique
+  const titre = {all:'Tous mes clients', fidele:'Clients fidèles', occasionnel:'Clients occasionnels', part:'Clients qui partent', endormi:'Clients endormis'};
+  document.getElementById('clients-modal-titre').textContent = titre[segmentFiltreModal] || 'Mes clients';
+  filtrerClientsModal();
+}
+
+function fermerListeClients() {
+  document.getElementById('clients-modal').classList.remove('show');
+}
+
+function filtrerSegmentModal(seg) {
+  segmentFiltreModal = seg;
+  document.querySelectorAll('#clients-modal .prod-cat-chip[data-seg]').forEach(chip => {
+    chip.classList.toggle('active', chip.dataset.seg === seg);
+  });
+  const titre = {all:'Tous mes clients', fidele:'Clients fidèles', occasionnel:'Clients occasionnels', part:'Clients qui partent', endormi:'Clients endormis'};
+  document.getElementById('clients-modal-titre').textContent = titre[seg] || 'Mes clients';
+  filtrerClientsModal();
+}
+
+function filtrerClientsModal() {
+  const zone = document.getElementById('clients-modal-liste');
+  if (!zone) return;
+  const search = (document.getElementById('clients-search-input').value || '').toLowerCase().trim();
+  const tri = document.getElementById('clients-tri').value;
+
+  let filtres = clientsCache.slice();
+
+  // Filtre segment
+  if (segmentFiltreModal !== 'all') {
+    filtres = filtres.filter(c => segmentClient(c) === segmentFiltreModal);
+  }
+
+  // Filtre recherche (nom ou téléphone)
+  if (search) {
+    filtres = filtres.filter(c => {
+      const nom = (c.nom || '').toLowerCase();
+      const tel = (c.telephone || '').replace(/\D/g, '');
+      const searchClean = search.replace(/\D/g, '');
+      return nom.includes(search) || (searchClean.length >= 3 && tel.includes(searchClean));
+    });
+  }
+
+  // Tri
+  filtres.sort((a, b) => {
+    switch (tri) {
+      case 'visites': return (b.nb_visites || 0) - (a.nb_visites || 0);
+      case 'points': return (b.points || 0) - (a.points || 0);
+      case 'alpha': return (a.nom || '').localeCompare(b.nom || '');
+      case 'inscription':
+        return new Date(b.date_inscription || 0) - new Date(a.date_inscription || 0);
+      case 'recence':
+      default:
+        return new Date(b.derniere_visite || 0) - new Date(a.derniere_visite || 0);
+    }
+  });
+
+  if (filtres.length === 0) {
+    zone.innerHTML = `<div class="prod-empty"><p>Aucun client ne correspond à cette recherche.</p></div>`;
+    return;
+  }
+
+  zone.innerHTML = filtres.map(c => {
+    const seg = segmentClient(c);
+    const j = c.derniere_visite ? joursDepuisVisiteApp(c.derniere_visite) : 'jamais';
+    return `
+      <div class="client-list-row" onclick="ouvrirDetailClient('${c.id}')">
+        <div class="client-list-avatar ${seg}">${initiales(c.nom || '?')}</div>
+        <div class="client-list-info">
+          <div class="client-list-nom">${escapeHtmlSimple(c.nom || 'Sans nom')}</div>
+          <div class="client-list-meta">${c.nb_visites || 0} visites · ${j}</div>
+        </div>
+        <div class="client-list-tampons">${c.points || 0}/10</div>
+      </div>`;
+  }).join('');
+}
+
+function joursDepuisVisiteApp(dateStr) {
+  if (!dateStr) return 'jamais';
+  const d = new Date(dateStr);
+  const diff = Math.floor((Date.now() - d.getTime()) / (1000 * 60 * 60 * 24));
+  if (diff <= 0) return "aujourd'hui";
+  if (diff === 1) return 'hier';
+  if (diff < 7) return `il y a ${diff} j`;
+  if (diff < 30) return `il y a ${Math.floor(diff / 7)} sem`;
+  return `il y a ${Math.floor(diff / 30)} mois`;
+}
+
+// ============================================================
+//  FICHE DÉTAIL CLIENT
+// ============================================================
+let clientDetailEnCours = null;
+
+async function ouvrirDetailClient(clientId) {
+  const m = document.getElementById('client-detail-modal');
+  m.classList.add('show');
+  document.getElementById('client-detail-vue-fiche').style.display = 'flex';
+  document.getElementById('client-detail-vue-edit').style.display = 'none';
+
+  // Recharge le client depuis cache (ou base)
+  let c = clientsCache.find(x => x.id === clientId);
+  if (!c) {
+    const { data } = await sbClient.from('clients').select('*').eq('id', clientId).single();
+    c = data;
+  }
+  if (!c) return;
+  clientDetailEnCours = c;
+
+  document.getElementById('client-detail-titre').textContent = c.nom || 'Client';
+  afficherFicheClient(c);
+}
+
+function fermerDetailClient() {
+  document.getElementById('client-detail-modal').classList.remove('show');
+  clientDetailEnCours = null;
+}
+
+function afficherFicheClient(c) {
+  const zone = document.getElementById('client-detail-content');
+  const seg = segmentClient(c);
+  const segLabel = {fidele:'🌟 Fidèle', occasionnel:'👋 Occasionnel', part:'⚠️ Part', endormi:'💤 Endormi'}[seg];
+  const noms = ['janv.','févr.','mars','avr.','mai','juin','juil.','août','sept.','oct.','nov.','déc.'];
+
+  let annivAffichage = '—';
+  let prochainAnniv = '';
+  if (c.date_anniversaire) {
+    const d = new Date(c.date_anniversaire);
+    annivAffichage = `${d.getDate()} ${noms[d.getMonth()]} ${d.getFullYear()}`;
+    // Calculer si l'anniversaire est proche
+    const aujourd = new Date();
+    const cetteAnnee = new Date(aujourd.getFullYear(), d.getMonth(), d.getDate());
+    if (cetteAnnee < aujourd) cetteAnnee.setFullYear(aujourd.getFullYear() + 1);
+    const jours = Math.ceil((cetteAnnee - aujourd) / (1000 * 60 * 60 * 24));
+    if (jours === 0) prochainAnniv = '<span style="color:var(--gold);">🎂 Aujourd\'hui !</span>';
+    else if (jours <= 7) prochainAnniv = `<span style="color:var(--gold);">🎂 dans ${jours} jour${jours>1?'s':''}</span>`;
+  }
+
+  const dateInscription = c.date_inscription
+    ? new Date(c.date_inscription).toLocaleDateString('fr-FR', {day:'numeric', month:'long', year:'numeric'})
+    : '—';
+  const derniereVisite = c.derniere_visite
+    ? joursDepuisVisiteApp(c.derniere_visite)
+    : 'aucune visite';
+
+  zone.innerHTML = `
+    <div class="cd-hero">
+      <div class="cd-avatar-big">${initiales(c.nom || '?')}</div>
+      <div class="cd-nom">${escapeHtmlSimple(c.nom || 'Sans nom')}</div>
+      <div class="cd-segment ${seg}">${segLabel}</div>
+    </div>
+
+    <div class="cd-grid">
+      <div class="cd-stat"><div class="cd-stat-val">${c.nb_visites || 0}</div><div class="cd-stat-lbl">Visites</div></div>
+      <div class="cd-stat"><div class="cd-stat-val">${c.points || 0}/10</div><div class="cd-stat-lbl">Tampons</div></div>
+    </div>
+
+    <div class="cd-info-block">
+      <div class="cd-info-row"><span class="lbl">Téléphone</span><span class="val">${formatTelephone(c.telephone) || '—'}</span></div>
+      <div class="cd-info-row"><span class="lbl">Email</span><span class="val">${c.email ? escapeHtmlSimple(c.email) : '—'}</span></div>
+      <div class="cd-info-row"><span class="lbl">Anniversaire</span><span class="val">${annivAffichage} ${prochainAnniv}</span></div>
+      <div class="cd-info-row"><span class="lbl">Dernière visite</span><span class="val">${derniereVisite}</span></div>
+      <div class="cd-info-row"><span class="lbl">Total points gagnés</span><span class="val">${c.total_points_gagnes || 0}</span></div>
+      <div class="cd-info-row"><span class="lbl">Inscription</span><span class="val">${dateInscription}</span></div>
+    </div>
+
+    ${c.telephone ? `
+    <div class="cd-actions">
+      <a href="tel:${c.telephone}" class="cd-btn" style="text-decoration:none; display:flex; align-items:center; justify-content:center;">📞 Appeler</a>
+      <a href="sms:${c.telephone}" class="cd-btn" style="text-decoration:none; display:flex; align-items:center; justify-content:center;">💬 SMS</a>
+      <button class="cd-btn primary" onclick="envoyerSMS('${(c.nom || '').replace(/'/g, "\\'")}', this)">🤖 SMS IA</button>
+    </div>
+    ` : ''}
+  `;
+}
+
+function formatTelephone(tel) {
+  if (!tel) return '';
+  const c = String(tel).replace(/\D/g, '');
+  if (c.length === 10) return c.replace(/(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, '$1 $2 $3 $4 $5');
+  return tel;
+}
+
+function ouvrirEditionClient() {
+  if (!clientDetailEnCours) return;
+  const c = clientDetailEnCours;
+  document.getElementById('client-detail-vue-fiche').style.display = 'none';
+  document.getElementById('client-detail-vue-edit').style.display = 'flex';
+  document.getElementById('ed-client-nom').value = c.nom || '';
+  document.getElementById('ed-client-tel').value = c.telephone || '';
+  document.getElementById('ed-client-email').value = c.email || '';
+  document.getElementById('ed-client-anniv').value = c.date_anniversaire || '';
+  document.getElementById('ed-client-anniv').max = new Date().toISOString().slice(0, 10);
+  document.getElementById('ed-client-points').value = c.points || 0;
+}
+
+function retourFicheClient() {
+  document.getElementById('client-detail-vue-edit').style.display = 'none';
+  document.getElementById('client-detail-vue-fiche').style.display = 'flex';
+}
+
+async function sauverClient() {
+  if (!clientDetailEnCours) return;
+  const nom = document.getElementById('ed-client-nom').value.trim();
+  const tel = document.getElementById('ed-client-tel').value.trim();
+  const email = document.getElementById('ed-client-email').value.trim();
+  const anniv = document.getElementById('ed-client-anniv').value || null;
+  const points = parseInt(document.getElementById('ed-client-points').value) || 0;
+
+  if (!nom) { alert('Le prénom est obligatoire'); return; }
+  if (!tel || tel.replace(/\D/g, '').length < 8) { alert('Téléphone invalide'); return; }
+
+  const btn = document.getElementById('client-save-btn');
+  btn.disabled = true;
+  btn.textContent = '⏳';
+
+  try {
+    const { error } = await sbClient.from('clients').update({
+      nom, telephone: tel, email: email || null,
+      date_anniversaire: anniv, points
+    }).eq('id', clientDetailEnCours.id);
+    if (error) throw error;
+
+    // Mise à jour locale + rechargement
+    Object.assign(clientDetailEnCours, { nom, telephone: tel, email, date_anniversaire: anniv, points });
+    document.getElementById('client-detail-titre').textContent = nom;
+    afficherFicheClient(clientDetailEnCours);
+    retourFicheClient();
+    await chargerClients();
+  } catch (e) {
+    alert('Erreur : ' + e.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '💾';
+  }
+}
+
+async function supprimerClient() {
+  if (!clientDetailEnCours) return;
+  if (!confirm(`Supprimer définitivement ${clientDetailEnCours.nom} ?\n\nCette action est irréversible.`)) return;
+
+  try {
+    const { error } = await sbClient.from('clients').delete().eq('id', clientDetailEnCours.id);
+    if (error) throw error;
+    fermerDetailClient();
+    await chargerClients();
+  } catch (e) {
+    alert('Erreur : ' + e.message);
+  }
+}
+
+// ============================================================
+//  CRÉATION CLIENT DEPUIS L'APP
+// ============================================================
+function ouvrirCreationClientApp() {
+  // Ferme les autres modales si ouvertes
+  document.getElementById('clients-modal').classList.remove('show');
+  document.getElementById('client-detail-modal').classList.remove('show');
+
+  const m = document.getElementById('creation-client-modal');
+  m.classList.add('show');
+
+  document.getElementById('nc-nom').value = '';
+  document.getElementById('nc-tel').value = '';
+  document.getElementById('nc-email').value = '';
+  document.getElementById('nc-anniv').value = '';
+  document.getElementById('nc-anniv').max = new Date().toISOString().slice(0, 10);
+
+  setTimeout(() => document.getElementById('nc-nom').focus(), 100);
+}
+
+function fermerCreationClientApp() {
+  document.getElementById('creation-client-modal').classList.remove('show');
+}
+
+async function creerClientApp() {
+  const nom = document.getElementById('nc-nom').value.trim();
+  const tel = document.getElementById('nc-tel').value.trim();
+  const email = document.getElementById('nc-email').value.trim();
+  const anniv = document.getElementById('nc-anniv').value || null;
+
+  if (!nom) { alert('Le prénom est obligatoire'); return; }
+  if (!tel || tel.replace(/\D/g, '').length < 8) { alert('Téléphone invalide'); return; }
+
+  const btn = document.getElementById('new-client-app-btn');
+  btn.disabled = true;
+  btn.textContent = '⏳';
+
+  try {
+    // Vérifier qu'un client n'existe pas déjà avec ce téléphone
+    const { data: existant } = await sbClient.from('clients')
+      .select('id, nom').eq('telephone', tel).eq('restaurant_id', RESTO_ID).maybeSingle();
+    if (existant) {
+      alert(`Un client existe déjà avec ce téléphone : ${existant.nom}`);
+      btn.disabled = false;
+      btn.textContent = '💾 Créer';
+      return;
+    }
+
+    const insertData = {
+      nom, telephone: tel, restaurant_id: RESTO_ID,
+      points: 0, total_points_gagnes: 0, nb_visites: 0
+    };
+    if (email) insertData.email = email;
+    if (anniv) insertData.date_anniversaire = anniv;
+
+    const { data, error } = await sbClient.from('clients').insert(insertData).select().single();
+    if (error) throw error;
+
+    fermerCreationClientApp();
+    await chargerClients();
+    // Ouvre directement la fiche du nouveau client
+    setTimeout(() => ouvrirDetailClient(data.id), 200);
+  } catch (e) {
+    alert('Erreur : ' + e.message);
+    btn.disabled = false;
+    btn.textContent = '💾 Créer';
+  }
+}
+
+// ============================================================
+//  TOGGLES AUTOMATISATIONS (localStorage)
+// ============================================================
+function toggleAutomatisation(cle, el) {
+  el.classList.toggle('on');
+  const actif = el.classList.contains('on');
+  localStorage.setItem('auto-' + cle, actif ? 'on' : 'off');
+}
+
+// ============================================================
+//  REALTIME : recharger clients à chaque changement
+// ============================================================
+if (typeof sbClient !== 'undefined') {
+  sbClient.channel('clients-changes')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'clients' },
+        () => { if (typeof chargerClients === 'function') chargerClients(); })
+    .subscribe();
+}
+
 
   // ===== CLIENTS : génération de SMS personnalisé par l'IA =====
 async function envoyerSMS(prenom, btn) {
