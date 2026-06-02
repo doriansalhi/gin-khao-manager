@@ -94,6 +94,31 @@ exports.handler = async function (event) {
       };
     }
 
+    // 💰 Comptabiliser le SMS dans la compta (charge journalière groupée)
+    // On utilise la clé service_role pour appeler la fonction SQL incrementer_charge_sms
+    try {
+      const SUPA_URL = process.env.SUPABASE_URL || 'https://szpgbdnijyoquqmjhhjj.supabase.co';
+      const SUPA_KEY = process.env.SUPABASE_SERVICE_KEY;
+      if (SUPA_KEY) {
+        const nbSms = dataAPI.smsCount || 1;
+        await fetch(SUPA_URL + '/rest/v1/rpc/incrementer_charge_sms', {
+          method: 'POST',
+          headers: {
+            'apikey': SUPA_KEY,
+            'Authorization': 'Bearer ' + SUPA_KEY,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            p_restaurant_id: 'gin-khao',
+            p_cout_eur: 0.05 * nbSms,
+            p_nb_sms: nbSms
+          })
+        });
+      }
+    } catch (errCompta) {
+      console.error('Compta SMS échouée (SMS quand même envoyé):', errCompta.message);
+    }
+
     // Succès
     return {
       statusCode: 200,
