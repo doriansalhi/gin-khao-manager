@@ -4713,8 +4713,13 @@ function joursDepuis(dateStr) {
 
 // Détermine le segment d'un client
 function segmentClient(c) {
-  const j = joursDepuis(c.derniere_visite);
   const v = c.nb_visites || 0;
+
+  // Nouveau client (jamais venu) → catégorie "occasionnel" par défaut
+  // (pas endormi car il n'a pas eu le temps de l'être)
+  if (!c.derniere_visite || v === 0) return 'occasionnel';
+
+  const j = joursDepuis(c.derniere_visite);
   if (j > 50) return 'endormi';
   if (j > 18) return 'part';          // en train de partir
   if (v >= 20) return 'fidele';
@@ -4774,18 +4779,19 @@ function afficherARelancer() {
   }
 
   zone.innerHTML = aRelancer.map(c => {
-    const j = joursDepuis(c.derniere_visite);
+    const j = joursDepuisVisiteApp(c.derniere_visite);
+    const visites = c.nb_visites || 0;
     const segChip = segmentClient(c) === 'endormi'
       ? '<span class="client-tag lost">endormi</span>'
       : '<span class="client-tag lost">part</span>';
     return `
-      <div class="client-row">
+      <div class="client-row" onclick="ouvrirDetailClient('${c.id}')">
         <div class="client-avatar red">${initiales(c.nom)}</div>
         <div class="client-info">
           <div class="client-name">${c.nom} ${segChip}</div>
-          <div class="client-meta"><strong>${c.nb_visites} visites</strong> · dernier passage il y a <strong>${j} jours</strong></div>
+          <div class="client-meta"><strong>${visites} visite${visites > 1 ? 's' : ''}</strong> · dernier passage ${j}</div>
         </div>
-        <button class="client-cta send" onclick="envoyerSMS('${c.nom.replace(/'/g, "\\'")}', this)">SMS</button>
+        <button class="client-cta send" onclick="event.stopPropagation(); envoyerSMS('${c.nom.replace(/'/g, "\\'")}', this, '${c.id}')">SMS</button>
       </div>`;
   }).join('');
 }
@@ -4805,13 +4811,13 @@ function afficherVIP() {
   }
 
   zone.innerHTML = vips.map(c => `
-    <div class="client-row">
+    <div class="client-row" onclick="ouvrirDetailClient('${c.id}')">
       <div class="client-avatar gold">${initiales(c.nom)}</div>
       <div class="client-info">
         <div class="client-name">${c.nom} <span class="client-tag vip">VIP</span></div>
-        <div class="client-meta"><strong>${c.nb_visites} visites</strong> · ${c.points}/10 tampons</div>
+        <div class="client-meta"><strong>${c.nb_visites} visite${(c.nb_visites || 0) > 1 ? 's' : ''}</strong> · ${c.points || 0}/10 tampons</div>
       </div>
-      <button class="client-cta ghost" onclick="envoyerSMS('${c.nom.replace(/'/g, "\\'")}', this)">Récompenser</button>
+      <button class="client-cta ghost" onclick="event.stopPropagation(); envoyerSMS('${c.nom.replace(/'/g, "\\'")}', this, '${c.id}')">Récompenser</button>
     </div>`).join('');
 }
 
@@ -4939,7 +4945,7 @@ function majModeAffichage() {
 }
 
 // Sauvegarde l'offre
-function sauverConfigOffre() {
+async function sauverConfigOffre() {
   const offre = document.getElementById('oc-offre-text').value.trim();
   const code = document.getElementById('oc-code-text').value.trim().toUpperCase();
   const mode = document.querySelector('.oc-mode-btn.active')?.dataset.mode || 'ia';
@@ -4955,6 +4961,18 @@ function sauverConfigOffre() {
   if (mode === 'manuel') config.msgManuel = msgManuel;
   setOffreConfig(config);
 
+  // Sauvegarde aussi dans Supabase pour que les cron jobs puissent lire
+  try {
+    await sbClient.from('parametres_sms').upsert({
+      restaurant_id: RESTO_ID,
+      offre_texte: offre,
+      offre_code: code,
+      mode_message: mode,
+      message_manuel: mode === 'manuel' ? msgManuel : null,
+      modifie_le: new Date().toISOString()
+    }, { onConflict: 'restaurant_id' });
+  } catch (e) { console.error('Erreur sauvegarde config offre:', e); }
+
   rafraichirAffichageOffre();
   fermerConfigOffre();
 
@@ -4967,11 +4985,15 @@ function sauverConfigOffre() {
 
 document.addEventListener('DOMContentLoaded', () => {
   rafraichirAffichageOffre();
-  // Charger toggles automatisations depuis localStorage
+  // Charger toggles automatisations depuis localStorage (fast)
   ['anniversaire','endormi','avis'].forEach(k => {
     const t = document.getElementById('auto-' + k);
     if (t && localStorage.getItem('auto-' + k) === 'on') t.classList.add('on');
   });
+  // Puis synchroniser depuis Supabase (source de vérité)
+  if (typeof chargerToggles === 'function') {
+    setTimeout(() => chargerToggles(), 800);
+  }
 });
 
 // ============================================================
@@ -5285,7 +5307,7 @@ function filtrerClientsModal() {
 }
 
 function joursDepuisVisiteApp(dateStr) {
-  if (!dateStr) return 'jamais';
+  if (!dateStr) return 'pas encore venu';
   const d = new Date(dateStr);
   const diff = Math.floor((Date.now() - d.getTime()) / (1000 * 60 * 60 * 24));
   if (diff <= 0) return "aujourd'hui";
@@ -5525,12 +5547,49 @@ async function creerClientApp() {
 }
 
 // ============================================================
-//  TOGGLES AUTOMATISATIONS (localStorage)
+//  TOGGLES AUTOMATISATIONS (Supabase + localStorage)
 // ============================================================
-function toggleAutomatisation(cle, el) {
+async function toggleAutomatisation(cle, el) {
   el.classList.toggle('on');
   const actif = el.classList.contains('on');
+  // Sauvegarde immédiate dans localStorage (réactivité UI)
   localStorage.setItem('auto-' + cle, actif ? 'on' : 'off');
+
+  // Et aussi dans Supabase pour que les cron jobs puissent lire
+  const col = 'auto_' + (cle === 'anniversaire' ? 'anniv' : cle);
+  try {
+    const config = getOffreConfig();
+    await sbClient.from('parametres_sms').upsert({
+      restaurant_id: RESTO_ID,
+      [col]: actif,
+      offre_texte: config.offre,
+      offre_code: config.code,
+      mode_message: config.mode,
+      message_manuel: config.msgManuel || null,
+      modifie_le: new Date().toISOString()
+    }, { onConflict: 'restaurant_id' });
+  } catch (e) {
+    console.error('Erreur sauvegarde automatisation:', e);
+  }
+}
+
+// Au chargement, lire l'état réel depuis Supabase (synchroniser)
+async function chargerToggles() {
+  try {
+    const { data } = await sbClient.from('parametres_sms')
+      .select('auto_anniv, auto_endormi, auto_avis')
+      .eq('restaurant_id', RESTO_ID).maybeSingle();
+    if (data) {
+      const map = { anniversaire: 'auto_anniv', endormi: 'auto_endormi', avis: 'auto_avis' };
+      Object.entries(map).forEach(([cle, col]) => {
+        const t = document.getElementById('auto-' + cle);
+        if (t) {
+          t.classList.toggle('on', !!data[col]);
+          localStorage.setItem('auto-' + cle, data[col] ? 'on' : 'off');
+        }
+      });
+    }
+  } catch (e) { console.log('Pas de table parametres_sms encore:', e.message); }
 }
 
 // ============================================================
