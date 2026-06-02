@@ -165,29 +165,51 @@ exports.handler = async function (event) {
 // ============================================================
 
 async function genererSMSAnniversaire(prenom, offre, code) {
+  // Message de secours par défaut (au cas où Claude IA plante)
+  const messageDefaut = `🎂 Bon anniversaire ${prenom} ! Pour fêter ça, on t'offre ${offre} chez Gin Khao avec le code ${code}. À très vite 🍜`;
+
   if (!ANTHROPIC_API_KEY) {
-    // Fallback sans IA
-    return `🎂 Bon anniversaire ${prenom} ! On te souhaite une superbe journée. Pour la fêter, on t'offre ${offre} avec le code ${code} chez Gin Khao. À très vite 🍜`;
+    console.log('⚠️ Pas de ANTHROPIC_API_KEY, utilisation du message par défaut');
+    return messageDefaut;
   }
 
   const prompt = `Tu es un assistant marketing pour le restaurant Gin Khao (street food thaï, Marseille). Rédige UN SEUL SMS court (max 160 caractères, sinon coupé en 2 SMS = plus cher). Pour souhaiter bon anniversaire à ${prenom}. Offre à mentionner : ${offre}. Code promo OBLIGATOIRE : ${code}. Ton chaleureux, direct, restaurant thaï décontracté. Tu peux utiliser des emojis (max 2). Réponds UNIQUEMENT avec le texte du SMS, sans guillemets ni commentaire.`;
 
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'x-api-key': ANTHROPIC_API_KEY,
-      'anthropic-version': '2023-06-01',
-      'content-type': 'application/json'
-    },
-    body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 200,
-      messages: [{ role: 'user', content: prompt }]
-    })
-  });
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'x-api-key': ANTHROPIC_API_KEY,
+        'anthropic-version': '2023-06-01',
+        'content-type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 200,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
 
-  const data = await res.json();
-  return (data.content?.[0]?.text || '').trim();
+    if (!res.ok) {
+      const errText = await res.text();
+      console.log('⚠️ Erreur Claude API ' + res.status + ' : ' + errText);
+      console.log('→ Utilisation du message par défaut');
+      return messageDefaut;
+    }
+
+    const data = await res.json();
+    const sms = (data.content?.[0]?.text || '').trim();
+
+    if (!sms || sms.length < 10) {
+      console.log('⚠️ Claude a renvoyé un texte vide → message par défaut');
+      return messageDefaut;
+    }
+
+    return sms;
+  } catch (e) {
+    console.log('⚠️ Exception appel Claude:', e.message);
+    return messageDefaut;
+  }
 }
 
 async function envoyerSMS(numero, texte) {
