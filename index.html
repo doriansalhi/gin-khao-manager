@@ -5247,9 +5247,9 @@ async function sauverConfigOffre() {
 document.addEventListener('DOMContentLoaded', () => {
   rafraichirAffichageOffre();
   // Charger toggles automatisations depuis localStorage (fast)
-  ['anniversaire','endormi','avis'].forEach(k => {
-    const t = document.getElementById('auto-' + k);
-    if (t && localStorage.getItem('auto-' + k) === 'on') t.classList.add('on');
+  ['auto-anniv', 'auto-endormi', 'auto-avis'].forEach(id => {
+    const t = document.getElementById(id);
+    if (t && localStorage.getItem(id) === 'on') t.classList.add('on');
   });
   // Puis synchroniser depuis Supabase (source de vérité)
   if (typeof chargerToggles === 'function') {
@@ -5813,8 +5813,8 @@ async function creerClientApp() {
 async function toggleAutomatisation(cle, el) {
   el.classList.toggle('on');
   const actif = el.classList.contains('on');
-  // Sauvegarde immédiate dans localStorage (réactivité UI)
-  localStorage.setItem('auto-' + cle, actif ? 'on' : 'off');
+  // Sauvegarde immédiate dans localStorage avec l'ID HTML (cohérent avec la lecture)
+  localStorage.setItem(el.id, actif ? 'on' : 'off');
 
   // Et aussi dans Supabase pour que les cron jobs puissent lire
   const col = 'auto_' + (cle === 'anniversaire' ? 'anniv' : cle);
@@ -5849,12 +5849,17 @@ async function chargerToggles() {
       return; // On garde l'état localStorage
     }
     // Synchroniser les toggles avec Supabase
-    const map = { anniversaire: 'auto_anniv', endormi: 'auto_endormi', avis: 'auto_avis' };
-    Object.entries(map).forEach(([cle, col]) => {
-      const t = document.getElementById('auto-' + cle);
+    // map : { cleSupabase: idHTML }
+    const map = {
+      auto_anniv: 'auto-anniv',
+      auto_endormi: 'auto-endormi',
+      auto_avis: 'auto-avis'
+    };
+    Object.entries(map).forEach(([col, id]) => {
+      const t = document.getElementById(id);
       if (t) {
         t.classList.toggle('on', !!data[col]);
-        localStorage.setItem('auto-' + cle, data[col] ? 'on' : 'off');
+        localStorage.setItem(id, data[col] ? 'on' : 'off');
       }
     });
   } catch (e) {
