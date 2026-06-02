@@ -118,7 +118,15 @@ exports.handler = async function (event) {
             brevo_id: resultat.messageId,
             cout_sms: resultat.cout || 1
           });
-          console.log(`  ✅ ${client.nom} : SMS envoyé`);
+
+          // 💰 Incrémenter la charge SMS du jour (compta automatique)
+          await sb.rpc('incrementer_charge_sms', {
+            p_restaurant_id: RESTO_ID,
+            p_cout_eur: 0.05 * (resultat.cout || 1),
+            p_nb_sms: resultat.cout || 1
+          });
+
+          console.log(`  ✅ ${client.nom} : SMS envoyé + comptabilisé`);
         } else {
           stats.erreurs++;
           await sb.from('sms_logs').insert({
