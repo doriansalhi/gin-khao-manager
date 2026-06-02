@@ -135,6 +135,18 @@ exports.handler = async function (event) {
       } catch (e) {
         stats.erreurs++;
         console.log(`  ❌ ${client.nom} : ${e.message}`);
+        // Logger même les erreurs JS (génération IA, etc.)
+        try {
+          await sb.from('sms_logs').insert({
+            restaurant_id: RESTO_ID,
+            client_id: client.id,
+            type: 'anniversaire',
+            numero: client.telephone || 'inconnu',
+            texte: sms || '(non généré)',
+            statut: 'echec',
+            erreur: 'Exception JS : ' + e.message
+          });
+        } catch (e2) { console.error('Impossible de logger:', e2.message); }
       }
 
       // Petite pause entre chaque envoi
