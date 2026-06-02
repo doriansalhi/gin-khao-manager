@@ -1,0 +1,24 @@
+# netlify.toml — configuration Netlify
+# À placer à la racine du repo
+
+[build]
+  publish = "."
+  functions = "netlify/functions"
+
+# ============================================================
+# Cron Jobs (Scheduled Functions)
+# ============================================================
+# Cron syntax: minute hour day-of-month month day-of-week
+# Toutes les heures = "0 * * * *"
+# 9h chaque jour = "0 9 * * *"
+# 11h chaque lundi = "0 11 * * 1"
+# ============================================================
+
+[functions."cron-anniversaires"]
+  schedule = "0 9 * * *"
+
+[functions."cron-endormis"]
+  schedule = "0 11 * * 1"
+
+[functions."cron-demande-avis"]
+  schedule = "0 * * * *"
