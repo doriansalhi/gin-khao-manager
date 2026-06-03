@@ -343,6 +343,128 @@ body {
 .gate p { color: var(--text-mute); font-size: 14px; max-width: 320px; line-height: 1.6; }
 .gate a { color: var(--gold); }
 .gate.hidden { display: none; }
+
+/* ===== BANDEAU FIDÉLITÉ ===== */
+.fid-bandeau {
+  margin: 16px 28px 0;
+  border-radius: 16px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+.fid-bandeau:active { transform: scale(0.98); }
+.fid-bandeau-pas-connecte, .fid-bandeau-connecte {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+}
+.fid-bandeau-pas-connecte {
+  background: linear-gradient(135deg, rgba(228,184,96,0.15), rgba(228,184,96,0.05));
+  border: 1.5px solid var(--gold);
+}
+.fid-bandeau-connecte {
+  background: linear-gradient(135deg, rgba(168,225,12,0.15), rgba(168,225,12,0.05));
+  border: 1.5px solid var(--lime);
+}
+.fid-icone {
+  font-size: 28px;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.2);
+  border-radius: 12px;
+  flex-shrink: 0;
+}
+.fid-info { flex: 1; min-width: 0; }
+.fid-titre {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+.fid-sous {
+  font-size: 13px;
+  color: var(--text-mute);
+}
+.fid-detach-hint {
+  opacity: 0.6;
+  font-size: 11px;
+}
+.fid-arrow {
+  font-size: 24px;
+  color: var(--gold);
+  flex-shrink: 0;
+}
+
+/* ===== ÉCRAN SCAN QR ===== */
+#ecran-scan-qr { background: var(--bg-deep); padding: 28px; }
+.scan-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+.scan-head h2 { font-family: var(--display); font-size: 30px; font-weight: 500; }
+.scan-instruction {
+  font-size: 16px;
+  color: var(--text-soft);
+  text-align: center;
+  margin-bottom: 24px;
+  line-height: 1.5;
+}
+.qr-reader-box {
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+  border-radius: 20px;
+  overflow: hidden;
+  background: var(--surface);
+  border: 2px solid var(--gold);
+}
+.qr-reader-box video { width: 100% !important; }
+.scan-aide {
+  text-align: center;
+  margin-top: 28px;
+  color: var(--text-mute);
+  font-size: 14px;
+}
+.scan-aide a { color: var(--gold); text-decoration: underline; }
+
+/* ===== ÉCRAN PAIEMENT SUMUP ===== */
+#ecran-paiement-sumup {
+  background: var(--bg-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.paie-sumup-content {
+  text-align: center;
+  padding: 40px 28px;
+  max-width: 500px;
+}
+.paie-sumup-icon { font-size: 80px; margin-bottom: 16px; }
+.paie-sumup-titre {
+  font-family: var(--display);
+  font-size: 36px;
+  font-weight: 500;
+  margin-bottom: 12px;
+}
+.paie-sumup-montant {
+  font-family: var(--display);
+  font-size: 60px;
+  font-weight: 500;
+  color: var(--gold);
+  margin: 20px 0;
+}
+.paie-sumup-sub {
+  font-size: 16px;
+  color: var(--text-mute);
+  margin-top: 16px;
+}
+
 </style>
 </head>
 <body>
@@ -401,6 +523,29 @@ body {
     <h2>Votre commande</h2>
     <button class="btn-retour" onclick="allerEcran('ecran-menu')">← Ajouter des plats</button>
   </div>
+
+  <!-- 🎫 BANDEAU FIDÉLITÉ -->
+  <div class="fid-bandeau" id="fid-bandeau">
+    <div class="fid-bandeau-pas-connecte" id="fid-pas-connecte" onclick="ouvrirScanQR()">
+      <div class="fid-icone">🎫</div>
+      <div class="fid-info">
+        <div class="fid-titre">Carte de fidélité Gin Khao</div>
+        <div class="fid-sous">Scannez votre QR code pour cumuler vos tampons</div>
+      </div>
+      <div class="fid-arrow">→</div>
+    </div>
+    <div class="fid-bandeau-connecte" id="fid-connecte" style="display:none;" onclick="detacherClient()">
+      <div class="fid-icone">✅</div>
+      <div class="fid-info">
+        <div class="fid-titre" id="fid-nom-client">Client</div>
+        <div class="fid-sous">
+          <span id="fid-tampons-affiche">0/10 tampons</span>
+          <span class="fid-detach-hint">· toucher pour annuler</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="panier-liste" id="panier-liste"></div>
   <div class="panier-foot">
     <div class="panier-foot-total">
@@ -411,23 +556,51 @@ body {
   </div>
 </div>
 
+<!-- ===== ÉCRAN 4 bis : SCAN QR FIDELITE ===== -->
+<div class="ecran" id="ecran-scan-qr">
+  <div class="scan-head">
+    <h2>🎫 Carte de fidélité</h2>
+    <button class="btn-retour" onclick="fermerScanQR()">← Retour</button>
+  </div>
+  <div class="scan-instruction">
+    Présentez votre QR code Gin Khao devant la caméra
+  </div>
+  <div id="qr-reader" class="qr-reader-box"></div>
+  <div class="scan-aide">
+    Vous n'avez pas de carte fidélité ?
+    <a href="#" onclick="afficherInfoFidelite(); return false;">Inscrivez-vous</a>
+  </div>
+</div>
+
 <!-- ===== ÉCRAN 5 : PAIEMENT ===== -->
 <div class="ecran" id="ecran-paiement">
   <div class="paie-titre">Comment réglez-vous ?</div>
   <div class="paie-montant" id="paie-montant">0,00 €</div>
   <div class="paie-choix">
+    <div class="paie-card" onclick="lancerPaiementSumUp()">
+      <div class="ic">💳</div>
+      <div class="nm">Carte bancaire</div>
+      <div class="badge">SumUp</div>
+    </div>
     <div class="paie-card" onclick="payer('comptoir')">
       <div class="ic">🏪</div>
       <div class="nm">Payer au comptoir</div>
-      <div class="badge">Disponible</div>
-    </div>
-    <div class="paie-card bientot" onclick="payerCarte()">
-      <div class="ic">💳</div>
-      <div class="nm">Carte bancaire</div>
-      <div class="badge">Bientôt (myPOS)</div>
+      <div class="badge">Espèces / CB</div>
     </div>
   </div>
   <button class="paie-annuler" onclick="allerEcran('ecran-panier')">Retour au panier</button>
+</div>
+
+<!-- ===== ÉCRAN 5 bis : ATTENTE PAIEMENT SUMUP ===== -->
+<div class="ecran" id="ecran-paiement-sumup">
+  <div class="paie-sumup-content">
+    <div class="paie-sumup-icon">💳</div>
+    <div class="paie-sumup-titre">Présentez votre carte</div>
+    <div class="paie-sumup-montant" id="paie-sumup-montant">0,00 €</div>
+    <div class="spinner" style="margin: 24px auto;"></div>
+    <div class="paie-sumup-sub" id="paie-sumup-sub">Suivez les instructions sur le terminal</div>
+    <button class="paie-annuler" onclick="annulerPaiementSumUp()" style="margin-top:30px;">Annuler le paiement</button>
+  </div>
 </div>
 
 <!-- ===== ÉCRAN 6 : CONFIRMATION ===== -->
@@ -443,6 +616,7 @@ body {
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script>
 // ===== CONFIG (même base que la caisse et l'appli) =====
 const SB_URL = 'https://szpgbdnijyoquqmjhhjj.supabase.co';
@@ -465,6 +639,7 @@ let categories = [];
 let catActive = 'tout';
 let panier = [];          // [{produit_id, nom, prix, quantite, emoji}]
 let modeService = 'sur_place';
+let clientFid = null;     // 🎫 Client attaché via QR code fidélité {id, nom, points, ...}
 
 // ===== NAVIGATION ENTRE ÉCRANS =====
 function allerEcran(id) {
@@ -483,6 +658,7 @@ function choisirMode(mode) {
 function allerPanier() {
   if (panier.length === 0) return;
   afficherPanier();
+  afficherFidelite();  // ✨ Mettre à jour le bandeau fidélité
   allerEcran('ecran-panier');
 }
 
@@ -627,9 +803,6 @@ function afficherPanier() {
 }
 
 // ===== PAIEMENT =====
-function payerCarte() {
-  alert('💳 Paiement par carte bientôt disponible.\n\nIl sera activé une fois l\'accès à l\'API myPOS configuré. Pour l\'instant, choisissez "Payer au comptoir".');
-}
 
 let envoiEnCours = false;
 async function payer(methode) {
@@ -650,11 +823,18 @@ async function payer(methode) {
       p_mode_paiement: methode === 'comptoir' ? 'comptoir' : 'carte',
       p_lignes: lignes,
       p_origine: 'borne',
-      p_mode_service: modeService
+      p_mode_service: modeService,
+      p_canal: 'borne',                                   // ✨ Canal "borne" pour distinguer dans les stats
+      p_client_id: clientFid ? clientFid.id : null        // ✨ Client attaché (si scan QR)
     });
     if (error) throw error;
 
     const numero = data?.numero ?? '?';
+    const venteId = data?.vente_id;
+
+    // 🧾 Impression auto du ticket cuisine (fire-and-forget)
+    imprimerTicketCuisine(venteId, numero, lignes).catch(e => console.error('Impression KO:', e));
+
     afficherConfirmation(numero);
   } catch (e) {
     alert('Erreur lors de l\'envoi : ' + e.message);
@@ -675,9 +855,13 @@ function afficherConfirmation(numero) {
     catActive = 'tout';
     modeService = 'sur_place';
     envoiEnCours = false;
+    clientFid = null;  // ✨ Reset client fidélité
+    sumupCheckoutId = null;
+    if (sumupPolling) { clearInterval(sumupPolling); sumupPolling = null; }
     majBarrePanier();
     afficherCats();
     afficherMenu();
+    afficherFidelite();
     allerEcran('ecran-accueil');
     chargerMenu(); // recharge le stock à jour
   }, 8000);
@@ -686,6 +870,232 @@ function afficherConfirmation(numero) {
 // ===== UTILITAIRE =====
 function fmt(n) {
   return Number(n).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+}
+
+// ============================================================
+//  🎫 SCAN QR FIDÉLITÉ
+// ============================================================
+let qrScanner = null;
+
+function ouvrirScanQR() {
+  allerEcran('ecran-scan-qr');
+  setTimeout(() => demarrerScanner(), 300);
+}
+
+function fermerScanQR() {
+  arreterScanner();
+  allerEcran('ecran-panier');
+}
+
+async function demarrerScanner() {
+  try {
+    qrScanner = new Html5Qrcode("qr-reader");
+    await qrScanner.start(
+      { facingMode: "user" },  // caméra frontale (tablette borne)
+      {
+        fps: 10,
+        qrbox: { width: 280, height: 280 },
+        aspectRatio: 1.0
+      },
+      onScanSuccess,
+      onScanError
+    );
+  } catch (e) {
+    console.error('Erreur scanner:', e);
+    // Si caméra frontale KO, essayer caméra arrière
+    try {
+      qrScanner = new Html5Qrcode("qr-reader");
+      await qrScanner.start(
+        { facingMode: "environment" },
+        { fps: 10, qrbox: { width: 280, height: 280 } },
+        onScanSuccess,
+        onScanError
+      );
+    } catch (e2) {
+      alert('Impossible d\'accéder à la caméra : ' + e2.message);
+      fermerScanQR();
+    }
+  }
+}
+
+async function arreterScanner() {
+  if (qrScanner) {
+    try {
+      await qrScanner.stop();
+      qrScanner.clear();
+    } catch (e) { /* silent */ }
+    qrScanner = null;
+  }
+}
+
+function onScanError(err) { /* silent : on ignore les "no qr code found" */ }
+
+async function onScanSuccess(decodedText) {
+  await arreterScanner();
+  // Le QR code contient l'ID du client (UUID) ou un lien
+  let clientId = decodedText.trim();
+
+  // Extraire l'UUID si c'est une URL (ex: https://gin-khao.com/?c=UUID)
+  const matchUrl = clientId.match(/[?&]c=([0-9a-f-]{36})/i);
+  if (matchUrl) clientId = matchUrl[1];
+
+  // Vérifier que c'est bien un UUID
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(clientId)) {
+    alert('QR code non reconnu. Veuillez réessayer avec votre carte fidélité Gin Khao.');
+    allerEcran('ecran-panier');
+    return;
+  }
+
+  // Récupérer le client en base
+  try {
+    const { data, error } = await sb.from('clients')
+      .select('id, nom, points, nb_visites, total_points_gagnes')
+      .eq('id', clientId)
+      .eq('restaurant_id', RESTO_ID)
+      .single();
+    if (error || !data) {
+      alert('Client introuvable. Veuillez réessayer ou demander de l\'aide au comptoir.');
+      allerEcran('ecran-panier');
+      return;
+    }
+    clientFid = data;
+    afficherFidelite();
+    allerEcran('ecran-panier');
+  } catch (e) {
+    alert('Erreur : ' + e.message);
+    allerEcran('ecran-panier');
+  }
+}
+
+function afficherFidelite() {
+  const pasConnecte = document.getElementById('fid-pas-connecte');
+  const connecte = document.getElementById('fid-connecte');
+  if (clientFid) {
+    pasConnecte.style.display = 'none';
+    connecte.style.display = 'flex';
+    document.getElementById('fid-nom-client').textContent = 'Bienvenue ' + (clientFid.nom || 'cher client') + ' 👋';
+    const pts = clientFid.points || 0;
+    let txt = pts + '/10 tampons';
+    if (pts === 9) txt += ' · 🎉 Prochaine commande = 1 plat offert !';
+    document.getElementById('fid-tampons-affiche').textContent = txt;
+  } else {
+    pasConnecte.style.display = 'flex';
+    connecte.style.display = 'none';
+  }
+}
+
+function detacherClient() {
+  if (!confirm('Annuler la carte fidélité ?')) return;
+  clientFid = null;
+  afficherFidelite();
+}
+
+function afficherInfoFidelite() {
+  alert('📱 Pour créer votre carte fidélité Gin Khao :\n\n1. Demandez à un employé au comptoir\n2. Donnez votre numéro de téléphone\n3. Recevez votre QR code par SMS\n\nÀ partir de la prochaine commande, scannez-le ici pour cumuler vos tampons et obtenir un plat offert !');
+}
+
+// ============================================================
+//  💳 PAIEMENT SUMUP (online checkout)
+// ============================================================
+let sumupCheckoutId = null;
+let sumupPolling = null;
+
+async function lancerPaiementSumUp() {
+  if (envoiEnCours || panier.length === 0) return;
+  envoiEnCours = true;
+  const montant = totalPanier();
+  document.getElementById('paie-sumup-montant').textContent = fmt(montant);
+  document.getElementById('paie-sumup-sub').textContent = 'Suivez les instructions sur le terminal SumUp Solo';
+  allerEcran('ecran-paiement-sumup');
+
+  try {
+    // Appel notre Netlify Function qui crée un checkout SumUp
+    const resp = await fetch('/.netlify/functions/sumup-create-checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        montant: montant.toFixed(2),
+        description: 'Gin Khao - Borne',
+        return_url: window.location.origin + '/borne.html'
+      })
+    });
+    const data = await resp.json();
+    if (!data.ok) throw new Error(data.erreur || 'Erreur création checkout');
+
+    sumupCheckoutId = data.checkout_id;
+
+    // On lance le polling pour vérifier le statut toutes les 2 secondes
+    sumupPolling = setInterval(verifierStatutSumUp, 2000);
+  } catch (e) {
+    alert('Erreur SumUp : ' + e.message + '\n\nVeuillez payer au comptoir.');
+    envoiEnCours = false;
+    allerEcran('ecran-paiement');
+  }
+}
+
+async function verifierStatutSumUp() {
+  if (!sumupCheckoutId) return;
+  try {
+    const resp = await fetch('/.netlify/functions/sumup-check-status?checkout_id=' + encodeURIComponent(sumupCheckoutId));
+    const data = await resp.json();
+    if (data.statut === 'PAID') {
+      clearInterval(sumupPolling);
+      sumupPolling = null;
+      // Paiement réussi ! On enregistre la vente
+      await payer('carte');
+    } else if (data.statut === 'FAILED' || data.statut === 'EXPIRED') {
+      clearInterval(sumupPolling);
+      sumupPolling = null;
+      alert('Paiement échoué ou expiré. Veuillez réessayer.');
+      envoiEnCours = false;
+      allerEcran('ecran-paiement');
+    }
+    // PENDING / autre : on continue à attendre
+  } catch (e) {
+    console.error('Polling SumUp:', e);
+  }
+}
+
+function annulerPaiementSumUp() {
+  if (sumupPolling) {
+    clearInterval(sumupPolling);
+    sumupPolling = null;
+  }
+  sumupCheckoutId = null;
+  envoiEnCours = false;
+  allerEcran('ecran-paiement');
+}
+
+// ============================================================
+//  🧾 IMPRESSION TICKET CUISINE (auto)
+// ============================================================
+async function imprimerTicketCuisine(venteId, numero, lignes) {
+  try {
+    // Appel du serveur d'impression local (déjà en place au resto)
+    await fetch('/.netlify/functions/imprimer-ticket', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        vente_id: venteId,
+        numero: numero,
+        mode_service: modeService,
+        origine: 'borne',
+        client_nom: clientFid ? clientFid.nom : null,
+        lignes: lignes.map(l => {
+          // Détection si c'est un sushi/maki (pour routage station sushi)
+          const nom = l.nom.toLowerCase();
+          const isSushi = /sushi|maki|sashimi|nigiri|temaki|california/.test(nom);
+          return {
+            nom: l.nom,
+            quantite: l.quantite,
+            station: isSushi ? 'sushi' : 'cuisine'
+          };
+        })
+      })
+    });
+  } catch (e) {
+    console.error('Impression échouée (non bloquant) :', e);
+  }
 }
 
 init();
