@@ -328,6 +328,29 @@ body {
 .fin-numero-lbl { font-size: 14px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-mute); }
 .fin-numero { font-family: var(--display); font-size: 80px; font-weight: 600; color: var(--gold); line-height: 1; margin-top: 6px; }
 .fin-mode { font-size: 15px; color: var(--text-mute); }
+.fin-instructions {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 20px 28px;
+  margin-bottom: 24px;
+  max-width: 500px;
+  text-align: center;
+  font-size: 17px;
+  line-height: 1.6;
+  color: var(--text-soft);
+}
+.fin-instructions.comptoir {
+  background: linear-gradient(135deg, rgba(228,184,96,0.12), rgba(228,184,96,0.04));
+  border-color: var(--gold);
+  color: var(--text);
+}
+.fin-instructions.paye {
+  background: linear-gradient(135deg, rgba(168,225,12,0.12), rgba(168,225,12,0.04));
+  border-color: var(--lime);
+  color: var(--text);
+}
+.fin-instructions strong { color: var(--gold); font-weight: 700; }
 
 .spinner {
   width: 40px; height: 40px; border: 4px solid var(--border);
@@ -605,13 +628,14 @@ body {
 
 <!-- ===== ÉCRAN 6 : CONFIRMATION ===== -->
 <div class="ecran" id="ecran-fin">
-  <div class="fin-check">✓</div>
-  <div class="fin-titre">Commande envoyée !</div>
+  <div class="fin-check" id="fin-check">✓</div>
+  <div class="fin-titre" id="fin-titre">Commande envoyée !</div>
   <div class="fin-sub" id="fin-sub">Votre commande est en préparation</div>
   <div class="fin-numero-box">
     <div class="fin-numero-lbl">Votre numéro</div>
     <div class="fin-numero" id="fin-numero">—</div>
   </div>
+  <div class="fin-instructions" id="fin-instructions"></div>
   <div class="fin-mode" id="fin-mode"></div>
 </div>
 
@@ -835,27 +859,58 @@ async function payer(methode) {
     // 🧾 Impression auto du ticket cuisine (fire-and-forget)
     imprimerTicketCuisine(venteId, numero, lignes).catch(e => console.error('Impression KO:', e));
 
-    afficherConfirmation(numero);
+    afficherConfirmation(numero, methode);
   } catch (e) {
     alert('Erreur lors de l\'envoi : ' + e.message);
     envoiEnCours = false;
+    allerEcran('ecran-paiement'); // Retour à l'écran paiement en cas d'erreur
   }
 }
 
-function afficherConfirmation(numero) {
+function afficherConfirmation(numero, methode) {
   document.getElementById('fin-numero').textContent = numero;
-  document.getElementById('fin-mode').textContent =
-    (modeService === 'sur_place' ? '🍽️ Sur place' : '🥡 À emporter') + ' · Réglez au comptoir';
-  document.getElementById('fin-sub').textContent = 'Présentez ce numéro au comptoir';
+  const modeBadge = (modeService === 'sur_place' ? '🍽️ Sur place' : '🥡 À emporter');
+  const instructions = document.getElementById('fin-instructions');
+
+  if (methode === 'comptoir') {
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    //  PAIEMENT AU COMPTOIR — pas encore réglé
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    document.getElementById('fin-titre').textContent = 'Commande prise en compte !';
+    document.getElementById('fin-sub').textContent = '👇 Étapes à suivre :';
+    document.getElementById('fin-check').textContent = '📝';
+    instructions.className = 'fin-instructions comptoir';
+    instructions.innerHTML = `
+      <strong>1.</strong> Récupérez votre ticket de commande<br>
+      <strong>2.</strong> Présentez-vous au comptoir pour <strong>régler</strong><br>
+      <strong>3.</strong> Patientez, on prépare votre plat 🍜
+    `;
+    document.getElementById('fin-mode').textContent = modeBadge + ' · À régler au comptoir';
+  } else {
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    //  PAIEMENT CARTE — déjà réglé
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    document.getElementById('fin-titre').textContent = 'Paiement validé !';
+    document.getElementById('fin-sub').textContent = 'Merci pour votre commande 🙏';
+    document.getElementById('fin-check').textContent = '✓';
+    instructions.className = 'fin-instructions paye';
+    instructions.innerHTML = `
+      <strong>Récupérez votre ticket de commande</strong><br>
+      Patientez, on prépare votre plat 🍜<br>
+      Vous serez appelé(e) par votre numéro
+    `;
+    document.getElementById('fin-mode').textContent = modeBadge + ' · Déjà réglé ✓';
+  }
+
   allerEcran('ecran-fin');
 
-  // Reset auto au bout de 8 secondes pour le client suivant
+  // Reset auto au bout de 10 secondes pour le client suivant
   setTimeout(() => {
     panier = [];
     catActive = 'tout';
     modeService = 'sur_place';
     envoiEnCours = false;
-    clientFid = null;  // ✨ Reset client fidélité
+    clientFid = null;
     sumupCheckoutId = null;
     if (sumupPolling) { clearInterval(sumupPolling); sumupPolling = null; }
     majBarrePanier();
@@ -863,8 +918,8 @@ function afficherConfirmation(numero) {
     afficherMenu();
     afficherFidelite();
     allerEcran('ecran-accueil');
-    chargerMenu(); // recharge le stock à jour
-  }, 8000);
+    chargerMenu();
+  }, 10000);
 }
 
 // ===== UTILITAIRE =====
