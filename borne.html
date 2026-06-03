@@ -842,19 +842,24 @@ async function payer(methode) {
   }));
 
   try {
-    const { data, error } = await sb.rpc('enregistrer_vente', {
-      p_restaurant_id: RESTO_ID,
-      p_mode_paiement: methode === 'comptoir' ? 'comptoir' : 'carte',
-      p_lignes: lignes,
-      p_origine: 'borne',
-      p_mode_service: modeService,
-      p_canal: 'borne',                                   // ✨ Canal "borne" pour distinguer dans les stats
-      p_client_id: clientFid ? clientFid.id : null        // ✨ Client attaché (si scan QR)
+    // ✨ On passe par notre Netlify Function (sécurisée, service_role)
+    // au lieu d'appeler Supabase directement depuis la borne (clé anon limitée)
+    const resp = await fetch('/.netlify/functions/borne-enregistrer-vente', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        restaurant_id: RESTO_ID,
+        mode_paiement: methode === 'comptoir' ? 'comptoir' : 'carte',
+        lignes: lignes,
+        mode_service: modeService,
+        client_id: clientFid ? clientFid.id : null
+      })
     });
-    if (error) throw error;
+    const data = await resp.json();
+    if (!data.ok) throw new Error(data.erreur || 'Erreur enregistrement vente');
 
-    const numero = data?.numero ?? '?';
-    const venteId = data?.vente_id;
+    const numero = data.numero ?? '?';
+    const venteId = data.vente_id;
 
     // 🧾 Impression auto du ticket cuisine (fire-and-forget)
     imprimerTicketCuisine(venteId, numero, lignes).catch(e => console.error('Impression KO:', e));
@@ -863,7 +868,7 @@ async function payer(methode) {
   } catch (e) {
     alert('Erreur lors de l\'envoi : ' + e.message);
     envoiEnCours = false;
-    allerEcran('ecran-paiement'); // Retour à l'écran paiement en cas d'erreur
+    allerEcran('ecran-paiement');
   }
 }
 
