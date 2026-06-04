@@ -615,7 +615,138 @@ body {
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* Gate connexion */
+/* ===== MODALE UPSELL ===== */
+.upsell-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 6000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  animation: fadeIn 0.25s ease;
+}
+.upsell-modal.actif {
+  display: flex;
+}
+.upsell-content {
+  background: linear-gradient(160deg, var(--surface-2), var(--surface));
+  border: 1.5px solid var(--gold);
+  border-radius: 28px;
+  padding: 36px 28px 28px;
+  max-width: 700px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+  animation: upsellPop 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes upsellPop {
+  from { transform: scale(0.85) translateY(20px); opacity: 0; }
+  to { transform: scale(1) translateY(0); opacity: 1; }
+}
+.upsell-confirme {
+  font-family: var(--display);
+  font-size: 26px;
+  font-weight: 500;
+  color: var(--lime, #A8E10C);
+  margin-bottom: 14px;
+}
+.upsell-question {
+  font-family: var(--display);
+  font-size: 32px;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 28px;
+}
+.upsell-grille {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  margin-bottom: 24px;
+}
+@media (min-width: 640px) {
+  .upsell-grille {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+.upsell-card {
+  background: var(--surface-2);
+  border: 2px solid var(--border);
+  border-radius: 18px;
+  padding: 18px 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 170px;
+}
+.upsell-card:active { transform: scale(0.95); }
+.upsell-card:hover { border-color: var(--gold); }
+.upsell-card.upsell-ajoute {
+  border-color: var(--lime, #A8E10C);
+  background: linear-gradient(160deg, rgba(168, 225, 12, 0.15), rgba(168, 225, 12, 0.05));
+  transform: scale(1.05);
+}
+.upsell-card.upsell-ajoute .upsell-plus {
+  background: var(--lime, #A8E10C);
+  color: var(--bg-deep);
+}
+.upsell-emoji {
+  font-size: 40px;
+  margin-bottom: 8px;
+  line-height: 1;
+}
+.upsell-nom {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.2;
+  margin-bottom: 6px;
+  min-height: 32px;
+}
+.upsell-prix {
+  font-family: var(--display);
+  font-size: 18px;
+  color: var(--gold);
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+.upsell-plus {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--sriracha);
+  color: #fff;
+  font-size: 22px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: auto;
+  transition: all 0.2s;
+}
+.upsell-skip {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text-mute);
+  padding: 14px 28px;
+  border-radius: 999px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--body);
+  margin-top: 8px;
+}
+.upsell-skip:active { transform: scale(0.97); }
+.upsell-skip:hover { border-color: var(--text-soft); color: var(--text-soft); }
+
+
 .gate { position: fixed; inset: 0; background: var(--bg-deep); display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 16px; z-index: 5000; padding: 24px; text-align: center; }
 .gate .logo { font-family: var(--display); font-size: 32px; }
 .gate .logo span { color: var(--sriracha); }
@@ -923,6 +1054,18 @@ body {
   </div>
 </div>
 
+<!-- ===== MODALE UPSELL ===== -->
+<div class="upsell-modal" id="modal-upsell">
+  <div class="upsell-content">
+    <div class="upsell-confirme" id="upsell-titre">Ajouté ! 🎉</div>
+    <div class="upsell-question">🎁 Et avec ça ?</div>
+    <div class="upsell-grille" id="upsell-liste">
+      <!-- Suggestions injectées par JS -->
+    </div>
+    <button class="upsell-skip" onclick="fermerUpsell()">Non merci, continuer →</button>
+  </div>
+</div>
+
 <!-- ===== ÉCRAN 6 : CONFIRMATION ===== -->
 <div class="ecran" id="ecran-fin">
   <div class="fin-check" id="fin-check">✓</div>
@@ -1164,6 +1307,80 @@ function ajouter(produitId) {
   if (ligne) ligne.quantite++;
   else panier.push({ produit_id: p.id, nom: p.nom, prix: parseFloat(p.prix), quantite: 1, emoji });
   majBarrePanier();
+
+  // ✨ NOUVEAU : Déclenche l'upsell si le produit a des suggestions
+  declencherUpsell(p);
+}
+
+// ============================================================
+//  💰 UPSELL — Suggestions à chaque ajout au panier
+// ============================================================
+let upsellDejaProposees = new Set(); // Anti-spam : on ne re-propose pas dans la même commande
+
+function declencherUpsell(produitAjoute) {
+  // Pas d'upsell ids ? Pas d'upsell
+  const ids = produitAjoute.upsell_ids;
+  if (!ids || !Array.isArray(ids) || ids.length === 0) return;
+
+  // Filtrer : on prend les produits qui existent, qui sont actifs, et qu'on n'a pas DÉJÀ proposés
+  const suggestions = ids
+    .map(id => produits.find(p => p.id === id))
+    .filter(p => p && !upsellDejaProposees.has(p.id))
+    .slice(0, 4); // Max 4 suggestions
+
+  if (suggestions.length === 0) return;
+
+  // Marquer comme proposées pour ne pas les re-suggérer
+  suggestions.forEach(p => upsellDejaProposees.add(p.id));
+
+  // Afficher la modale
+  afficherUpsell(produitAjoute, suggestions);
+}
+
+function afficherUpsell(produitAjoute, suggestions) {
+  const modal = document.getElementById('modal-upsell');
+  const titre = document.getElementById('upsell-titre');
+  const liste = document.getElementById('upsell-liste');
+
+  titre.textContent = produitAjoute.nom + ' ajouté ! 🎉';
+
+  liste.innerHTML = suggestions.map(p => {
+    const cat = categories.find(c => c.id === p.categorie_id);
+    const emoji = emojiCat(cat ? cat.nom : '');
+    return `
+      <div class="upsell-card" onclick="ajouterUpsell('${p.id}', this)">
+        <div class="upsell-emoji">${emoji}</div>
+        <div class="upsell-nom">${p.nom}</div>
+        <div class="upsell-prix">${fmt(p.prix)}</div>
+        <div class="upsell-plus">+</div>
+      </div>
+    `;
+  }).join('');
+
+  modal.classList.add('actif');
+}
+
+function fermerUpsell() {
+  document.getElementById('modal-upsell').classList.remove('actif');
+}
+
+function ajouterUpsell(produitId, btnEl) {
+  const p = produits.find(x => x.id === produitId);
+  if (!p) return;
+  const cat = categories.find(c => c.id === p.categorie_id);
+  const emoji = emojiCat(cat ? cat.nom : '');
+
+  // Ajout direct au panier (SANS redéclencher l'upsell)
+  const ligne = panier.find(l => l.produit_id === produitId);
+  if (ligne) ligne.quantite++;
+  else panier.push({ produit_id: p.id, nom: p.nom, prix: parseFloat(p.prix), quantite: 1, emoji });
+  majBarrePanier();
+
+  // Animation visuelle d'ajout
+  if (btnEl) {
+    btnEl.classList.add('upsell-ajoute');
+    setTimeout(() => fermerUpsell(), 600);
+  }
 }
 
 function modifierQte(produitId, delta) {
@@ -1308,6 +1525,7 @@ function afficherConfirmation(numero, methode) {
     envoiEnCours = false;
     clientFid = null;
     sumupCheckoutId = null;
+    upsellDejaProposees.clear();  // ✨ Reset des upsells proposés
     if (sumupPolling) { clearInterval(sumupPolling); sumupPolling = null; }
     majBarrePanier();
     afficherCats();
