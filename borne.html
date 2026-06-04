@@ -56,13 +56,13 @@ body {
   text-align: center;
   cursor: pointer;
   background-color: var(--bg-deep);
-  background-image: url('https://res.cloudinary.com/dci5mreqo/image/upload/w_1080,h_1920,c_fill,g_auto,q_auto,f_auto/v1780537853/ChatGPT_Image_4_juin_2026_03_50_05_xilbec.png');
+  background-image: url('https://res.cloudinary.com/dci5mreqo/image/upload/v1780537853/ChatGPT_Image_4_juin_2026_03_50_05_xilbec.png');
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
   position: relative;
   overflow: hidden;
-  padding-bottom: 80px;
+  padding-bottom: 100px;
 }
 .accueil-cta {
   display: inline-flex;
@@ -119,7 +119,220 @@ body {
 .mode-card .ic { font-size: 90px; }
 .mode-card .nm { font-size: 26px; font-weight: 700; }
 
-/* ===== ÉCRAN MENU ===== */
+/* ===== ÉCRAN ACCUEIL CATÉGORIES (style McDo) ===== */
+#ecran-accueil-cats { background: var(--bg-soft); }
+.ac-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 28px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.ac-logo {
+  font-family: var(--display);
+  font-size: 28px;
+  font-weight: 500;
+}
+.ac-logo span { color: var(--sriracha); }
+.ac-mode-badge {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--gold);
+  border: 1px solid var(--gold-soft);
+  padding: 8px 16px;
+  border-radius: 999px;
+}
+.ac-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px 28px;
+}
+.ac-scroll::-webkit-scrollbar { width: 8px; }
+.ac-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+/* Bandeau PROMO */
+.ac-promo {
+  background: linear-gradient(135deg, rgba(230,57,70,0.18) 0%, rgba(228,184,96,0.12) 100%);
+  border: 1.5px solid var(--gold);
+  border-radius: 22px;
+  padding: 22px 24px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 32px;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+.ac-promo:active { transform: scale(0.98); }
+.ac-promo::before {
+  content: '';
+  position: absolute;
+  top: -50%; right: -20%;
+  width: 200px; height: 200px;
+  background: radial-gradient(circle, rgba(228,184,96,0.15), transparent 70%);
+  pointer-events: none;
+}
+.ac-promo-img {
+  font-size: 60px;
+  flex-shrink: 0;
+  filter: drop-shadow(0 4px 12px rgba(0,0,0,0.4));
+}
+.ac-promo-content {
+  flex: 1;
+  min-width: 0;
+  position: relative;
+  z-index: 1;
+}
+.ac-promo-label {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.ac-promo-title {
+  font-family: var(--display);
+  font-size: 24px;
+  font-weight: 500;
+  margin-bottom: 4px;
+  line-height: 1.2;
+}
+.ac-promo-sub {
+  font-size: 14px;
+  color: var(--text-mute);
+  line-height: 1.4;
+}
+.ac-promo-arrow {
+  font-size: 28px;
+  color: var(--gold);
+  flex-shrink: 0;
+}
+
+/* SECTION TITRE */
+.ac-section-title {
+  font-family: var(--display);
+  font-size: 26px;
+  font-weight: 500;
+  margin-bottom: 18px;
+  margin-top: 8px;
+}
+
+/* GRILLE DES CATÉGORIES */
+.ac-cats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 14px;
+  margin-bottom: 32px;
+}
+.ac-cat-card {
+  background: linear-gradient(160deg, var(--surface-2), var(--surface));
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 20px 14px;
+  cursor: pointer;
+  transition: all 0.18s;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 130px;
+  gap: 8px;
+}
+.ac-cat-card:active { transform: scale(0.96); }
+.ac-cat-card:hover { border-color: var(--gold); }
+.ac-cat-emoji {
+  font-size: 44px;
+  line-height: 1;
+}
+.ac-cat-nom {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.2;
+}
+.ac-cat-count {
+  font-size: 11px;
+  color: var(--text-mute);
+  font-weight: 600;
+}
+
+/* BEST-SELLERS scroll horizontal */
+.ac-bestsellers-scroll {
+  display: flex;
+  gap: 14px;
+  overflow-x: auto;
+  padding-bottom: 12px;
+  margin: 0 -28px;
+  padding-left: 28px;
+  padding-right: 28px;
+  scrollbar-width: none;
+}
+.ac-bestsellers-scroll::-webkit-scrollbar { display: none; }
+.ac-best-card {
+  flex-shrink: 0;
+  width: 180px;
+  background: linear-gradient(160deg, var(--surface-2), var(--surface));
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.18s;
+  position: relative;
+}
+.ac-best-card:active { transform: scale(0.97); }
+.ac-best-card:hover { border-color: var(--gold-soft); }
+.ac-best-badge {
+  position: absolute;
+  top: 10px; right: 10px;
+  background: var(--gold);
+  color: var(--bg-deep);
+  font-size: 10px;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 999px;
+  letter-spacing: 0.05em;
+}
+.ac-best-emoji {
+  font-size: 40px;
+  margin-bottom: 10px;
+}
+.ac-best-nom {
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 8px;
+  min-height: 34px;
+}
+.ac-best-bas {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.ac-best-prix {
+  font-family: var(--display);
+  font-size: 18px;
+  color: var(--gold);
+  font-weight: 500;
+}
+.ac-best-plus {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: var(--sriracha);
+  color: #fff;
+  font-size: 22px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 3px 10px rgba(230, 57, 70, 0.3);
+}
+
+
 #ecran-menu { background: var(--bg-soft); }
 .menu-top {
   display: flex;
@@ -131,6 +344,18 @@ body {
 }
 .menu-top .logo { font-family: var(--display); font-size: 26px; font-weight: 500; }
 .menu-top .logo span { color: var(--sriracha); }
+.btn-retour-cats {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--text-soft);
+  padding: 10px 18px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--body);
+}
+.btn-retour-cats:active { transform: scale(0.95); }
 .menu-mode-badge {
   font-size: 13px;
   font-weight: 700;
@@ -556,9 +781,48 @@ body {
   </div>
 </div>
 
+<!-- ===== ÉCRAN 2 bis : ACCUEIL CATÉGORIES (style McDo) ===== -->
+<div class="ecran" id="ecran-accueil-cats">
+  <div class="ac-top">
+    <div class="ac-logo">Gin <span>Khao</span></div>
+    <div class="ac-mode-badge" id="ac-mode-badge">Sur place</div>
+  </div>
+
+  <div class="ac-scroll">
+    <!-- Bandeau promo -->
+    <div class="ac-promo">
+      <div class="ac-promo-img">🌶️</div>
+      <div class="ac-promo-content">
+        <div class="ac-promo-label">L'OFFRE DU MOMENT</div>
+        <div class="ac-promo-title">Découvrez nos spécialités</div>
+        <div class="ac-promo-sub">Des plats thaï authentiques préparés avec amour</div>
+      </div>
+      <div class="ac-promo-arrow">→</div>
+    </div>
+
+    <!-- Catégories en grille -->
+    <h2 class="ac-section-title">Nos catégories</h2>
+    <div class="ac-cats-grid" id="ac-cats-grid">
+      <!-- Catégories injectées par JS -->
+    </div>
+
+    <!-- Best-sellers -->
+    <div id="ac-bestsellers-section" style="display:none;">
+      <h2 class="ac-section-title">⭐ Best-sellers</h2>
+      <div class="ac-bestsellers-scroll" id="ac-bestsellers-list">
+        <!-- Best-sellers injectés par JS -->
+      </div>
+    </div>
+
+    <!-- Espace bas -->
+    <div style="height: 40px;"></div>
+  </div>
+</div>
+
 <!-- ===== ÉCRAN 3 : MENU ===== -->
 <div class="ecran" id="ecran-menu">
   <div class="menu-top">
+    <button class="btn-retour-cats" onclick="allerEcran('ecran-accueil-cats')">← Catégories</button>
     <div class="logo">Gin <span>Khao</span></div>
     <div class="menu-mode-badge" id="menu-mode-badge">Sur place</div>
   </div>
@@ -709,7 +973,89 @@ function allerMode() { allerEcran('ecran-mode'); }
 function choisirMode(mode) {
   modeService = mode;
   document.getElementById('menu-mode-badge').textContent = mode === 'sur_place' ? '🍽️ Sur place' : '🥡 À emporter';
+  document.getElementById('ac-mode-badge').textContent = mode === 'sur_place' ? '🍽️ Sur place' : '🥡 À emporter';
+  afficherAccueilCats();
+  allerEcran('ecran-accueil-cats');
+}
+
+// ============================================================
+//  ÉCRAN ACCUEIL CATÉGORIES (style McDo)
+// ============================================================
+function emojiPourCategorie(nomCat) {
+  const n = (nomCat || '').toLowerCase();
+  if (/sushi/.test(n)) return '🍣';
+  if (/maki/.test(n)) return '🍙';
+  if (/california/.test(n)) return '🍣';
+  if (/crispy/.test(n)) return '🥢';
+  if (/tiger/.test(n)) return '🐯';
+  if (/pad.*tha|pad.*thai/.test(n)) return '🍜';
+  if (/riz.*tha|riz.*thai/.test(n)) return '🍚';
+  if (/loc.*lac/.test(n)) return '🥩';
+  if (/dynamite|crousty/.test(n)) return '💥';
+  if (/gin.*bo.*bun|bo.*bun/.test(n)) return '🥗';
+  if (/salade/.test(n)) return '🥗';
+  if (/sauce/.test(n)) return '🍶';
+  if (/boisson/.test(n)) return '🥤';
+  if (/dessert/.test(n)) return '🍮';
+  if (/pok/.test(n)) return '🍱';
+  if (/plat/.test(n)) return '🍽️';
+  return '🍴';
+}
+
+function afficherAccueilCats() {
+  // 1. Catégories
+  const zone = document.getElementById('ac-cats-grid');
+  const catsAvecProduits = categories.filter(c =>
+    produits.some(p => p.categorie_id === c.id)
+  );
+  zone.innerHTML = catsAvecProduits.map(c => {
+    const nb = produits.filter(p => p.categorie_id === c.id).length;
+    const emoji = emojiPourCategorie(c.nom);
+    return `
+      <div class="ac-cat-card" onclick="filtrerCatEtAller('${c.id}')">
+        <div class="ac-cat-emoji">${emoji}</div>
+        <div class="ac-cat-nom">${c.nom}</div>
+        <div class="ac-cat-count">${nb} produit${nb > 1 ? 's' : ''}</div>
+      </div>
+    `;
+  }).join('');
+
+  // 2. Best-sellers
+  const bestsellers = produits.filter(p => p.best_seller === true);
+  const sectionBest = document.getElementById('ac-bestsellers-section');
+  const zoneBest = document.getElementById('ac-bestsellers-list');
+  if (bestsellers.length > 0) {
+    sectionBest.style.display = 'block';
+    zoneBest.innerHTML = bestsellers.map(p => {
+      const cat = categories.find(c => c.id === p.categorie_id);
+      const emoji = emojiPourCategorie(cat ? cat.nom : '');
+      return `
+        <div class="ac-best-card" onclick="ajouter('${p.id}'); allerEcran('ecran-accueil-cats'); animationAjout(this);">
+          <div class="ac-best-badge">⭐ TOP</div>
+          <div class="ac-best-emoji">${emoji}</div>
+          <div class="ac-best-nom">${p.nom}</div>
+          <div class="ac-best-bas">
+            <div class="ac-best-prix">${fmt(p.prix)}</div>
+            <div class="ac-best-plus">+</div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  } else {
+    sectionBest.style.display = 'none';
+  }
+}
+
+function filtrerCatEtAller(catId) {
+  catActive = catId;
+  afficherCats();
+  afficherMenu();
   allerEcran('ecran-menu');
+}
+
+function animationAjout(el) {
+  el.style.transform = 'scale(1.1)';
+  setTimeout(() => { el.style.transform = ''; }, 200);
 }
 
 function allerPanier() {
@@ -749,14 +1095,26 @@ async function chargerMenu() {
   if (error) throw error;
   produits = prods || [];
 
+  // ✨ Sélectionner la première catégorie qui a des produits comme catégorie active
+  if (catActive === 'tout' || !categories.find(c => c.id === catActive)) {
+    const premiereCatAvecProduits = categories.find(c =>
+      produits.some(p => p.categorie_id === c.id)
+    );
+    if (premiereCatAvecProduits) catActive = premiereCatAvecProduits.id;
+  }
+
   afficherCats();
   afficherMenu();
 }
 
 function afficherCats() {
   const zone = document.getElementById('menu-cats');
-  let html = `<div class="menu-cat ${catActive==='tout'?'actif':''}" onclick="filtrerCat('tout')">Tout</div>`;
-  categories.forEach(c => {
+  // ✨ N'afficher que les catégories qui ONT des produits actifs
+  const catsAvecProduits = categories.filter(c =>
+    produits.some(p => p.categorie_id === c.id)
+  );
+  let html = '';
+  catsAvecProduits.forEach(c => {
     html += `<div class="menu-cat ${catActive===c.id?'actif':''}" onclick="filtrerCat('${c.id}')">${c.nom}</div>`;
   });
   zone.innerHTML = html;
@@ -766,8 +1124,8 @@ function filtrerCat(id) { catActive = id; afficherCats(); afficherMenu(); }
 
 function afficherMenu() {
   const grille = document.getElementById('menu-grille');
-  let liste = produits;
-  if (catActive !== 'tout') liste = produits.filter(p => p.categorie_id === catActive);
+  // ✨ Toujours filtrer par catégorie (plus de "Tout")
+  const liste = produits.filter(p => p.categorie_id === catActive);
 
   if (liste.length === 0) {
     grille.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px;color:var(--text-mute);">Aucun produit dans cette catégorie</div>';
