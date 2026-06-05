@@ -123,6 +123,169 @@ html, body {
 }
 .link-btn:hover { color: var(--text); border-color: var(--gold-soft); }
 
+/* Bouton commandes borne en attente */
+.btn-borne-attente {
+  background: linear-gradient(135deg, var(--gold) 0%, #d4a456 100%) !important;
+  color: var(--bg-deep) !important;
+  font-weight: 700;
+  border: none !important;
+  animation: pulseBorne 2s ease-in-out infinite;
+}
+.btn-borne-attente:hover {
+  filter: brightness(1.1);
+  border: none !important;
+}
+.badge-attente {
+  display: inline-block;
+  background: var(--sriracha);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 999px;
+  margin-left: 6px;
+  min-width: 22px;
+}
+@keyframes pulseBorne {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(228,184,96,0.6); }
+  50% { box-shadow: 0 0 0 10px rgba(228,184,96,0); }
+}
+
+/* Modale paiements en attente */
+.borne-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  z-index: 5000;
+  display: none;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 60px 20px 20px;
+  overflow-y: auto;
+}
+.borne-modal.actif { display: flex; }
+.borne-modal-content {
+  background: var(--surface-2);
+  border: 1.5px solid var(--gold);
+  border-radius: 20px;
+  padding: 28px;
+  max-width: 900px;
+  width: 100%;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+}
+.borne-modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 22px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--border);
+}
+.borne-modal-titre {
+  font-family: var(--display);
+  font-size: 28px;
+  font-weight: 500;
+}
+.borne-modal-close {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text-soft);
+  padding: 10px 18px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-weight: 600;
+}
+.borne-attente-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+.borne-attente-card {
+  background: linear-gradient(160deg, var(--surface), var(--surface-2));
+  border: 1px solid var(--gold-soft);
+  border-radius: 16px;
+  padding: 18px;
+  position: relative;
+}
+.borne-attente-numero {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: var(--gold);
+  color: var(--bg-deep);
+  font-size: 24px;
+  font-weight: 800;
+  padding: 8px 16px;
+  border-radius: 999px;
+  font-family: var(--display);
+}
+.borne-attente-mode {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--gold);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 4px;
+}
+.borne-attente-heure {
+  font-size: 12px;
+  color: var(--text-mute);
+  margin-bottom: 14px;
+}
+.borne-attente-lignes {
+  margin-bottom: 14px;
+}
+.borne-attente-ligne {
+  font-size: 14px;
+  padding: 4px 0;
+  color: var(--text-soft);
+}
+.borne-attente-total {
+  font-family: var(--display);
+  font-size: 24px;
+  color: var(--gold);
+  font-weight: 500;
+  text-align: right;
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
+  margin-bottom: 14px;
+}
+.borne-attente-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.btn-encaisser {
+  background: linear-gradient(135deg, var(--lime, #A8E10C) 0%, #94c510 100%);
+  color: var(--bg-deep);
+  border: none;
+  padding: 12px;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  font-size: 14px;
+}
+.btn-encaisser:hover { filter: brightness(1.1); }
+.btn-annuler-borne {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text-soft);
+  padding: 12px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 14px;
+}
+.borne-attente-vide {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-mute);
+}
+.borne-attente-vide .big {
+  font-size: 60px;
+  margin-bottom: 16px;
+}
+
 /* Filtres catégories */
 .cats {
   display: flex;
@@ -1390,6 +1553,9 @@ html, body {
       </div>
       <div class="topbar-right">
         <div class="clock" id="clock">--:--</div>
+        <button class="link-btn btn-borne-attente" id="btn-borne-attente" onclick="ouvrirPaiementsAttente()" style="display:none;position:relative;">
+          🔔 Commandes borne <span id="nb-borne-attente" class="badge-attente">0</span>
+        </button>
         <button class="link-btn" onclick="ouvrirHistorique()">🧾 Historique</button>
         <button class="link-btn" onclick="ouvrirCloture()">🔒 Clôture Z</button>
         <a href="index.html" class="link-btn">← Gestion</a>
@@ -1685,6 +1851,17 @@ html, body {
   </div>
 </div>
 
+<!-- ===== MODALE PAIEMENTS BORNE EN ATTENTE ===== -->
+<div class="borne-modal" id="borne-modal-attente">
+  <div class="borne-modal-content">
+    <div class="borne-modal-head">
+      <div class="borne-modal-titre">🔔 Commandes borne en attente</div>
+      <button class="borne-modal-close" onclick="fermerPaiementsAttente()">✕ Fermer</button>
+    </div>
+    <div id="borne-attente-liste"></div>
+  </div>
+</div>
+
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
@@ -1721,6 +1898,165 @@ let remise = null;  // { type: 'pct'|'montant', valeur: number }  ou null
 let ventesDuJour = [];
 
 // ============================================
+//  🔔 PAIEMENTS BORNE EN ATTENTE
+// ============================================
+let paiementsBorneAttente = [];
+let subBorneAttente = null;
+
+async function chargerPaiementsBorneAttente() {
+  try {
+    const { data, error } = await sb
+      .from('ventes')
+      .select('id, numero, total, mode_service, cree_le, client_id')
+      .eq('restaurant_id', RESTO_ID)
+      .eq('statut', 'en_attente')
+      .order('cree_le', { ascending: true });
+
+    if (error) {
+      console.error('Erreur chargement paiements attente:', error);
+      return;
+    }
+
+    // Pour chaque vente, charger les lignes
+    const ventesAvecLignes = await Promise.all((data || []).map(async (v) => {
+      const { data: lignes } = await sb
+        .from('lignes_vente')
+        .select('nom_produit, quantite, prix_unitaire, sous_total')
+        .eq('vente_id', v.id);
+      return { ...v, lignes: lignes || [] };
+    }));
+
+    paiementsBorneAttente = ventesAvecLignes;
+    majAffichageBorneAttente();
+  } catch (e) {
+    console.error('Erreur:', e);
+  }
+}
+
+function majAffichageBorneAttente() {
+  const nb = paiementsBorneAttente.length;
+  const btn = document.getElementById('btn-borne-attente');
+  const badge = document.getElementById('nb-borne-attente');
+
+  if (nb > 0) {
+    btn.style.display = 'inline-flex';
+    badge.textContent = nb;
+  } else {
+    btn.style.display = 'none';
+  }
+
+  // Si la modale est ouverte, on rafraîchit
+  if (document.getElementById('borne-modal-attente').classList.contains('actif')) {
+    afficherListePaiementsAttente();
+  }
+}
+
+function subscribeBorneAttente() {
+  // Realtime sur les ventes en attente
+  if (subBorneAttente) {
+    sb.removeChannel(subBorneAttente);
+  }
+  subBorneAttente = sb
+    .channel('borne-attente')
+    .on('postgres_changes',
+      { event: '*', schema: 'public', table: 'ventes', filter: `restaurant_id=eq.${RESTO_ID}` },
+      () => { chargerPaiementsBorneAttente(); }
+    )
+    .subscribe();
+}
+
+function ouvrirPaiementsAttente() {
+  document.getElementById('borne-modal-attente').classList.add('actif');
+  afficherListePaiementsAttente();
+}
+
+function fermerPaiementsAttente() {
+  document.getElementById('borne-modal-attente').classList.remove('actif');
+}
+
+function afficherListePaiementsAttente() {
+  const zone = document.getElementById('borne-attente-liste');
+  if (paiementsBorneAttente.length === 0) {
+    zone.innerHTML = `
+      <div class="borne-attente-vide">
+        <div class="big">✅</div>
+        <p>Aucune commande borne en attente</p>
+      </div>`;
+    return;
+  }
+
+  let html = '<div class="borne-attente-grid">';
+  paiementsBorneAttente.forEach(v => {
+    const heure = new Date(v.cree_le).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+    const mode = v.mode_service === 'sur_place' ? '🍽️ Sur place' : '🥡 À emporter';
+    const total = Number(v.total || 0).toFixed(2).replace('.', ',');
+    let lignesHtml = '';
+    v.lignes.forEach(l => {
+      lignesHtml += `<div class="borne-attente-ligne">${l.quantite}× ${l.nom_produit}</div>`;
+    });
+    html += `
+      <div class="borne-attente-card">
+        <div class="borne-attente-numero">#${v.numero}</div>
+        <div class="borne-attente-mode">${mode}</div>
+        <div class="borne-attente-heure">${heure}</div>
+        <div class="borne-attente-lignes">${lignesHtml}</div>
+        <div class="borne-attente-total">${total} €</div>
+        <div class="borne-attente-actions">
+          <button class="btn-annuler-borne" onclick="annulerBorne('${v.id}')">Annuler</button>
+          <button class="btn-encaisser" onclick="encaisserBorne('${v.id}', ${v.total})">💰 Encaisser</button>
+        </div>
+      </div>
+    `;
+  });
+  html += '</div>';
+  zone.innerHTML = html;
+}
+
+async function encaisserBorne(venteId, total) {
+  if (!confirm(`Encaisser la commande de ${total.toFixed(2).replace('.', ',')} € ?`)) return;
+
+  try {
+    // Marquer la vente comme validée
+    const { error } = await sb
+      .from('ventes')
+      .update({ statut: 'validé' })
+      .eq('id', venteId);
+
+    if (error) throw error;
+
+    // TODO : déclencher impression cuisine
+    // Pour l'instant, on rafraîchit juste
+    await chargerPaiementsBorneAttente();
+
+    // Toast de succès
+    const toast = document.getElementById('toast');
+    document.getElementById('toast-title').textContent = '✓ Commande encaissée';
+    document.getElementById('toast-sub').textContent = `${total.toFixed(2).replace('.', ',')} €`;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 3000);
+
+  } catch (e) {
+    alert('Erreur : ' + e.message);
+  }
+}
+
+async function annulerBorne(venteId) {
+  if (!confirm('Annuler cette commande borne ? Le client ne sera pas servi.')) return;
+
+  try {
+    const { error } = await sb
+      .from('ventes')
+      .update({ statut: 'annulé', annulee: true })
+      .eq('id', venteId);
+
+    if (error) throw error;
+    await chargerPaiementsBorneAttente();
+  } catch (e) {
+    alert('Erreur : ' + e.message);
+  }
+}
+
+// ============================================
 //  HORLOGE
 // ============================================
 function majHorloge() {
@@ -1746,6 +2082,8 @@ async function init() {
     }
     gate.classList.add('hidden');
     await chargerMenu();
+    await chargerPaiementsBorneAttente();
+    subscribeBorneAttente();
   } catch (e) {
     gateMsg.textContent = 'Erreur de connexion : ' + e.message;
     gate.querySelector('.spinner').style.display = 'none';
