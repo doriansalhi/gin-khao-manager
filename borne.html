@@ -1682,15 +1682,12 @@ async function traiterScanFidelite(decodedText) {
     }
     clientFid = data;
     afficherFidelite();
-    // Si on n'est pas déjà sur le panier, on n'y va pas (pour ne pas perturber)
-    if (document.getElementById('ecran-panier').classList.contains('actif')) {
-      // déjà au panier, on reste
-    } else if (document.getElementById('ecran-scanner-fid').classList.contains('actif')) {
-      // depuis le scanner caméra, on retourne au panier
+    // Si on est sur l'écran scanner caméra, on retourne au panier
+    const ecranScanQr = document.getElementById('ecran-scan-qr');
+    if (ecranScanQr && ecranScanQr.classList.contains('actif')) {
       allerEcran('ecran-panier');
     }
-    // Sinon (depuis menu, accueil-cats), on reste sur la page actuelle
-    // et un toast/bandeau affichera "Bienvenue [nom]"
+    // Sinon (depuis menu, accueil-cats, panier), on reste sur la page actuelle
 
     // Toast/feedback visuel
     afficherToastFidelite(data.nom);
