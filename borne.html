@@ -513,6 +513,16 @@ body {
   cursor: pointer; font-family: var(--body);
 }
 .panier-liste { flex: 1; overflow-y: auto; padding: 18px 28px; }
+.pl-options {
+  font-size: 12px;
+  color: var(--text-mute);
+  font-style: italic;
+  margin-top: 2px;
+}
+.pl-lie {
+  background: rgba(255,255,255,0.02);
+  padding-left: 32px !important;
+}
 .panier-ligne {
   display: flex; align-items: center; gap: 16px;
   background: var(--surface); border: 1px solid var(--border-soft);
@@ -629,6 +639,174 @@ body {
   padding: 24px;
   animation: fadeIn 0.25s ease;
 }
+
+/* ============================================================ */
+/* MODALE PARCOURS PLAT (retirable / suppléments / sauces)       */
+/* ============================================================ */
+.parcours-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.92);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 7000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  animation: fadeIn 0.25s ease;
+}
+.parcours-modal.actif {
+  display: flex;
+}
+.parcours-content {
+  background: linear-gradient(160deg, var(--surface-2), var(--surface));
+  border: 1.5px solid var(--gold);
+  border-radius: 32px;
+  padding: 40px 32px;
+  max-width: 720px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+  animation: upsellPop 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.parcours-head {
+  text-align: center;
+  margin-bottom: 28px;
+}
+.parcours-etape {
+  display: inline-block;
+  background: var(--gold);
+  color: var(--bg-deep);
+  font-size: 13px;
+  font-weight: 800;
+  padding: 6px 16px;
+  border-radius: 999px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+.parcours-titre {
+  font-family: var(--display);
+  font-size: 32px;
+  font-weight: 500;
+  color: var(--text);
+  margin: 0 0 8px;
+}
+.parcours-sous {
+  color: var(--text-soft);
+  font-size: 16px;
+  margin: 0;
+}
+.parcours-options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 28px;
+}
+/* Checkbox classique (retirables / suppléments) */
+.parcours-option, .parcours-option-pay {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  padding: 16px 20px;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-size: 18px;
+}
+.parcours-option:hover, .parcours-option-pay:hover {
+  border-color: var(--gold-soft);
+  background: var(--surface-2);
+}
+.parcours-option input[type="checkbox"],
+.parcours-option-pay input[type="checkbox"] {
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  accent-color: var(--gold);
+}
+.parcours-option-label {
+  flex: 1;
+  color: var(--text);
+  font-weight: 600;
+}
+.parcours-option-prix {
+  color: var(--gold);
+  font-weight: 800;
+  font-size: 18px;
+}
+/* Radio sauce (avec sélection visuelle) */
+.parcours-option-radio {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: 14px;
+  padding: 18px 22px;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-size: 18px;
+}
+.parcours-option-radio:hover {
+  border-color: var(--gold-soft);
+  background: var(--surface-2);
+}
+.parcours-option-radio.actif {
+  border-color: var(--gold);
+  background: linear-gradient(135deg, rgba(228, 184, 96, 0.15), rgba(228, 184, 96, 0.05));
+  box-shadow: 0 0 0 2px var(--gold-soft);
+}
+.parcours-option-radio.actif .parcours-option-label::after {
+  content: ' ✓';
+  color: var(--gold);
+}
+.parcours-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 20px;
+}
+.parcours-btn-passer {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text-soft);
+  padding: 16px;
+  border-radius: 14px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--display);
+}
+.parcours-btn-passer:hover {
+  color: var(--text);
+  border-color: var(--gold-soft);
+}
+.parcours-btn-valider {
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold-soft) 100%);
+  color: var(--bg-deep);
+  border: none;
+  padding: 18px;
+  border-radius: 14px;
+  font-size: 20px;
+  font-weight: 800;
+  cursor: pointer;
+  font-family: var(--display);
+  transition: all 0.15s;
+}
+.parcours-btn-valider:hover:not(:disabled) {
+  filter: brightness(1.1);
+  transform: translateY(-2px);
+}
+.parcours-btn-valider:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
 .upsell-modal.actif {
   display: flex;
 }
@@ -1066,6 +1244,11 @@ body {
   </div>
 </div>
 
+<!-- ===== MODALE PARCOURS PLAT (retirable / supp / sauce) ===== -->
+<div class="parcours-modal" id="modal-parcours">
+  <!-- Contenu injecté par JS selon l'étape -->
+</div>
+
 <!-- ===== ÉCRAN 6 : CONFIRMATION ===== -->
 <div class="ecran" id="ecran-fin">
   <div class="fin-check" id="fin-check">✓</div>
@@ -1231,11 +1414,14 @@ async function init() {
 async function chargerMenu() {
   const { data: cats } = await sb.from('categories')
     .select('*').eq('restaurant_id', RESTO_ID).order('ordre');
-  categories = cats || [];
+  // ✨ Filtrer les catégories cachées de la borne (Sauces, Suppléments, Extras)
+  categories = (cats || []).filter(c => c.visible_borne !== false);
 
   const { data: prods, error } = await sb.from('produits')
     .select('*').eq('restaurant_id', RESTO_ID).eq('actif', true).order('ordre');
   if (error) throw error;
+  // On garde TOUS les produits actifs (y compris sauces/suppléments/extras
+  // pour les retrouver via leurs UUIDs dans le parcours plat et upsell)
   produits = prods || [];
 
   // ✨ Sélectionner la première catégorie qui a des produits comme catégorie active
@@ -1296,19 +1482,53 @@ function afficherMenu() {
 function ajouter(produitId) {
   const p = produits.find(x => x.id === produitId);
   if (!p) return;
+
+  // ✨ Si le plat a des options de personnalisation, lancer le parcours modal
+  const aRetirables = Array.isArray(p.ingredients_retirable) && p.ingredients_retirable.length > 0;
+  const aSupplements = Array.isArray(p.supplements_ids) && p.supplements_ids.length > 0;
+  const aSauces = Array.isArray(p.sauces_ids) && p.sauces_ids.length > 0;
+
+  if (aRetirables || aSupplements || aSauces) {
+    // Lance le parcours plat (modales successives)
+    demarrerParcoursPlat(p);
+    return;
+  }
+
+  // Sinon, ajout direct au panier (comportement original)
+  ajouterDirect(p);
+}
+
+// Ajout direct au panier (sans options)
+function ajouterDirect(p, options) {
   const cat = categories.find(c => c.id === p.categorie_id);
   const emoji = emojiCat(cat ? cat.nom : '');
 
-  const ligne = panier.find(l => l.produit_id === produitId);
   if (p.stock_actif) {
-    const deja = ligne ? ligne.quantite : 0;
-    if (deja >= p.stock) return; // pas plus que le stock
+    const dejaTotal = panier.filter(l => l.produit_id === p.id).reduce((s, l) => s + l.quantite, 0);
+    if (dejaTotal >= p.stock) return;
   }
-  if (ligne) ligne.quantite++;
-  else panier.push({ produit_id: p.id, nom: p.nom, prix: parseFloat(p.prix), quantite: 1, emoji });
+
+  // Si pas d'options personnalisées, regrouper avec ligne existante
+  if (!options || (!options.retirable?.length && !options.supplements?.length && !options.sauce)) {
+    const ligne = panier.find(l => l.produit_id === p.id && !l.options);
+    if (ligne) {
+      ligne.quantite++;
+    } else {
+      panier.push({ produit_id: p.id, nom: p.nom, prix: parseFloat(p.prix), quantite: 1, emoji });
+    }
+  } else {
+    // Avec options : toujours une nouvelle ligne (chaque combinaison unique)
+    panier.push({
+      produit_id: p.id,
+      nom: p.nom,
+      prix: parseFloat(p.prix),
+      quantite: 1,
+      emoji,
+      options: options
+    });
+  }
   majBarrePanier();
 
-  // ✨ NOUVEAU : Déclenche l'upsell si le produit a des suggestions
   declencherUpsell(p);
 }
 
@@ -1335,6 +1555,246 @@ function declencherUpsell(produitAjoute) {
 
   // Afficher la modale
   afficherUpsell(produitAjoute, suggestions);
+}
+
+// ============================================================
+//  🍜 PARCOURS PLAT — McDo style (modales successives)
+// ============================================================
+// État du parcours en cours
+let parcoursPlatEnCours = null;
+
+function demarrerParcoursPlat(produit) {
+  parcoursPlatEnCours = {
+    produit: produit,
+    retirables: [],     // Tableau de strings (ingrédients retirés)
+    supplements: [],    // Tableau d'UUIDs (suppléments ajoutés)
+    sauce: null,        // UUID de la sauce choisie (ou null si pas de sauce)
+    etape: 'retirables'
+  };
+
+  // Étape 1 : Retirables (si présents)
+  if (produit.ingredients_retirable && produit.ingredients_retirable.length > 0) {
+    afficherModaleRetirables();
+  } else {
+    passerEtapeSuivante();
+  }
+}
+
+function passerEtapeSuivante() {
+  const p = parcoursPlatEnCours.produit;
+
+  if (parcoursPlatEnCours.etape === 'retirables') {
+    parcoursPlatEnCours.etape = 'supplements';
+    if (p.supplements_ids && p.supplements_ids.length > 0) {
+      afficherModaleSupplements();
+    } else {
+      passerEtapeSuivante();
+    }
+  } else if (parcoursPlatEnCours.etape === 'supplements') {
+    parcoursPlatEnCours.etape = 'sauces';
+    if (p.sauces_ids && p.sauces_ids.length > 0) {
+      afficherModaleSauces();
+    } else {
+      finaliserParcoursPlat();
+    }
+  } else if (parcoursPlatEnCours.etape === 'sauces') {
+    finaliserParcoursPlat();
+  }
+}
+
+function finaliserParcoursPlat() {
+  const p = parcoursPlatEnCours.produit;
+  const options = {
+    retirable: parcoursPlatEnCours.retirables,
+    supplements: parcoursPlatEnCours.supplements,
+    sauce: parcoursPlatEnCours.sauce
+  };
+
+  // Calculer le prix total avec suppléments + sauce
+  let prixSupp = 0;
+  options.supplements.forEach(suppId => {
+    const supp = produits.find(p => p.id === suppId);
+    if (supp) prixSupp += parseFloat(supp.prix);
+  });
+
+  // Ajouter au panier avec options
+  ajouterDirect(p, options);
+
+  // Si suppléments choisis, ajouter aussi au panier comme lignes séparées
+  options.supplements.forEach(suppId => {
+    const supp = produits.find(p => p.id === suppId);
+    if (supp) {
+      panier.push({
+        produit_id: supp.id,
+        nom: '  ↳ ' + supp.nom,
+        prix: parseFloat(supp.prix),
+        quantite: 1,
+        emoji: '➕',
+        lien_plat: p.id  // Liaison visuelle
+      });
+    }
+  });
+
+  // Si sauce choisie ET payante, ajouter aussi
+  if (options.sauce) {
+    const sauce = produits.find(p => p.id === options.sauce);
+    if (sauce && parseFloat(sauce.prix) > 0) {
+      panier.push({
+        produit_id: sauce.id,
+        nom: '  ↳ ' + sauce.nom,
+        prix: parseFloat(sauce.prix),
+        quantite: 1,
+        emoji: '🌶️',
+        lien_plat: p.id
+      });
+    }
+  }
+
+  majBarrePanier();
+  fermerModaleParcours();
+  parcoursPlatEnCours = null;
+}
+
+// ============================================================
+//  MODALES DU PARCOURS
+// ============================================================
+
+function afficherModaleRetirables() {
+  const p = parcoursPlatEnCours.produit;
+  const modal = document.getElementById('modal-parcours');
+  modal.classList.add('actif');
+
+  const html = `
+    <div class="parcours-content">
+      <div class="parcours-head">
+        <div class="parcours-etape">Étape 1/3</div>
+        <h2 class="parcours-titre">🌿 Personnaliser votre ${p.nom}</h2>
+        <p class="parcours-sous">Décochez les ingrédients que vous ne voulez pas</p>
+      </div>
+      <div class="parcours-options">
+        ${p.ingredients_retirable.map(ing => `
+          <label class="parcours-option" data-ing="${ing}">
+            <input type="checkbox" checked onchange="toggleRetirable('${ing.replace(/'/g, "\\'")}', this.checked)">
+            <span class="parcours-option-label">${ing}</span>
+          </label>
+        `).join('')}
+      </div>
+      <div class="parcours-actions">
+        <button class="parcours-btn-passer" onclick="passerEtapeSuivante()">Passer →</button>
+      </div>
+    </div>
+  `;
+  modal.innerHTML = html;
+}
+
+function toggleRetirable(ingredient, checked) {
+  if (!checked) {
+    // Ajouter à la liste des retirés
+    if (!parcoursPlatEnCours.retirables.includes(ingredient)) {
+      parcoursPlatEnCours.retirables.push(ingredient);
+    }
+  } else {
+    // Retirer de la liste des retirés
+    parcoursPlatEnCours.retirables = parcoursPlatEnCours.retirables.filter(i => i !== ingredient);
+  }
+}
+
+function afficherModaleSupplements() {
+  const p = parcoursPlatEnCours.produit;
+  const modal = document.getElementById('modal-parcours');
+
+  const supps = p.supplements_ids
+    .map(id => produits.find(pp => pp.id === id))
+    .filter(s => s);
+
+  const html = `
+    <div class="parcours-content">
+      <div class="parcours-head">
+        <div class="parcours-etape">Étape 2/3</div>
+        <h2 class="parcours-titre">➕ Suppléments ?</h2>
+        <p class="parcours-sous">Ajoutez des protéines à votre ${p.nom}</p>
+      </div>
+      <div class="parcours-options">
+        ${supps.map(s => `
+          <label class="parcours-option-pay" data-supp="${s.id}">
+            <input type="checkbox" onchange="toggleSupplement('${s.id}', this.checked)">
+            <span class="parcours-option-label">${s.nom.replace('Suppl. ', '')}</span>
+            <span class="parcours-option-prix">+${parseFloat(s.prix).toFixed(2).replace('.', ',')} €</span>
+          </label>
+        `).join('')}
+      </div>
+      <div class="parcours-actions">
+        <button class="parcours-btn-passer" onclick="passerEtapeSuivante()">Passer →</button>
+      </div>
+    </div>
+  `;
+  modal.innerHTML = html;
+}
+
+function toggleSupplement(suppId, checked) {
+  if (checked) {
+    if (!parcoursPlatEnCours.supplements.includes(suppId)) {
+      parcoursPlatEnCours.supplements.push(suppId);
+    }
+  } else {
+    parcoursPlatEnCours.supplements = parcoursPlatEnCours.supplements.filter(id => id !== suppId);
+  }
+}
+
+function afficherModaleSauces() {
+  const p = parcoursPlatEnCours.produit;
+  const modal = document.getElementById('modal-parcours');
+
+  const sauces = p.sauces_ids
+    .map(id => produits.find(pp => pp.id === id))
+    .filter(s => s);
+
+  const obligatoire = p.sauce_required === true;
+
+  const html = `
+    <div class="parcours-content">
+      <div class="parcours-head">
+        <div class="parcours-etape">Étape 3/3</div>
+        <h2 class="parcours-titre">🌶️ ${obligatoire ? 'Choisissez votre sauce' : 'Une sauce ?'}</h2>
+        <p class="parcours-sous">${obligatoire ? 'Sélection obligatoire' : 'Optionnel'}</p>
+      </div>
+      <div class="parcours-options">
+        ${sauces.map(s => `
+          <div class="parcours-option-radio" onclick="selectionnerSauce('${s.id}', this)">
+            <span class="parcours-option-label">${s.nom.replace('Sauce ', '')}</span>
+            <span class="parcours-option-prix">${parseFloat(s.prix) > 0 ? '+' + parseFloat(s.prix).toFixed(2).replace('.', ',') + ' €' : 'inclus'}</span>
+          </div>
+        `).join('')}
+      </div>
+      <div class="parcours-actions">
+        ${obligatoire ? '' : '<button class="parcours-btn-passer" onclick="parcoursPlatEnCours.sauce = null; passerEtapeSuivante()">Aucune sauce →</button>'}
+        <button class="parcours-btn-valider" id="parcours-btn-valider" ${obligatoire ? 'disabled' : ''} onclick="passerEtapeSuivante()">Valider ✓</button>
+      </div>
+    </div>
+  `;
+  modal.innerHTML = html;
+}
+
+function selectionnerSauce(sauceId, element) {
+  // Désélectionner tous
+  document.querySelectorAll('.parcours-option-radio').forEach(el => el.classList.remove('actif'));
+  // Sélectionner celui cliqué
+  element.classList.add('actif');
+  parcoursPlatEnCours.sauce = sauceId;
+  // Activer le bouton Valider
+  const btn = document.getElementById('parcours-btn-valider');
+  if (btn) btn.disabled = false;
+}
+
+function fermerModaleParcours() {
+  const modal = document.getElementById('modal-parcours');
+  modal.classList.remove('actif');
+  modal.innerHTML = '';
+}
+
+function annulerParcoursPlat() {
+  parcoursPlatEnCours = null;
+  fermerModaleParcours();
 }
 
 function afficherUpsell(produitAjoute, suggestions) {
@@ -1416,11 +1876,22 @@ function majBarrePanier() {
 
 function afficherPanier() {
   const liste = document.getElementById('panier-liste');
-  liste.innerHTML = panier.map(l => `
-    <div class="panier-ligne">
+  liste.innerHTML = panier.map(l => {
+    // Affichage des options (retirables)
+    let optionsHtml = '';
+    if (l.options) {
+      if (l.options.retirable && l.options.retirable.length > 0) {
+        optionsHtml += `<div class="pl-options">🚫 Sans : ${l.options.retirable.join(', ')}</div>`;
+      }
+    }
+    // Style spécial pour les lignes liées (supplément, sauce sous un plat)
+    const classe = l.lien_plat ? 'panier-ligne pl-lie' : 'panier-ligne';
+    return `
+    <div class="${classe}">
       <div class="pl-emoji">${l.emoji}</div>
       <div class="pl-info">
         <div class="pl-nom">${l.nom}</div>
+        ${optionsHtml}
         <div class="pl-prix">${fmt(l.prix)} / unité</div>
       </div>
       <div class="pl-qte">
@@ -1429,7 +1900,8 @@ function afficherPanier() {
         <button class="pl-qbtn" onclick="modifierQte('${l.produit_id}', 1)">+</button>
       </div>
       <div class="pl-st">${fmt(l.prix * l.quantite)}</div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
   const [e, c] = totalPanier().toFixed(2).split('.');
   document.getElementById('panier-total-final').innerHTML = `${e}<span>,${c} €</span>`;
 }
@@ -1836,27 +2308,24 @@ async function imprimerTicketBorneRawBT(numero, methode, lignes) {
   try {
     // Construire le contenu ESC/POS du ticket
     const escpos = genererTicketBorneEscPos(numero, methode, lignes);
-    // Encoder en base64 (compatible URL)
+    // Encoder en base64
     const base64 = btoa(escpos);
-    // URL-encode pour utilisation dans une intent URL
-    const base64Url = encodeURIComponent(base64);
 
-    // Format intent:// pour compatibilité Kiosk Browser et autres navigateurs Android
-    // L'intent fonctionne en background sans quitter la page
-    const intentUrl = 'intent:base64,' + base64 + '#Intent;scheme=rawbt;package=ru.a402d.rawbtprinter;end';
+    // ✨ Méthode RawBT — Utiliser le format intent:// standard Android
+    // Documentation : https://rawbt.ru/docs
+    // Format officiel : "rawbt:" SUIVI par le contenu base64
+    // OU avec intent: si rawbt: ne marche pas (Kiosk Browser bloque les schemes inconnus)
 
-    // Utiliser un iframe caché pour ne pas naviguer (évite le ERR_UNKNOWN_URL_SCHEME visible)
-    const iframe = document.createElement('iframe');
-    iframe.style.display = 'none';
-    iframe.src = intentUrl;
-    document.body.appendChild(iframe);
+    // Méthode 1 : Lien classique rawbt: avec window.open
+    // Si ça ne marche pas, on essaie l'intent
+    try {
+      window.open('rawbt:' + base64, '_self');
+      return;
+    } catch (e) {}
 
-    // Nettoyer l'iframe après 2 secondes
-    setTimeout(() => {
-      if (iframe && iframe.parentNode) {
-        iframe.parentNode.removeChild(iframe);
-      }
-    }, 2000);
+    // Méthode 2 : Fallback avec intent://
+    const intentUrl = 'intent:#Intent;scheme=rawbt;action=android.intent.action.VIEW;package=ru.a402d.rawbtprinter;S.android.intent.extra.TEXT=' + encodeURIComponent(base64) + ';end';
+    window.location.href = intentUrl;
   } catch (e) {
     console.error('Erreur impression RawBT:', e);
   }
