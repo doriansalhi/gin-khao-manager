@@ -345,7 +345,7 @@ body {
   text-align: center;
   display: flex;
   flex-direction: column;
-  height: 280px;
+  height: 340px;
   position: relative;
   overflow: hidden;
   box-shadow: var(--shadow-sm);
@@ -628,7 +628,7 @@ body {
   position: relative;
   box-shadow: var(--shadow-sm);
   overflow: hidden;
-  height: 320px;  /* Hauteur FIXE pour TOUTES les cartes */
+  height: 400px;  /* Hauteur FIXE pour TOUTES les cartes */
   display: flex;
   flex-direction: column;
   background-size: cover;
@@ -644,14 +644,14 @@ body {
 /* Sur grand écran, on peut faire les cartes plus grandes */
 @media (min-width: 900px) and (orientation: landscape) {
   .plat-card {
-    height: 360px;
+    height: 440px;
   }
 }
 
 /* Sur PETIT écran ou borne portrait (largeur < 600px), on s'adapte */
 @media (max-width: 600px) {
   .plat-card {
-    height: 280px;
+    height: 360px;
   }
 }
 .plat-card:active {
