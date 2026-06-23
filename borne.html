@@ -345,11 +345,11 @@ body {
   text-align: center;
   display: flex;
   flex-direction: column;
-  height: 340px;
+  aspect-ratio: 4 / 5;  /* Format Canva 1080x1350 */
   position: relative;
   overflow: hidden;
   box-shadow: var(--shadow-sm);
-  background-size: contain;  /* Image entière visible, jamais coupée */
+  background-size: cover;
   background-position: center center;
   background-repeat: no-repeat;
 }
@@ -597,10 +597,36 @@ body {
   padding: 32px 32px 140px;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  grid-auto-rows: max-content;  /* Lignes auto sans tirer en hauteur */
-  gap: 32px;
+  grid-auto-rows: max-content;
+  gap: 60px 32px;  /* +d'espace vertical pour le bandeau prix */
   align-content: start;
   background: var(--bg-deep);
+}
+
+/* Wrapper qui contient prix-top + carte */
+.plat-wrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Bandeau prix au-dessus de la carte (centré) */
+.plat-prix-top {
+  background: linear-gradient(135deg, var(--orange), var(--orange-dark));
+  color: #FFFFFF;
+  font-family: var(--display);
+  font-size: 22px;
+  font-weight: 800;
+  padding: 10px 24px;
+  border-radius: 999px;
+  letter-spacing: -0.01em;
+  box-shadow: 0 6px 18px rgba(255, 107, 53, 0.45);
+  line-height: 1;
+  margin-bottom: 12px;
+  white-space: nowrap;
+  border: 3px solid #FFFFFF;
+  z-index: 2;
 }
 /* En écran large (PC en paysage), on passe à 3 colonnes */
 @media (min-width: 900px) and (orientation: landscape) {
@@ -2029,17 +2055,17 @@ function afficherMenu() {
     const rupture = p.stock_actif && p.stock <= 0;
     const hasImage = p.image_url && p.image_url.trim() !== '';
     return `
-      <div class="plat-card ${rupture?'rupture':''} ${hasImage?'has-image':''}" onclick="ajouter('${p.id}')" ${hasImage?`style="background-image:url('${p.image_url}')"`:''}>
-        ${rupture ? '<div class="plat-rupture-badge">Épuisé</div>' : ''}
-        ${!hasImage ? `
-          <div class="plat-emoji-bg">${emoji}</div>
-          <div class="plat-bandeau-fallback">
-            <div class="plat-nom-fallback">${p.nom}</div>
-            <div class="plat-prix">${fmt(p.prix)}</div>
-          </div>
-        ` : `
-          <div class="plat-prix-tag">${fmt(p.prix)}</div>
-        `}
+      <div class="plat-wrapper">
+        <div class="plat-prix-top">${fmt(p.prix)}</div>
+        <div class="plat-card ${rupture?'rupture':''} ${hasImage?'has-image':''}" onclick="ajouter('${p.id}')" ${hasImage?`style="background-image:url('${p.image_url}')"`:''}>
+          ${rupture ? '<div class="plat-rupture-badge">Épuisé</div>' : ''}
+          ${!hasImage ? `
+            <div class="plat-emoji-bg">${emoji}</div>
+            <div class="plat-bandeau-fallback">
+              <div class="plat-nom-fallback">${p.nom}</div>
+            </div>
+          ` : ''}
+        </div>
       </div>`;
   }).join('');
 }
