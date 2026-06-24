@@ -329,12 +329,18 @@ body {
   margin-top: -2px;
 }
 
-/* GRILLE DES CATÉGORIES - 2 colonnes McDo style */
+/* GRILLE DES CATÉGORIES - 4 colonnes pour cartes 2x plus petites */
 .ac-cats-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
   margin-bottom: 36px;
+}
+/* En portrait borne ou écran étroit, on revient à 2 colonnes */
+@media (max-width: 700px) {
+  .ac-cats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 .ac-cat-card {
   background: #FFFFFF;
@@ -400,32 +406,46 @@ body {
 .ac-cat-bandeau {
   margin-top: auto;
   background: #FFFFFF;
-  padding: 14px 16px;
+  padding: 10px 10px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: 3px;
   border-top: 1px solid var(--border-soft);
   box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.08);
   position: relative;
   z-index: 2;
 }
 .ac-cat-nom {
-  font-size: 17px;
+  font-size: 13px;
   font-weight: 800;
   color: var(--text);
   line-height: 1.2;
   letter-spacing: -0.01em;
 }
 .ac-cat-count {
-  font-size: 11px;
+  font-size: 9px;
   color: var(--orange);
   font-weight: 700;
   background: var(--orange-pale);
-  padding: 3px 10px;
+  padding: 2px 7px;
   border-radius: 999px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+}
+/* En mobile/borne portrait étroit, on revient à des tailles normales */
+@media (max-width: 700px) {
+  .ac-cat-bandeau {
+    padding: 14px 16px;
+    gap: 4px;
+  }
+  .ac-cat-nom {
+    font-size: 17px;
+  }
+  .ac-cat-count {
+    font-size: 11px;
+    padding: 3px 10px;
+  }
 }
 
 /* BEST-SELLERS - scroll horizontal */
