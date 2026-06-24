@@ -1700,14 +1700,6 @@ body {
       <!-- Catégories injectées par JS -->
     </div>
 
-    <!-- Best-sellers -->
-    <div id="ac-bestsellers-section" style="display:none;">
-      <h2 class="ac-section-title">⭐ Best-sellers</h2>
-      <div class="ac-bestsellers-scroll" id="ac-bestsellers-list">
-        <!-- Best-sellers injectés par JS -->
-      </div>
-    </div>
-
     <!-- Espace bas -->
     <div style="height: 40px;"></div>
   </div>
@@ -1935,29 +1927,9 @@ function afficherAccueilCats() {
   }).join('');
 
   // 2. Best-sellers
-  const bestsellers = produits.filter(p => p.best_seller === true);
+  // Best-sellers retiré de l'interface (section supprimée)
   const sectionBest = document.getElementById('ac-bestsellers-section');
-  const zoneBest = document.getElementById('ac-bestsellers-list');
-  if (bestsellers.length > 0) {
-    sectionBest.style.display = 'block';
-    zoneBest.innerHTML = bestsellers.map(p => {
-      const cat = categories.find(c => c.id === p.categorie_id);
-      const emoji = emojiPourCategorie(cat ? cat.nom : '');
-      return `
-        <div class="ac-best-card" onclick="ajouter('${p.id}'); allerEcran('ecran-accueil-cats'); animationAjout(this);">
-          <div class="ac-best-badge">⭐ TOP</div>
-          <div class="ac-best-emoji">${emoji}</div>
-          <div class="ac-best-nom">${p.nom}</div>
-          <div class="ac-best-bas">
-            <div class="ac-best-prix">${fmt(p.prix)}</div>
-            <div class="ac-best-plus">+</div>
-          </div>
-        </div>
-      `;
-    }).join('');
-  } else {
-    sectionBest.style.display = 'none';
-  }
+  if (sectionBest) sectionBest.style.display = 'none';
 }
 
 function filtrerCatEtAller(catId) {
