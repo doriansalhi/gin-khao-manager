@@ -82,8 +82,14 @@ body {
   position: relative;
   overflow: hidden;
   padding: 0;
-  display: flex;
   flex-direction: column;
+}
+/* L'écran n'est affiché en flex QUE quand il a la classe .actif */
+#ecran-accueil.actif {
+  display: flex;
+}
+#ecran-accueil:not(.actif) {
+  display: none !important;
 }
 .accueil-image {
   position: absolute;
