@@ -2165,7 +2165,14 @@ function ajouterDirect(p, options) {
   }
 
   // Si pas d'options personnalisées, regrouper avec ligne existante
-  if (!options || (!options.retirable?.length && !options.supplements?.length && !options.sauce)) {
+  const aDesOptions = options && (
+    options.retirable?.length > 0 ||
+    options.supplements?.length > 0 ||
+    options.sauces?.length > 0 ||
+    options.sauce ||  // compat ancienne version
+    (options.options_base && Object.keys(options.options_base).length > 0)
+  );
+  if (!aDesOptions) {
     const ligne = panier.find(l => l.produit_id === p.id && !l.options);
     if (ligne) {
       ligne.quantite++;
@@ -2185,7 +2192,11 @@ function ajouterDirect(p, options) {
   }
   majBarrePanier();
 
-  declencherUpsell(p);
+  // ⚠️ NE PAS déclencher l'upsell ici (il est déjà appelé dans finaliserParcoursPlat)
+  // pour éviter le double appel
+  if (!options || (!options.retirable && !options.supplements && !options.sauces && !options.options_base)) {
+    declencherUpsell(p);
+  }
 }
 
 // ============================================================
@@ -2222,15 +2233,16 @@ let parcoursPlatEnCours = null;
 function demarrerParcoursPlat(produit) {
   parcoursPlatEnCours = {
     produit: produit,
-    retirables: [],     // Tableau de strings (ingrédients retirés)
-    supplements: [],    // Tableau d'UUIDs (suppléments ajoutés)
-    sauce: null,        // UUID de la sauce choisie (ou null si pas de sauce)
-    etape: 'retirables'
+    retirables: [],         // Tableau de strings
+    supplements: [],        // Tableau d'UUIDs
+    sauces: [],             // ✨ MULTI : tableau d'UUIDs (au lieu de mono)
+    options_base: {},       // ✨ NOUVEAU : { "Niveau épicé": "Spicy", "Féculent": "Riz" }
+    etape: 'options_base'   // ✨ NOUVEAU : on commence par les options de base
   };
 
-  // Étape 1 : Retirables (si présents)
-  if (produit.ingredients_retirable && produit.ingredients_retirable.length > 0) {
-    afficherModaleRetirables();
+  // ✨ Étape 0 : Options de base (Spicy/Normal, Riz/Nouilles)
+  if (produit.options_base && Array.isArray(produit.options_base) && produit.options_base.length > 0) {
+    afficherModaleOptionsBase();
   } else {
     passerEtapeSuivante();
   }
@@ -2239,7 +2251,14 @@ function demarrerParcoursPlat(produit) {
 function passerEtapeSuivante() {
   const p = parcoursPlatEnCours.produit;
 
-  if (parcoursPlatEnCours.etape === 'retirables') {
+  if (parcoursPlatEnCours.etape === 'options_base') {
+    parcoursPlatEnCours.etape = 'retirables';
+    if (p.ingredients_retirable && p.ingredients_retirable.length > 0) {
+      afficherModaleRetirables();
+    } else {
+      passerEtapeSuivante();
+    }
+  } else if (parcoursPlatEnCours.etape === 'retirables') {
     parcoursPlatEnCours.etape = 'supplements';
     if (p.supplements_ids && p.supplements_ids.length > 0) {
       afficherModaleSupplements();
@@ -2263,22 +2282,16 @@ function finaliserParcoursPlat() {
   const options = {
     retirable: parcoursPlatEnCours.retirables,
     supplements: parcoursPlatEnCours.supplements,
-    sauce: parcoursPlatEnCours.sauce
+    sauces: parcoursPlatEnCours.sauces,         // ✨ Array maintenant
+    options_base: parcoursPlatEnCours.options_base
   };
 
-  // Calculer le prix total avec suppléments + sauce
-  let prixSupp = 0;
-  options.supplements.forEach(suppId => {
-    const supp = produits.find(p => p.id === suppId);
-    if (supp) prixSupp += parseFloat(supp.prix);
-  });
-
-  // Ajouter au panier avec options
+  // Ajouter le plat au panier avec options
   ajouterDirect(p, options);
 
-  // Si suppléments choisis, ajouter aussi au panier comme lignes séparées
+  // Ajouter chaque supplément comme ligne séparée
   options.supplements.forEach(suppId => {
-    const supp = produits.find(p => p.id === suppId);
+    const supp = produits.find(pp => pp.id === suppId);
     if (supp) {
       panier.push({
         produit_id: supp.id,
@@ -2286,29 +2299,92 @@ function finaliserParcoursPlat() {
         prix: parseFloat(supp.prix),
         quantite: 1,
         emoji: '➕',
-        lien_plat: p.id  // Liaison visuelle
+        lien_plat: p.id
       });
     }
   });
 
-  // Si sauce choisie ET payante, ajouter aussi
-  if (options.sauce) {
-    const sauce = produits.find(p => p.id === options.sauce);
-    if (sauce && parseFloat(sauce.prix) > 0) {
-      panier.push({
-        produit_id: sauce.id,
-        nom: '  ↳ ' + sauce.nom,
-        prix: parseFloat(sauce.prix),
-        quantite: 1,
-        emoji: '🌶️',
-        lien_plat: p.id
-      });
-    }
+  // ✨ Ajouter chaque sauce PAYANTE comme ligne séparée
+  // (si sauces_incluses = false, chaque sauce coûte son prix)
+  const saucesPayantes = !p.sauces_incluses;
+  if (saucesPayantes) {
+    options.sauces.forEach(sauceId => {
+      const sauce = produits.find(pp => pp.id === sauceId);
+      if (sauce && parseFloat(sauce.prix) > 0) {
+        panier.push({
+          produit_id: sauce.id,
+          nom: '  ↳ ' + sauce.nom,
+          prix: parseFloat(sauce.prix),
+          quantite: 1,
+          emoji: '🌶️',
+          lien_plat: p.id
+        });
+      }
+    });
   }
 
   majBarrePanier();
   fermerModaleParcours();
   parcoursPlatEnCours = null;
+
+  // Déclencher l'upsell (boissons + extras)
+  declencherUpsell(p);
+}
+
+// ============================================================
+//  MODALE OPTIONS DE BASE (Spicy/Normal, Riz/Nouilles)
+// ============================================================
+function afficherModaleOptionsBase() {
+  const p = parcoursPlatEnCours.produit;
+  const modal = document.getElementById('modal-parcours');
+  modal.classList.add('actif');
+
+  const groupes = p.options_base;
+  // Calculer nombre total d'étapes pour l'indicateur
+  let totalEtapes = 0;
+  if (groupes && groupes.length > 0) totalEtapes += groupes.length;
+  if (p.ingredients_retirable && p.ingredients_retirable.length > 0) totalEtapes++;
+  if (p.supplements_ids && p.supplements_ids.length > 0) totalEtapes++;
+  if (p.sauces_ids && p.sauces_ids.length > 0) totalEtapes++;
+
+  // On affiche le premier groupe qui n'est pas encore choisi
+  const groupeEnCours = groupes.find(g => !parcoursPlatEnCours.options_base[g.groupe]);
+  if (!groupeEnCours) {
+    // Tous les groupes traités, on passe à l'étape suivante
+    passerEtapeSuivante();
+    return;
+  }
+
+  const html = `
+    <div class="parcours-content">
+      <div class="parcours-head">
+        <div class="parcours-etape">Personnalisation</div>
+        <h2 class="parcours-titre">${groupeEnCours.groupe}</h2>
+        <p class="parcours-sous">${groupeEnCours.obligatoire ? 'Sélection obligatoire' : 'Optionnel'}</p>
+      </div>
+      <div class="parcours-options">
+        ${groupeEnCours.choix.map(choix => `
+          <div class="parcours-option-radio" onclick="selectionnerOptionBase('${groupeEnCours.groupe.replace(/'/g, "\\'")}', '${choix.replace(/'/g, "\\'")}', this)">
+            <span class="parcours-option-label">${choix}</span>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+  modal.innerHTML = html;
+}
+
+function selectionnerOptionBase(groupe, choix, element) {
+  // Désélectionner tous
+  document.querySelectorAll('.parcours-option-radio').forEach(el => el.classList.remove('actif'));
+  // Sélectionner celui cliqué
+  element.classList.add('actif');
+  parcoursPlatEnCours.options_base[groupe] = choix;
+
+  // Attendre 400ms pour montrer la sélection puis passer au groupe suivant
+  setTimeout(() => {
+    afficherModaleOptionsBase();
+  }, 400);
 }
 
 // ============================================================
@@ -2408,40 +2484,102 @@ function afficherModaleSauces() {
     .filter(s => s);
 
   const obligatoire = p.sauce_required === true;
+  const max = p.sauces_max || 1;
+  const incluses = p.sauces_incluses === true;
+  const multiChoix = max > 1;
+
+  // Choix actuel
+  const dejaChoisies = parcoursPlatEnCours.sauces || [];
+
+  let titre, sous;
+  if (multiChoix) {
+    titre = obligatoire ? '🌶️ Choisissez vos sauces' : '🌶️ Sauces ?';
+    sous = `Jusqu'à ${max} sauce${max > 1 ? 's' : ''} · ${dejaChoisies.length}/${max} sélectionnée${dejaChoisies.length > 1 ? 's' : ''}`;
+  } else {
+    titre = obligatoire ? '🌶️ Choisissez votre sauce' : '🌶️ Une sauce ?';
+    sous = obligatoire ? 'Sélection obligatoire' : 'Optionnel';
+  }
 
   const html = `
     <div class="parcours-content">
       <div class="parcours-head">
-        <div class="parcours-etape">Étape 3/3</div>
-        <h2 class="parcours-titre">🌶️ ${obligatoire ? 'Choisissez votre sauce' : 'Une sauce ?'}</h2>
-        <p class="parcours-sous">${obligatoire ? 'Sélection obligatoire' : 'Optionnel'}</p>
+        <div class="parcours-etape">Sauces</div>
+        <h2 class="parcours-titre">${titre}</h2>
+        <p class="parcours-sous" id="parcours-sauces-compteur">${sous}</p>
       </div>
       <div class="parcours-options">
-        ${sauces.map(s => `
-          <div class="parcours-option-radio" onclick="selectionnerSauce('${s.id}', this)">
-            <span class="parcours-option-label">${s.nom.replace('Sauce ', '')}</span>
-            <span class="parcours-option-prix">${parseFloat(s.prix) > 0 ? '+' + parseFloat(s.prix).toFixed(2).replace('.', ',') + ' €' : 'inclus'}</span>
-          </div>
-        `).join('')}
+        ${sauces.map(s => {
+          const dejaChoisie = dejaChoisies.includes(s.id);
+          const prixAffiche = (!incluses && parseFloat(s.prix) > 0)
+            ? '+' + parseFloat(s.prix).toFixed(2).replace('.', ',') + ' €'
+            : 'inclus';
+          return `
+            <div class="parcours-option-radio ${dejaChoisie ? 'actif' : ''}" onclick="toggleSauce('${s.id}', this)">
+              <span class="parcours-option-label">${s.nom.replace('Sauce ', '')}</span>
+              <span class="parcours-option-prix">${prixAffiche}</span>
+            </div>
+          `;
+        }).join('')}
       </div>
       <div class="parcours-actions">
-        ${obligatoire ? '' : '<button class="parcours-btn-passer" onclick="parcoursPlatEnCours.sauce = null; passerEtapeSuivante()">Aucune sauce →</button>'}
-        <button class="parcours-btn-valider" id="parcours-btn-valider" ${obligatoire ? 'disabled' : ''} onclick="passerEtapeSuivante()">Valider ✓</button>
+        ${obligatoire ? '' : '<button class="parcours-btn-passer" onclick="parcoursPlatEnCours.sauces = []; passerEtapeSuivante()">Aucune sauce →</button>'}
+        <button class="parcours-btn-valider" id="parcours-btn-valider" ${(obligatoire && dejaChoisies.length === 0) ? 'disabled' : ''} onclick="passerEtapeSuivante()">Valider ✓</button>
       </div>
     </div>
   `;
   modal.innerHTML = html;
 }
 
+function toggleSauce(sauceId, element) {
+  const p = parcoursPlatEnCours.produit;
+  const max = p.sauces_max || 1;
+  const multiChoix = max > 1;
+
+  if (!multiChoix) {
+    // Mode mono : désélectionner tout sauf l'élément cliqué
+    document.querySelectorAll('.parcours-option-radio').forEach(el => el.classList.remove('actif'));
+    element.classList.add('actif');
+    parcoursPlatEnCours.sauces = [sauceId];
+  } else {
+    // Mode multi avec limite
+    const dejaChoisies = parcoursPlatEnCours.sauces;
+    const indexExistant = dejaChoisies.indexOf(sauceId);
+
+    if (indexExistant >= 0) {
+      // Déjà choisie → on désélectionne
+      dejaChoisies.splice(indexExistant, 1);
+      element.classList.remove('actif');
+    } else {
+      // Pas encore choisie → on ajoute si limite pas atteinte
+      if (dejaChoisies.length >= max) {
+        // Limite atteinte, on retire la première et on ajoute la nouvelle
+        // OU on bloque - on choisit de bloquer pour être plus prévisible
+        return; // Bloque
+      }
+      dejaChoisies.push(sauceId);
+      element.classList.add('actif');
+    }
+  }
+
+  // Mettre à jour le compteur et l'état du bouton
+  const dejaChoisies2 = parcoursPlatEnCours.sauces;
+  const compteur = document.getElementById('parcours-sauces-compteur');
+  if (compteur && multiChoix) {
+    compteur.textContent = `Jusqu'à ${max} sauce${max > 1 ? 's' : ''} · ${dejaChoisies2.length}/${max} sélectionnée${dejaChoisies2.length > 1 ? 's' : ''}`;
+  }
+  const btnValider = document.getElementById('parcours-btn-valider');
+  if (btnValider) {
+    if (p.sauce_required && dejaChoisies2.length === 0) {
+      btnValider.disabled = true;
+    } else {
+      btnValider.disabled = false;
+    }
+  }
+}
+
+// Compat : ancienne fonction selectionnerSauce (au cas où elle est appelée par ailleurs)
 function selectionnerSauce(sauceId, element) {
-  // Désélectionner tous
-  document.querySelectorAll('.parcours-option-radio').forEach(el => el.classList.remove('actif'));
-  // Sélectionner celui cliqué
-  element.classList.add('actif');
-  parcoursPlatEnCours.sauce = sauceId;
-  // Activer le bouton Valider
-  const btn = document.getElementById('parcours-btn-valider');
-  if (btn) btn.disabled = false;
+  toggleSauce(sauceId, element);
 }
 
 function fermerModaleParcours() {
@@ -2535,11 +2673,30 @@ function majBarrePanier() {
 function afficherPanier() {
   const liste = document.getElementById('panier-liste');
   liste.innerHTML = panier.map(l => {
-    // Affichage des options (retirables)
+    // Affichage des options
     let optionsHtml = '';
     if (l.options) {
+      // Options de base (Spicy/Normal, Riz/Nouilles)
+      if (l.options.options_base) {
+        Object.entries(l.options.options_base).forEach(([groupe, choix]) => {
+          optionsHtml += `<div class="pl-options">${groupe} : <b>${choix}</b></div>`;
+        });
+      }
+      // Retirables
       if (l.options.retirable && l.options.retirable.length > 0) {
         optionsHtml += `<div class="pl-options">🚫 Sans : ${l.options.retirable.join(', ')}</div>`;
+      }
+      // Sauces (si incluses, sinon elles sont en lignes séparées payantes)
+      if (l.options.sauces && l.options.sauces.length > 0) {
+        const sauceNoms = l.options.sauces
+          .map(sid => {
+            const s = produits.find(p => p.id === sid);
+            return s ? s.nom.replace('Sauce ', '') : null;
+          })
+          .filter(n => n);
+        if (sauceNoms.length > 0) {
+          optionsHtml += `<div class="pl-options">🌶️ ${sauceNoms.join(', ')}</div>`;
+        }
       }
     }
     // Style spécial pour les lignes liées (supplément, sauce sous un plat)
