@@ -2358,6 +2358,7 @@ function toggleRetirable(ingredient, checked) {
 function afficherModaleSupplements() {
   const p = parcoursPlatEnCours.produit;
   const modal = document.getElementById('modal-parcours');
+  modal.classList.add('actif');
 
   const supps = p.supplements_ids
     .map(id => produits.find(pp => pp.id === id))
@@ -2400,6 +2401,7 @@ function toggleSupplement(suppId, checked) {
 function afficherModaleSauces() {
   const p = parcoursPlatEnCours.produit;
   const modal = document.getElementById('modal-parcours');
+  modal.classList.add('actif');
 
   const sauces = p.sauces_ids
     .map(id => produits.find(pp => pp.id === id))
