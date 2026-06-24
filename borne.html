@@ -1693,14 +1693,15 @@ body {
 </div>
 
 <!-- ===== ÉCRAN 1 : ACCUEIL ===== -->
-<div class="ecran actif" id="ecran-accueil" onclick="allerMode()">
-  <div class="accueil-image">
+<div class="ecran actif" id="ecran-accueil">
+  <div class="accueil-image" onclick="allerMode()">
     <img src="https://res.cloudinary.com/dci5mreqo/image/upload/v1782303388/ChatGPT_Image_24_juin_2026_14_16_03_l5b0u5.png" 
          alt="Gin Khao - Accueil" 
-         id="accueil-img" />
+         id="accueil-img" 
+         onclick="allerMode()" />
   </div>
-  <div class="accueil-bottom">
-    <div class="accueil-cta">👆 Touchez pour commander</div>
+  <div class="accueil-bottom" onclick="allerMode()">
+    <div class="accueil-cta" onclick="allerMode()">👆 Touchez pour commander</div>
   </div>
 </div>
 
