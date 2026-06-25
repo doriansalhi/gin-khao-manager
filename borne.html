@@ -1273,6 +1273,36 @@ body {
 }
 
 /* ============================================================ */
+/* 🎉 CONFETTIS DE CÉLÉBRATION                                    */
+/* ============================================================ */
+#conteneur-confettis {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  overflow: hidden;
+}
+.confetti {
+  position: absolute;
+  top: -20px;
+  border-radius: 2px;
+  animation: confetti-tombe linear forwards;
+}
+@keyframes confetti-tombe {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+  10% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(110vh) rotate(720deg);
+    opacity: 0.7;
+  }
+}
+
+/* ============================================================ */
 /* ÉCRAN SOUS-CATÉGORIES (Sushi → Makis/Tigers/etc.)              */
 /* ============================================================ */
 #ecran-sous-cats {
@@ -2205,6 +2235,7 @@ body {
 
 <!-- ===== ÉCRAN 6 : CONFIRMATION ===== -->
 <div class="ecran" id="ecran-fin">
+  <div id="conteneur-confettis"></div>
   <div class="fin-check" id="fin-check">✓</div>
   <div class="fin-titre" id="fin-titre">Commande envoyée !</div>
   <div class="fin-sub" id="fin-sub">Votre commande est en préparation</div>
@@ -3327,6 +3358,37 @@ function annulerParcoursPlat() {
   fermerModaleParcours();
 }
 
+// ============================================================
+//  🎉 CONFETTIS DE CÉLÉBRATION
+// ============================================================
+function declencherConfettis() {
+  const conteneur = document.getElementById('conteneur-confettis');
+  if (!conteneur) return;
+  
+  conteneur.innerHTML = '';
+  
+  const couleurs = ['#FF6B35', '#FFD23F', '#06D6A0', '#118AB2', '#EF476F', '#FFFFFF'];
+  const nbConfettis = 80;
+  
+  for (let i = 0; i < nbConfettis; i++) {
+    const c = document.createElement('div');
+    c.className = 'confetti';
+    c.style.left = Math.random() * 100 + '%';
+    c.style.background = couleurs[Math.floor(Math.random() * couleurs.length)];
+    c.style.animationDelay = (Math.random() * 0.6) + 's';
+    c.style.animationDuration = (2.5 + Math.random() * 1.5) + 's';
+    c.style.transform = `rotate(${Math.random() * 360}deg)`;
+    c.style.width = (8 + Math.random() * 6) + 'px';
+    c.style.height = (12 + Math.random() * 8) + 'px';
+    conteneur.appendChild(c);
+  }
+  
+  // Nettoyer après la fin de l'animation
+  setTimeout(() => {
+    if (conteneur) conteneur.innerHTML = '';
+  }, 5000);
+}
+
 function afficherUpsell(produitAjoute, suggestions) {
   const modal = document.getElementById('modal-upsell');
   const titre = document.getElementById('upsell-titre');
@@ -3544,6 +3606,9 @@ function afficherConfirmation(numero, methode) {
   }
 
   allerEcran('ecran-fin');
+  
+  // ✨ Confettis de célébration !
+  declencherConfettis();
 
   // Reset auto au bout de 10 secondes pour le client suivant
   setTimeout(() => {
