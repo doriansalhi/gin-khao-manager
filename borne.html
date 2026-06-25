@@ -1499,6 +1499,64 @@ body {
 /* ============================================================ */
 /* MODALE PARCOURS PLAT (retirable / suppléments / sauces)       */
 /* ============================================================ */
+
+/* Grille des images (formule boisson + entrée) */
+.parcours-grille-images {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  padding: 20px 24px 24px;
+  flex: 1;
+  overflow-y: auto;
+}
+.parcours-card-image {
+  background: #FFFFFF;
+  border: 3px solid var(--border-soft);
+  border-radius: 18px;
+  cursor: pointer;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  aspect-ratio: 4 / 5;
+  position: relative;
+  overflow: hidden;
+  background-size: cover;
+  background-position: center;
+  box-shadow: var(--shadow-sm);
+}
+.parcours-card-image:active {
+  transform: scale(0.96);
+}
+.parcours-card-image.actif {
+  border-color: var(--orange);
+  box-shadow: 0 8px 24px rgba(255, 107, 53, 0.4);
+  transform: scale(1.03);
+}
+.parcours-card-image.has-image {
+  background-color: var(--orange-pale);
+}
+.parcours-card-emoji {
+  font-size: 60px;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.parcours-card-bandeau {
+  background: #FFFFFF;
+  padding: 10px;
+  text-align: center;
+  border-top: 1px solid var(--border-soft);
+  z-index: 2;
+}
+.parcours-card-nom {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
 .parcours-modal {
   position: fixed;
   inset: 0;
@@ -2735,14 +2793,19 @@ let parcoursPlatEnCours = null;
 function demarrerParcoursPlat(produit) {
   parcoursPlatEnCours = {
     produit: produit,
-    retirables: [],         // Tableau de strings
-    supplements: [],        // Tableau d'UUIDs
-    sauces: [],             // ✨ MULTI : tableau d'UUIDs (au lieu de mono)
-    options_base: {},       // ✨ NOUVEAU : { "Niveau épicé": "Spicy", "Féculent": "Riz" }
-    etape: 'options_base'   // ✨ NOUVEAU : on commence par les options de base
+    retirables: [],
+    supplements: [],
+    sauces: [],
+    options_base: {},
+    // ✨ NOUVEAU pour les formules
+    est_formule: produit.est_formule === true,
+    formule_boisson_id: null,
+    formule_entree_id: null,
+    formule_entree_label: null,  // pour les variantes (2 pièces)
+    etape: 'options_base'
   };
 
-  // ✨ Étape 0 : Options de base (Spicy/Normal, Riz/Nouilles)
+  // Étape 0 : Options de base
   if (produit.options_base && Array.isArray(produit.options_base) && produit.options_base.length > 0) {
     afficherModaleOptionsBase();
   } else {
@@ -2752,6 +2815,7 @@ function demarrerParcoursPlat(produit) {
 
 function passerEtapeSuivante() {
   const p = parcoursPlatEnCours.produit;
+  const estFormule = parcoursPlatEnCours.est_formule;
 
   if (parcoursPlatEnCours.etape === 'options_base') {
     parcoursPlatEnCours.etape = 'retirables';
@@ -2772,9 +2836,20 @@ function passerEtapeSuivante() {
     if (p.sauces_ids && p.sauces_ids.length > 0) {
       afficherModaleSauces();
     } else {
-      finaliserParcoursPlat();
+      passerEtapeSuivante();
     }
   } else if (parcoursPlatEnCours.etape === 'sauces') {
+    // ✨ NOUVEAU : si formule, on passe par boisson puis entrée
+    if (estFormule) {
+      parcoursPlatEnCours.etape = 'formule_boisson';
+      afficherModaleFormuleBoisson();
+    } else {
+      finaliserParcoursPlat();
+    }
+  } else if (parcoursPlatEnCours.etape === 'formule_boisson') {
+    parcoursPlatEnCours.etape = 'formule_entree';
+    afficherModaleFormuleEntree();
+  } else if (parcoursPlatEnCours.etape === 'formule_entree') {
     finaliserParcoursPlat();
   }
 }
@@ -2807,7 +2882,6 @@ function finaliserParcoursPlat() {
   });
 
   // ✨ Ajouter chaque sauce PAYANTE comme ligne séparée
-  // (si sauces_incluses = false, chaque sauce coûte son prix)
   const saucesPayantes = !p.sauces_incluses;
   if (saucesPayantes) {
     options.sauces.forEach(sauceId => {
@@ -2825,12 +2899,166 @@ function finaliserParcoursPlat() {
     });
   }
 
+  // ✨ NOUVEAU : Si formule, ajouter boisson + entrée OFFERTES (prix 0€ — inclus dans le prix formule)
+  if (parcoursPlatEnCours.est_formule) {
+    if (parcoursPlatEnCours.formule_boisson_id) {
+      const boisson = produits.find(pp => pp.id === parcoursPlatEnCours.formule_boisson_id);
+      if (boisson) {
+        panier.push({
+          produit_id: boisson.id,
+          nom: '  ↳ ' + boisson.nom + ' (formule)',
+          prix: 0,  // OFFERT, prix dans la formule
+          quantite: 1,
+          emoji: '🍹',
+          lien_plat: p.id
+        });
+      }
+    }
+    if (parcoursPlatEnCours.formule_entree_id) {
+      const entree = produits.find(pp => pp.id === parcoursPlatEnCours.formule_entree_id);
+      if (entree) {
+        const label = parcoursPlatEnCours.formule_entree_label || entree.nom;
+        panier.push({
+          produit_id: entree.id,
+          nom: '  ↳ ' + label + ' (formule)',
+          prix: 0,  // OFFERT, prix dans la formule
+          quantite: 1,
+          emoji: '🥟',
+          lien_plat: p.id
+        });
+      }
+    }
+  }
+
   majBarrePanier();
   fermerModaleParcours();
   parcoursPlatEnCours = null;
 
-  // Déclencher l'upsell (boissons + extras)
+  // Déclencher l'upsell (boissons + extras) — désactivé pour les formules
+  // declencherUpsell est déjà no-op désormais
   declencherUpsell(p);
+}
+
+// ============================================================
+//  ✨ MODALE FORMULE BOISSON (toutes les 33cl + Cristalline)
+// ============================================================
+function afficherModaleFormuleBoisson() {
+  const modal = document.getElementById('modal-parcours');
+  modal.classList.add('actif');
+
+  // Trouver toutes les boissons éligibles : 33cl + Cristalline
+  const catBoissons = categories.find(c => c.nom === 'Boissons');
+  if (!catBoissons) {
+    passerEtapeSuivante();
+    return;
+  }
+  const boissons = produits.filter(p => {
+    if (p.categorie_id !== catBoissons.id || p.actif === false) return false;
+    return p.nom.includes('33cl') || p.nom.toLowerCase().includes('cristalline');
+  });
+
+  const html = `
+    <div class="parcours-content">
+      <div class="parcours-head">
+        <div class="parcours-etape">Formule — Boisson</div>
+        <h2 class="parcours-titre">🍹 Choisissez votre boisson</h2>
+        <p class="parcours-sous">Incluse dans la formule</p>
+      </div>
+      <div class="parcours-grille-images">
+        ${boissons.map(b => {
+          const hasImage = b.image_url && b.image_url.trim() !== '';
+          return `
+            <div class="parcours-card-image ${hasImage?'has-image':''}" onclick="choisirFormuleBoisson('${b.id}', this)"
+                 ${hasImage?`style="background-image:url('${b.image_url}')"`:''}>
+              ${!hasImage ? `<div class="parcours-card-emoji">🍹</div>` : ''}
+              <div class="parcours-card-bandeau">
+                <div class="parcours-card-nom">${b.nom.replace(' 33cl','').replace(' 50cl','')}</div>
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    </div>
+  `;
+  modal.innerHTML = html;
+}
+
+function choisirFormuleBoisson(boissonId, element) {
+  document.querySelectorAll('.parcours-card-image').forEach(el => el.classList.remove('actif'));
+  element.classList.add('actif');
+  parcoursPlatEnCours.formule_boisson_id = boissonId;
+  setTimeout(() => passerEtapeSuivante(), 400);
+}
+
+// ============================================================
+//  ✨ MODALE FORMULE ENTRÉE (toutes en 2 pièces)
+// ============================================================
+function afficherModaleFormuleEntree() {
+  const modal = document.getElementById('modal-parcours');
+  modal.classList.add('actif');
+
+  const catEntrees = categories.find(c => c.nom === 'Entrées');
+  if (!catEntrees) {
+    finaliserParcoursPlat();
+    return;
+  }
+  const entrees = produits.filter(p => p.categorie_id === catEntrees.id && p.actif !== false);
+
+  // Pour chaque entrée, on construit la liste des options affichables
+  // - Si variantes : on cherche la variante "2 pièces" (ou la première si pas de 2p)
+  // - Si pas de variantes : on affiche tel quel
+  const items = entrees.map(e => {
+    if (e.variantes && Array.isArray(e.variantes) && e.variantes.length > 0) {
+      // Trouver la variante 2 pièces, sinon prendre la première
+      const variante2p = e.variantes.find(v => v.label && v.label.includes('2 pi')) || e.variantes[0];
+      return {
+        id: e.id,
+        nom: e.nom,
+        label: e.nom + ' (' + variante2p.label + ')',
+        image_url: e.image_url
+      };
+    } else {
+      return {
+        id: e.id,
+        nom: e.nom,
+        label: e.nom,
+        image_url: e.image_url
+      };
+    }
+  });
+
+  const html = `
+    <div class="parcours-content">
+      <div class="parcours-head">
+        <div class="parcours-etape">Formule — Entrée</div>
+        <h2 class="parcours-titre">🥟 Choisissez votre entrée</h2>
+        <p class="parcours-sous">Incluse dans la formule</p>
+      </div>
+      <div class="parcours-grille-images">
+        ${items.map(it => {
+          const hasImage = it.image_url && it.image_url.trim() !== '';
+          return `
+            <div class="parcours-card-image ${hasImage?'has-image':''}" onclick="choisirFormuleEntree('${it.id}', '${it.label.replace(/'/g, "\\'")}', this)"
+                 ${hasImage?`style="background-image:url('${it.image_url}')"`:''}>
+              ${!hasImage ? `<div class="parcours-card-emoji">🥟</div>` : ''}
+              <div class="parcours-card-bandeau">
+                <div class="parcours-card-nom">${it.label}</div>
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    </div>
+  `;
+  modal.innerHTML = html;
+}
+
+function choisirFormuleEntree(entreeId, label, element) {
+  document.querySelectorAll('.parcours-card-image').forEach(el => el.classList.remove('actif'));
+  element.classList.add('actif');
+  parcoursPlatEnCours.formule_entree_id = entreeId;
+  parcoursPlatEnCours.formule_entree_label = label;
+  setTimeout(() => passerEtapeSuivante(), 400);
 }
 
 // ============================================================
