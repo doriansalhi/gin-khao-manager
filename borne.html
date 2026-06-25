@@ -1273,6 +1273,49 @@ body {
 }
 
 /* ============================================================ */
+/* ÉCRAN SOUS-CATÉGORIES (Sushi → Makis/Tigers/etc.)              */
+/* ============================================================ */
+#ecran-sous-cats {
+  background: var(--bg-deep);
+  flex-direction: column;
+  padding: 0;
+}
+#ecran-sous-cats.actif {
+  display: flex;
+}
+.sc-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 24px;
+  background: #FFFFFF;
+  border-bottom: 2px solid var(--border-soft);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.btn-voir-panier-mini {
+  background: linear-gradient(135deg, var(--orange), var(--orange-dark));
+  color: #FFFFFF;
+  border: none;
+  padding: 12px 22px;
+  border-radius: 999px;
+  font-weight: 800;
+  font-size: 16px;
+  cursor: pointer;
+}
+.sc-grille {
+  flex: 1;
+  overflow-y: auto;
+  padding: 32px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-auto-rows: max-content;
+  gap: 24px;
+}
+
+/* ============================================================ */
 /* ============================================================ */
 /* MODALE UPSELL V2 (Entrées + Boissons après "Voir mon panier") */
 /* ============================================================ */
@@ -1981,7 +2024,7 @@ body {
 <!-- ===== ÉCRAN 3 : MENU ===== -->
 <div class="ecran" id="ecran-menu">
   <div class="menu-top">
-    <button class="btn-retour-cats" onclick="allerEcran('ecran-accueil-cats')">← Catégories</button>
+    <button class="btn-retour-cats" onclick="retourCategories()">← Catégories</button>
     <div class="logo">Gin <span>Khao</span></div>
     <div class="menu-mode-badge" id="menu-mode-badge">Sur place</div>
   </div>
@@ -2179,13 +2222,26 @@ function emojiPourCategorie(nomCat) {
 }
 
 function afficherAccueilCats() {
-  // 1. Catégories
+  // 1. Catégories TOP-LEVEL (parent_id NULL) qui ont du contenu (produits OU sous-catégories)
   const zone = document.getElementById('ac-cats-grid');
-  const catsAvecProduits = categories.filter(c =>
-    produits.some(p => p.categorie_id === c.id)
-  );
-  zone.innerHTML = catsAvecProduits.map(c => {
-    const nb = produits.filter(p => p.categorie_id === c.id).length;
+  const topCats = categories.filter(c => !c.parent_id);
+  const catsAvecContenu = topCats.filter(c => {
+    // A des produits directs OU a des sous-catégories
+    const aProduits = produits.some(p => p.categorie_id === c.id);
+    const aSousCats = categories.some(sc => sc.parent_id === c.id);
+    return aProduits || aSousCats;
+  });
+  zone.innerHTML = catsAvecContenu.map(c => {
+    const sousCats = categories.filter(sc => sc.parent_id === c.id);
+    const aSousCats = sousCats.length > 0;
+    // Compter les produits : directs OU dans les sous-catégories
+    let nb;
+    if (aSousCats) {
+      const idsSousCats = sousCats.map(sc => sc.id);
+      nb = produits.filter(p => idsSousCats.includes(p.categorie_id)).length;
+    } else {
+      nb = produits.filter(p => p.categorie_id === c.id).length;
+    }
     const emoji = emojiPourCategorie(c.nom);
     const hasImage = c.image_url && c.image_url.trim() !== '';
     return `
@@ -2193,23 +2249,91 @@ function afficherAccueilCats() {
         ${!hasImage ? `<div class="ac-cat-emoji">${emoji}</div>` : ''}
         <div class="ac-cat-bandeau">
           <div class="ac-cat-nom">${c.nom}</div>
-          <div class="ac-cat-count">${nb} produit${nb > 1 ? 's' : ''}</div>
+          <div class="ac-cat-count">${nb} produit${nb > 1 ? 's' : ''}${aSousCats ? ' · ' + sousCats.length + ' sous-cat.' : ''}</div>
         </div>
       </div>
     `;
   }).join('');
 
-  // 2. Best-sellers
-  // Best-sellers retiré de l'interface (section supprimée)
+  // 2. Best-sellers retiré
   const sectionBest = document.getElementById('ac-bestsellers-section');
   if (sectionBest) sectionBest.style.display = 'none';
 }
 
 function filtrerCatEtAller(catId) {
+  // Si la cat a des sous-catégories, on va sur l'écran des sous-catégories
+  const sousCats = categories.filter(sc => sc.parent_id === catId);
+  if (sousCats.length > 0) {
+    afficherSousCategories(catId);
+    return;
+  }
+  // Sinon : comportement normal (afficher les produits de cette cat)
   catActive = catId;
   afficherCats();
   afficherMenu();
   allerEcran('ecran-menu');
+}
+
+// Retour intelligent : si on est sur une sous-catégorie, retour aux sous-catégories du parent
+function retourCategories() {
+  const cat = categories.find(c => c.id === catActive);
+  if (cat && cat.parent_id) {
+    // On est dans une sous-catégorie → retour à l'écran des sous-cats du parent
+    afficherSousCategories(cat.parent_id);
+  } else {
+    // On est dans une catégorie top-level → retour à l'écran principal
+    allerEcran('ecran-accueil-cats');
+  }
+}
+
+// ============================================================
+//  📂 ÉCRAN SOUS-CATÉGORIES (pour Sushi → Makis/Tigers/etc.)
+// ============================================================
+let categorieParenteEnCours = null;
+
+function afficherSousCategories(parentId) {
+  categorieParenteEnCours = parentId;
+  const parent = categories.find(c => c.id === parentId);
+  if (!parent) return;
+  
+  const sousCats = categories
+    .filter(sc => sc.parent_id === parentId)
+    .sort((a, b) => (a.ordre || 999) - (b.ordre || 999));
+  
+  // Créer l'écran s'il n'existe pas
+  let ecran = document.getElementById('ecran-sous-cats');
+  if (!ecran) {
+    ecran = document.createElement('div');
+    ecran.id = 'ecran-sous-cats';
+    ecran.className = 'ecran';
+    document.body.appendChild(ecran);
+  }
+  
+  ecran.innerHTML = `
+    <div class="sc-header">
+      <button class="btn-retour-cats" onclick="allerEcran('ecran-accueil-cats')">← Catégories</button>
+      <div class="logo">${parent.nom}</div>
+      <button class="btn-voir-panier-mini" onclick="allerPanier()" id="btn-voir-panier-sc">Panier</button>
+    </div>
+    <div class="sc-grille">
+      ${sousCats.map(sc => {
+        const nb = produits.filter(p => p.categorie_id === sc.id).length;
+        const emoji = emojiPourCategorie(sc.nom);
+        const hasImage = sc.image_url && sc.image_url.trim() !== '';
+        return `
+          <div class="ac-cat-card ${hasImage?'has-image':''}" onclick="filtrerCatEtAller('${sc.id}')" ${hasImage?`style="background-image:url('${sc.image_url}')"`:''}>
+            ${!hasImage ? `<div class="ac-cat-emoji">${emoji}</div>` : ''}
+            <div class="ac-cat-bandeau">
+              <div class="ac-cat-nom">${sc.nom}</div>
+              <div class="ac-cat-count">${nb} produit${nb > 1 ? 's' : ''}</div>
+            </div>
+          </div>
+        `;
+      }).join('')}
+    </div>
+  `;
+  
+  allerEcran('ecran-sous-cats');
 }
 
 function animationAjout(el) {
@@ -2278,10 +2402,15 @@ async function chargerMenu() {
 
 function afficherCats() {
   const zone = document.getElementById('menu-cats');
-  // ✨ N'afficher que les catégories qui ONT des produits actifs
-  const catsAvecProduits = categories.filter(c =>
-    produits.some(p => p.categorie_id === c.id)
-  );
+  // ✨ N'afficher que les catégories qui ONT des produits actifs ET PAS de sous-catégories
+  // (Les catégories avec sous-catégories ne sont pas cliquables directement dans le menu)
+  const catsAvecProduits = categories.filter(c => {
+    const aProduits = produits.some(p => p.categorie_id === c.id);
+    const aSousCats = categories.some(sc => sc.parent_id === c.id);
+    // On affiche : la cat actuelle (même si sous-cat), ou cats avec produits sans sous-cats
+    if (c.id === catActive) return true;
+    return aProduits && !aSousCats;
+  });
   let html = '';
   catsAvecProduits.forEach(c => {
     html += `<div class="menu-cat ${catActive===c.id?'actif':''}" onclick="filtrerCat('${c.id}')">${c.nom}</div>`;
