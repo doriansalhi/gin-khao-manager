@@ -2000,12 +2000,12 @@ body {
 
   <div class="ac-scroll">
     <!-- Bandeau promo -->
-    <div class="ac-promo">
-      <div class="ac-promo-img">🌶️</div>
+    <div class="ac-promo" onclick="filtrerCatEtAllerFormules()">
+      <div class="ac-promo-img">🍱</div>
       <div class="ac-promo-content">
-        <div class="ac-promo-label">L'OFFRE DU MOMENT</div>
-        <div class="ac-promo-title">Découvrez nos spécialités</div>
-        <div class="ac-promo-sub">Des plats thaï authentiques préparés avec amour</div>
+        <div class="ac-promo-label">DÉCOUVREZ</div>
+        <div class="ac-promo-title">Les Formules</div>
+        <div class="ac-promo-sub">Combos plat + boisson + entrée à prix réduit</div>
       </div>
       <div class="ac-promo-arrow">→</div>
     </div>
@@ -2272,6 +2272,16 @@ function filtrerCatEtAller(catId) {
   afficherCats();
   afficherMenu();
   allerEcran('ecran-menu');
+}
+
+// Ouvrir la catégorie Formules (cliquée depuis l'encadré "Les Formules")
+function filtrerCatEtAllerFormules() {
+  const cat = categories.find(c => c.nom === 'Formules' && !c.parent_id);
+  if (!cat) {
+    alert('Aucune formule disponible pour le moment');
+    return;
+  }
+  filtrerCatEtAller(cat.id);
 }
 
 // Retour intelligent : si on est sur une sous-catégorie, retour aux sous-catégories du parent
