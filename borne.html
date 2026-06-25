@@ -1273,6 +1273,187 @@ body {
 }
 
 /* ============================================================ */
+/* ============================================================ */
+/* MODALE UPSELL V2 (Entrées + Boissons après "Voir mon panier") */
+/* ============================================================ */
+#modal-upsell .upsell-content-v2 {
+  background: #FFFFFF;
+  border-radius: 32px;
+  max-width: 1000px;
+  width: 100%;
+  max-height: 92vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 32px 64px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+}
+.upsell-head-v2 {
+  text-align: center;
+  padding: 30px 24px 18px;
+  background: linear-gradient(135deg, var(--orange-pale) 0%, #FFFFFF 100%);
+  border-bottom: 2px solid var(--border-soft);
+}
+.upsell-titre-v2 {
+  font-family: var(--display);
+  font-size: 34px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 6px;
+  letter-spacing: -0.01em;
+}
+.upsell-sous-v2 {
+  font-size: 16px;
+  color: var(--text-soft);
+  margin: 0;
+}
+.upsell-grille-v2 {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-auto-rows: max-content;
+  gap: 16px;
+  background: var(--bg-deep);
+}
+.upsell-card-v2 {
+  background: #FFFFFF;
+  border: 2px solid var(--border-soft);
+  border-radius: 18px;
+  cursor: pointer;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  aspect-ratio: 4 / 5;
+  position: relative;
+  overflow: hidden;
+  background-size: cover;
+  background-position: center;
+  box-shadow: var(--shadow-sm);
+}
+.upsell-card-v2:active {
+  transform: scale(0.96);
+}
+.upsell-card-v2.has-image {
+  background-color: var(--orange-pale);
+}
+.upsell-card-v2.ajoute {
+  border-color: var(--orange);
+  transform: scale(1.05);
+  box-shadow: 0 8px 24px rgba(255, 107, 53, 0.35);
+}
+.upsell-emoji-v2 {
+  font-size: 80px;
+  text-align: center;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.upsell-bandeau-v2 {
+  background: #FFFFFF;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  border-top: 1px solid var(--border-soft);
+  z-index: 2;
+}
+.upsell-nom-v2 {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--text);
+  text-align: center;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+.upsell-prix-v2 {
+  font-size: 12px;
+  color: var(--orange);
+  font-weight: 700;
+  background: var(--orange-pale);
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+.upsell-actions-v2 {
+  padding: 18px 24px;
+  display: flex;
+  gap: 14px;
+  background: #FFFFFF;
+  border-top: 2px solid var(--border-soft);
+}
+.upsell-btn-skip-v2 {
+  flex: 1;
+  padding: 16px 24px;
+  border-radius: 999px;
+  background: #F5F5F5;
+  border: 2px solid var(--border-soft);
+  color: var(--text);
+  font-size: 17px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.18s;
+}
+.upsell-btn-skip-v2:active {
+  background: #E5E5E5;
+  transform: scale(0.97);
+}
+.upsell-btn-next-v2 {
+  flex: 2;
+  padding: 16px 24px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--orange), var(--orange-dark));
+  color: #FFFFFF;
+  border: none;
+  font-size: 18px;
+  font-weight: 800;
+  cursor: pointer;
+  letter-spacing: 0.01em;
+  box-shadow: 0 6px 18px rgba(255, 107, 53, 0.4);
+  transition: all 0.18s;
+}
+.upsell-btn-next-v2:active {
+  transform: scale(0.97);
+  box-shadow: 0 3px 10px rgba(255, 107, 53, 0.3);
+}
+.upsell-variantes-v2 {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: var(--bg-deep);
+}
+.upsell-variante-v2 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #FFFFFF;
+  border: 2px solid var(--border-soft);
+  border-radius: 16px;
+  padding: 18px 24px;
+  cursor: pointer;
+  transition: all 0.18s;
+}
+.upsell-variante-v2:active {
+  border-color: var(--orange);
+  background: var(--orange-pale);
+  transform: scale(0.98);
+}
+.upsell-variante-label {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text);
+}
+.upsell-variante-prix {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--orange);
+}
+
+/* ============================================================ */
 /* MODALE PARCOURS PLAT (retirable / suppléments / sauces)       */
 /* ============================================================ */
 .parcours-modal {
@@ -2038,8 +2219,15 @@ function animationAjout(el) {
 
 function allerPanier() {
   if (panier.length === 0) return;
+  
+  // ✨ NOUVEAU : Avant d'aller au panier, on déclenche la séquence d'upsells
+  // Ordre : 1. Entrées → 2. Boissons → 3. Panier final
+  declencherUpsellEntrees();
+}
+
+function ouvrirPanierFinal() {
   afficherPanier();
-  afficherFidelite();  // ✨ Mettre à jour le bandeau fidélité
+  afficherFidelite();
   allerEcran('ecran-panier');
 }
 
@@ -2200,28 +2388,203 @@ function ajouterDirect(p, options) {
 }
 
 // ============================================================
-//  💰 UPSELL — Suggestions à chaque ajout au panier
+//  💰 UPSELL — DÉSACTIVÉ (on déclenche maintenant via allerPanier)
+//  L'ancien système est remplacé par declencherUpsellEntrees + Boissons
 // ============================================================
-let upsellDejaProposees = new Set(); // Anti-spam : on ne re-propose pas dans la même commande
+let upsellDejaProposees = new Set();
 
 function declencherUpsell(produitAjoute) {
-  // Pas d'upsell ids ? Pas d'upsell
-  const ids = produitAjoute.upsell_ids;
-  if (!ids || !Array.isArray(ids) || ids.length === 0) return;
+  // ✨ DÉSACTIVÉ : remplacé par la séquence Entrées → Boissons via allerPanier
+  return;
+}
 
-  // Filtrer : on prend les produits qui existent, qui sont actifs, et qu'on n'a pas DÉJÀ proposés
-  const suggestions = ids
-    .map(id => produits.find(p => p.id === id))
-    .filter(p => p && !upsellDejaProposees.has(p.id))
-    .slice(0, 4); // Max 4 suggestions
+// ============================================================
+//  🥟 UPSELL ENTRÉES (avant boissons)
+// ============================================================
+function declencherUpsellEntrees() {
+  const cat = categories.find(c => c.nom === 'Entrées');
+  if (!cat) {
+    declencherUpsellBoissons();
+    return;
+  }
+  const entrees = produits.filter(p => p.categorie_id === cat.id && p.actif !== false);
+  if (entrees.length === 0) {
+    declencherUpsellBoissons();
+    return;
+  }
+  afficherUpsellGrille({
+    titre: '🥟 Une entrée pour accompagner ?',
+    sous: 'Ajoutez autant que vous voulez',
+    items: entrees,
+    type: 'entree',
+    onNext: () => declencherUpsellBoissons(),
+    onSkip: () => declencherUpsellBoissons()
+  });
+}
 
-  if (suggestions.length === 0) return;
+// ============================================================
+//  🍹 UPSELL BOISSONS
+// ============================================================
+function declencherUpsellBoissons() {
+  const cat = categories.find(c => c.nom === 'Boissons');
+  if (!cat) {
+    ouvrirPanierFinal();
+    return;
+  }
+  const boissons = produits.filter(p => p.categorie_id === cat.id && p.actif !== false);
+  if (boissons.length === 0) {
+    ouvrirPanierFinal();
+    return;
+  }
+  afficherUpsellGrille({
+    titre: '🍹 Et avec une boisson ?',
+    sous: 'Ajoutez autant que vous voulez',
+    items: boissons,
+    type: 'boisson',
+    onNext: () => ouvrirPanierFinal(),
+    onSkip: () => ouvrirPanierFinal()
+  });
+}
 
-  // Marquer comme proposées pour ne pas les re-suggérer
-  suggestions.forEach(p => upsellDejaProposees.add(p.id));
+// ============================================================
+//  🎨 AFFICHAGE GRILLE UPSELL (commune entrées + boissons)
+// ============================================================
+function afficherUpsellGrille(config) {
+  const modal = document.getElementById('modal-upsell') || creerModaleUpsell();
+  modal.classList.add('actif');
 
-  // Afficher la modale
-  afficherUpsell(produitAjoute, suggestions);
+  const html = `
+    <div class="upsell-content-v2">
+      <div class="upsell-head-v2">
+        <h2 class="upsell-titre-v2">${config.titre}</h2>
+        <p class="upsell-sous-v2">${config.sous}</p>
+      </div>
+      <div class="upsell-grille-v2">
+        ${config.items.map(p => {
+          const hasImage = p.image_url && p.image_url.trim() !== '';
+          const aVariantes = p.variantes && Array.isArray(p.variantes) && p.variantes.length > 1;
+          return `
+            <div class="upsell-card-v2 ${hasImage ? 'has-image' : ''}" 
+                 onclick="${aVariantes ? `ouvrirVariantesUpsell('${p.id}', '${config.type}')` : `ajouterUpsell('${p.id}', '${config.type}')`}"
+                 ${hasImage ? `style="background-image:url('${p.image_url}')"` : ''}>
+              ${!hasImage ? `<div class="upsell-emoji-v2">${emojiCat(p.nom)}</div>` : ''}
+              <div class="upsell-bandeau-v2">
+                <div class="upsell-nom-v2">${p.nom}</div>
+                <div class="upsell-prix-v2">${aVariantes ? 'dès ' : ''}${fmt(p.prix)}</div>
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+      <div class="upsell-actions-v2">
+        <button class="upsell-btn-skip-v2" onclick="fermerUpsellEtContinuer('${config.type}', 'skip')">Non merci →</button>
+        <button class="upsell-btn-next-v2" onclick="fermerUpsellEtContinuer('${config.type}', 'next')">Suivant ✓</button>
+      </div>
+    </div>
+  `;
+  modal.innerHTML = html;
+  
+  // Stocker le callback dans la modale
+  modal.dataset.onNext = '';
+  window._upsellOnNext = config.onNext;
+  window._upsellOnSkip = config.onSkip;
+}
+
+function creerModaleUpsell() {
+  // Si elle n'existe pas, on la crée
+  let modal = document.getElementById('modal-upsell');
+  if (modal) return modal;
+  modal = document.createElement('div');
+  modal.id = 'modal-upsell';
+  modal.className = 'parcours-modal';
+  document.body.appendChild(modal);
+  return modal;
+}
+
+function ajouterUpsell(produitId, type) {
+  const p = produits.find(x => x.id === produitId);
+  if (!p) return;
+  
+  // Ajout direct au panier
+  const ligne = panier.find(l => l.produit_id === p.id && !l.options && !l.variante);
+  if (ligne) {
+    ligne.quantite++;
+  } else {
+    panier.push({
+      produit_id: p.id,
+      nom: p.nom,
+      prix: parseFloat(p.prix),
+      quantite: 1,
+      emoji: emojiCat(p.nom)
+    });
+  }
+  majBarrePanier();
+  
+  // Animation de feedback
+  const card = event.target.closest('.upsell-card-v2');
+  if (card) {
+    card.classList.add('ajoute');
+    setTimeout(() => card.classList.remove('ajoute'), 600);
+  }
+}
+
+function ouvrirVariantesUpsell(produitId, type) {
+  const p = produits.find(x => x.id === produitId);
+  if (!p) return;
+  
+  const modal = document.getElementById('modal-upsell');
+  const html = `
+    <div class="upsell-content-v2">
+      <div class="upsell-head-v2">
+        <h2 class="upsell-titre-v2">${p.nom}</h2>
+        <p class="upsell-sous-v2">Choisissez la quantité</p>
+      </div>
+      <div class="upsell-variantes-v2">
+        ${p.variantes.map((v, i) => `
+          <div class="upsell-variante-v2" onclick="choisirVarianteUpsell('${p.id}', ${i})">
+            <span class="upsell-variante-label">${v.label}</span>
+            <span class="upsell-variante-prix">${fmt(v.prix)}</span>
+          </div>
+        `).join('')}
+      </div>
+      <div class="upsell-actions-v2">
+        <button class="upsell-btn-skip-v2" onclick="declencherUpsellEntrees()">← Retour</button>
+      </div>
+    </div>
+  `;
+  modal.innerHTML = html;
+}
+
+function choisirVarianteUpsell(produitId, indexVariante) {
+  const p = produits.find(x => x.id === produitId);
+  if (!p) return;
+  const variante = p.variantes[indexVariante];
+  if (!variante) return;
+  
+  // Ajout au panier (toujours nouvelle ligne car variante différente)
+  panier.push({
+    produit_id: p.id,
+    nom: p.nom + ' (' + variante.label + ')',
+    prix: parseFloat(variante.prix),
+    quantite: 1,
+    emoji: emojiCat(p.nom),
+    variante: variante.label
+  });
+  majBarrePanier();
+  
+  // Retour à la grille (entrées ou boissons selon le contexte)
+  declencherUpsellEntrees();
+}
+
+function fermerUpsellEtContinuer(type, action) {
+  const modal = document.getElementById('modal-upsell');
+  if (modal) modal.classList.remove('actif');
+  
+  if (action === 'skip' && window._upsellOnSkip) {
+    window._upsellOnSkip();
+  } else if (action === 'next' && window._upsellOnNext) {
+    window._upsellOnNext();
+  }
 }
 
 // ============================================================
