@@ -123,169 +123,6 @@ html, body {
 }
 .link-btn:hover { color: var(--text); border-color: var(--gold-soft); }
 
-/* Bouton commandes borne en attente */
-.btn-borne-attente {
-  background: linear-gradient(135deg, var(--gold) 0%, #d4a456 100%) !important;
-  color: var(--bg-deep) !important;
-  font-weight: 700;
-  border: none !important;
-  animation: pulseBorne 2s ease-in-out infinite;
-}
-.btn-borne-attente:hover {
-  filter: brightness(1.1);
-  border: none !important;
-}
-.badge-attente {
-  display: inline-block;
-  background: var(--sriracha);
-  color: #fff;
-  font-size: 12px;
-  font-weight: 800;
-  padding: 2px 8px;
-  border-radius: 999px;
-  margin-left: 6px;
-  min-width: 22px;
-}
-@keyframes pulseBorne {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(228,184,96,0.6); }
-  50% { box-shadow: 0 0 0 10px rgba(228,184,96,0); }
-}
-
-/* Modale paiements en attente */
-.borne-modal {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.85);
-  z-index: 5000;
-  display: none;
-  align-items: flex-start;
-  justify-content: center;
-  padding: 60px 20px 20px;
-  overflow-y: auto;
-}
-.borne-modal.actif { display: flex; }
-.borne-modal-content {
-  background: var(--surface-2);
-  border: 1.5px solid var(--gold);
-  border-radius: 20px;
-  padding: 28px;
-  max-width: 900px;
-  width: 100%;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.7);
-}
-.borne-modal-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 22px;
-  padding-bottom: 18px;
-  border-bottom: 1px solid var(--border);
-}
-.borne-modal-titre {
-  font-family: var(--display);
-  font-size: 28px;
-  font-weight: 500;
-}
-.borne-modal-close {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  color: var(--text-soft);
-  padding: 10px 18px;
-  border-radius: 999px;
-  cursor: pointer;
-  font-weight: 600;
-}
-.borne-attente-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 16px;
-}
-.borne-attente-card {
-  background: linear-gradient(160deg, var(--surface), var(--surface-2));
-  border: 1px solid var(--gold-soft);
-  border-radius: 16px;
-  padding: 18px;
-  position: relative;
-}
-.borne-attente-numero {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  background: var(--gold);
-  color: var(--bg-deep);
-  font-size: 24px;
-  font-weight: 800;
-  padding: 8px 16px;
-  border-radius: 999px;
-  font-family: var(--display);
-}
-.borne-attente-mode {
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--gold);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  margin-bottom: 4px;
-}
-.borne-attente-heure {
-  font-size: 12px;
-  color: var(--text-mute);
-  margin-bottom: 14px;
-}
-.borne-attente-lignes {
-  margin-bottom: 14px;
-}
-.borne-attente-ligne {
-  font-size: 14px;
-  padding: 4px 0;
-  color: var(--text-soft);
-}
-.borne-attente-total {
-  font-family: var(--display);
-  font-size: 24px;
-  color: var(--gold);
-  font-weight: 500;
-  text-align: right;
-  border-top: 1px solid var(--border);
-  padding-top: 12px;
-  margin-bottom: 14px;
-}
-.borne-attente-actions {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-}
-.btn-encaisser {
-  background: linear-gradient(135deg, var(--lime, #A8E10C) 0%, #94c510 100%);
-  color: var(--bg-deep);
-  border: none;
-  padding: 12px;
-  border-radius: 10px;
-  font-weight: 700;
-  cursor: pointer;
-  font-size: 14px;
-}
-.btn-encaisser:hover { filter: brightness(1.1); }
-.btn-annuler-borne {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  color: var(--text-soft);
-  padding: 12px;
-  border-radius: 10px;
-  font-weight: 600;
-  cursor: pointer;
-  font-size: 14px;
-}
-.borne-attente-vide {
-  text-align: center;
-  padding: 60px 20px;
-  color: var(--text-mute);
-}
-.borne-attente-vide .big {
-  font-size: 60px;
-  margin-bottom: 16px;
-}
-
 /* Filtres catégories */
 .cats {
   display: flex;
@@ -333,62 +170,16 @@ html, body {
 .produit-card {
   position: relative;
   background: linear-gradient(160deg, var(--surface-2) 0%, var(--surface) 100%);
-  background-size: cover;
-  background-position: center;
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 0;
+  padding: 18px 16px;
   cursor: pointer;
   transition: all 0.18s;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
-  aspect-ratio: 4 / 5;
+  justify-content: space-between;
+  min-height: 110px;
   overflow: hidden;
-}
-.produit-card.has-image::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(to top, rgba(10,9,8,0.95) 0%, rgba(10,9,8,0.5) 50%, transparent 100%);
-  z-index: 1;
-}
-.produit-bandeau {
-  position: relative;
-  z-index: 2;
-  padding: 14px 14px 12px;
-}
-.produit-card:not(.has-image) {
-  padding: 18px 16px;
-  justify-content: space-between;
-  aspect-ratio: auto;
-  min-height: 110px;
-}
-.produit-card:not(.has-image) .produit-bandeau {
-  padding: 0;
-  margin-top: auto;
-}
-.produit-card.has-image::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(to top, rgba(10,9,8,0.95) 0%, rgba(10,9,8,0.5) 50%, transparent 100%);
-  z-index: 1;
-}
-.produit-bandeau {
-  position: relative;
-  z-index: 2;
-  padding: 14px 14px 12px;
-}
-.produit-card:not(.has-image) {
-  padding: 18px 16px;
-  justify-content: space-between;
-  aspect-ratio: auto;
-  min-height: 110px;
-}
-.produit-card:not(.has-image) .produit-bandeau {
-  padding: 0;
-  margin-top: auto;
 }
 .produit-card::after {
   content: '';
@@ -730,156 +521,6 @@ html, body {
 }
 .scan-status.ok { color: var(--lime); font-weight: 600; }
 .scan-status.err { color: var(--danger); font-weight: 600; }
-
-/* ===== ONGLETS DE LA MODALE SCAN ===== */
-.scan-tabs {
-  display: flex;
-  gap: 4px;
-  margin-bottom: 16px;
-  background: var(--bg-deep, #0a0908);
-  padding: 4px;
-  border-radius: 12px;
-  border: 1px solid var(--border);
-}
-.scan-tab {
-  flex: 1;
-  background: transparent;
-  border: none;
-  padding: 9px 8px;
-  border-radius: 8px;
-  color: var(--text-mute);
-  font-size: 12px;
-  font-weight: 700;
-  cursor: pointer;
-  font-family: inherit;
-  transition: all 0.15s;
-  white-space: nowrap;
-}
-.scan-tab.active {
-  background: var(--surface-2);
-  color: var(--gold);
-}
-.scan-tab:hover:not(.active) { color: var(--text-soft); }
-
-/* ===== MODE TÉLÉPHONE ===== */
-.tel-search-input {
-  width: 100%;
-  padding: 16px 18px;
-  background: var(--bg-deep);
-  border: 1px solid var(--border);
-  border-radius: 13px;
-  color: var(--text);
-  font-size: 18px;
-  font-family: var(--mono, monospace);
-  letter-spacing: 0.05em;
-  outline: none;
-  margin: 12px 0 8px;
-  text-align: center;
-}
-.tel-search-input:focus { border-color: var(--gold-soft); }
-
-.tel-resultats {
-  max-height: 280px;
-  overflow-y: auto;
-  margin: 8px 0;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-.tel-resultat-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px;
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all 0.15s;
-}
-.tel-resultat-row:hover { border-color: var(--gold-soft); }
-.tel-resultat-row:active { transform: scale(0.98); }
-.tel-resultat-avatar {
-  width: 36px; height: 36px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--gold), var(--gold-soft));
-  color: var(--bg-deep);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  font-size: 13px;
-  flex-shrink: 0;
-}
-.tel-resultat-info { flex: 1; min-width: 0; }
-.tel-resultat-nom {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--text);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.tel-resultat-meta {
-  font-size: 11px;
-  color: var(--text-mute);
-  margin-top: 2px;
-}
-.tel-resultat-tampons {
-  font-size: 12px;
-  color: var(--gold);
-  font-weight: 700;
-  white-space: nowrap;
-}
-
-.tel-pas-resultat {
-  background: var(--surface-2);
-  border: 1px dashed var(--border);
-  border-radius: 14px;
-  padding: 20px 16px;
-  text-align: center;
-}
-.tel-pas-resultat p {
-  font-size: 13px;
-  color: var(--text-mute);
-  margin-bottom: 12px;
-}
-.tel-btn-creer {
-  background: linear-gradient(135deg, var(--lime, #A8E10C), var(--lime-soft, #82B509));
-  color: var(--bg-deep);
-  border: none;
-  border-radius: 12px;
-  padding: 12px 18px;
-  font-size: 13px;
-  font-weight: 700;
-  cursor: pointer;
-  font-family: inherit;
-}
-.tel-btn-creer:active { transform: scale(0.97); }
-
-.tel-field { margin-bottom: 12px; }
-.tel-field label {
-  display: block;
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--text-mute);
-  font-weight: 700;
-  margin-bottom: 6px;
-}
-.tel-field input {
-  width: 100%;
-  padding: 13px 14px;
-  background: var(--bg-deep);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  color: var(--text);
-  font-size: 16px;
-  font-family: inherit;
-  outline: none;
-  -webkit-appearance: none;
-}
-.tel-field input:focus { border-color: var(--gold-soft); }
 
 /* Pied ticket */
 .ticket-foot {
@@ -1569,14 +1210,164 @@ html, body {
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
+/* ===== MODALE PARCOURS PLAT (sauces/suppl/retirables/etc.) ===== */
+.mpp-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(5,4,3,0.85);
+  backdrop-filter: blur(8px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 3000;
+  padding: 20px;
+}
+.mpp-modal.actif { display: flex; }
+.mpp-content {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  padding: 24px;
+  max-width: 520px;
+  width: 100%;
+  max-height: 88vh;
+  overflow-y: auto;
+}
+.mpp-head { text-align: center; margin-bottom: 18px; }
+.mpp-head h3 {
+  font-family: var(--display);
+  font-size: 22px;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+.mpp-head p { font-size: 13px; color: var(--text-mute); }
+.mpp-bloc { margin-bottom: 16px; }
+.mpp-lbl {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-mute);
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.mpp-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.mpp-option {
+  padding: 14px 12px;
+  border: 1.5px solid var(--border);
+  background: var(--surface-2);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+  font-family: var(--body);
+  cursor: pointer;
+  transition: all 0.15s;
+  text-align: center;
+}
+.mpp-option:hover { border-color: var(--gold-soft); }
+.mpp-option.active {
+  border-color: var(--gold);
+  background: rgba(228,184,96,0.12);
+  color: var(--gold);
+}
+.mpp-opt-lbl { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+.mpp-opt-prix {
+  font-family: var(--display);
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--gold);
+}
+.mpp-prix {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--gold);
+  margin-left: 4px;
+}
+.mpp-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+.mpp-actions button {
+  flex: 1;
+  padding: 14px;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  font-family: var(--body);
+}
+
+/* ===== SOUS-CATÉGORIES (Sushi → California, Makis, Tigers, etc.) ===== */
+.sous-cats {
+  display: flex;
+  gap: 8px;
+  padding: 0 28px 12px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  flex-shrink: 0;
+}
+.sous-cats:empty { display: none; }
+.sous-cats::-webkit-scrollbar { display: none; }
+.sous-cat-chip {
+  flex-shrink: 0;
+  padding: 7px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-mute);
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.sous-cat-chip:hover { border-color: var(--gold-soft); }
+.sous-cat-chip.active {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: var(--bg-deep);
+}
+
+/* ===== CARTES PRODUITS AVEC IMAGE ===== */
+.produit-card.has-image {
+  background-size: cover;
+  background-position: center;
+  padding: 0;
+  justify-content: flex-end;
+  min-height: 180px;
+}
+.produit-card.has-image::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(10,9,8,0.95) 0%, rgba(10,9,8,0.6) 45%, transparent 100%);
+  z-index: 1;
+}
+.produit-bandeau {
+  position: relative;
+  z-index: 2;
+}
+.produit-card.has-image .produit-bandeau {
+  padding: 12px 12px 10px;
+}
+
 /* ===== RESPONSIVE TABLETTE ===== */
 @media (max-width: 1100px) {
   .caisse { grid-template-columns: 1fr 340px; }
   .produits-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; padding: 4px 18px 18px; }
-  .cats { padding: 14px 18px; }
+  .cats { padding: 14px 18px; gap: 8px; }
+  .sous-cats { padding: 0 18px 10px; }
   .topbar { padding: 14px 18px; }
   .produit-nom { font-size: 13px; }
   .produit-prix { font-size: 17px; }
+  .produit-card.has-image { min-height: 160px; }
 }
 @media (max-width: 920px) {
   .caisse { grid-template-columns: 1fr; grid-template-rows: 1fr auto; }
@@ -1591,6 +1382,7 @@ html, body {
   .produits-grid { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); }
   .ticket-head h2 { font-size: 18px; }
   .total-row .val { font-size: 30px; }
+  .produit-card.has-image { min-height: 140px; }
 }
 </style>
 </head>
@@ -1613,9 +1405,6 @@ html, body {
       </div>
       <div class="topbar-right">
         <div class="clock" id="clock">--:--</div>
-        <button class="link-btn btn-borne-attente" id="btn-borne-attente" onclick="ouvrirPaiementsAttente()" style="display:none;position:relative;">
-          🔔 Commandes borne <span id="nb-borne-attente" class="badge-attente">0</span>
-        </button>
         <button class="link-btn" onclick="ouvrirHistorique()">🧾 Historique</button>
         <button class="link-btn" onclick="ouvrirCloture()">🔒 Clôture Z</button>
         <a href="index.html" class="link-btn">← Gestion</a>
@@ -1750,13 +1539,6 @@ html, body {
   <div class="modal">
     <div class="scan-modal-inner">
 
-      <!-- ONGLETS DE NAVIGATION ENTRE MODES -->
-      <div class="scan-tabs">
-        <button class="scan-tab active" data-mode="physique" onclick="basculerPhysique()">🔫 Douchette</button>
-        <button class="scan-tab" data-mode="camera" onclick="basculerCamera()">📷 Caméra</button>
-        <button class="scan-tab" data-mode="telephone" onclick="basculerTelephone()">📞 Téléphone</button>
-      </div>
-
       <!-- MODE 1 : SCANNER PHYSIQUE (par défaut) -->
       <div id="mode-physique">
         <h3>Prêt à scanner</h3>
@@ -1770,6 +1552,7 @@ html, body {
         <div class="scan-status" id="scan-status">En attente du scan…</div>
         <div class="modal-actions">
           <button class="btn-annuler" onclick="fermerScanFid()">Annuler</button>
+          <button class="btn-annuler" onclick="basculerCamera()">📷 Utiliser la caméra</button>
         </div>
       </div>
 
@@ -1781,45 +1564,7 @@ html, body {
         <div class="scan-status" id="scan-status-cam">Ouverture de la caméra…</div>
         <div class="modal-actions">
           <button class="btn-annuler" onclick="fermerScanFid()">Annuler</button>
-        </div>
-      </div>
-
-      <!-- MODE 3 : RECHERCHE PAR TÉLÉPHONE (commande téléphone) -->
-      <div id="mode-telephone" style="display:none;">
-        <h3>Recherche par téléphone</h3>
-        <div class="modal-total">Tapez le numéro du client</div>
-
-        <!-- VUE A : Recherche -->
-        <div id="tel-vue-recherche">
-          <input type="tel" id="tel-search" class="tel-search-input" placeholder="06 12 34 56 78" autocomplete="off">
-          <div class="scan-status" id="tel-status">Saisissez au moins 4 chiffres…</div>
-
-          <div class="tel-resultats" id="tel-resultats"></div>
-
-          <div class="modal-actions">
-            <button class="btn-annuler" onclick="fermerScanFid()">Annuler</button>
-          </div>
-        </div>
-
-        <!-- VUE B : Création rapide d'un nouveau client -->
-        <div id="tel-vue-creation" style="display:none;">
-          <div style="margin-bottom:12px; font-size:13px; color:var(--text-mute);">Nouveau client</div>
-          <div class="tel-field">
-            <label>Prénom</label>
-            <input type="text" id="new-client-nom" placeholder="Ex : Karim">
-          </div>
-          <div class="tel-field">
-            <label>Téléphone</label>
-            <input type="tel" id="new-client-tel" placeholder="06 12 34 56 78">
-          </div>
-          <div class="tel-field">
-            <label>Anniversaire <span style="color:var(--text-mute);font-weight:400;">(optionnel)</span></label>
-            <input type="date" id="new-client-anniv">
-          </div>
-          <div class="modal-actions" style="margin-top:14px;">
-            <button class="btn-annuler" onclick="retourRechercheTel()">← Retour</button>
-            <button class="btn-encaisser" onclick="creerClientRapide()" id="btn-creer-client">Créer et attacher</button>
-          </div>
+          <button class="btn-annuler" onclick="basculerPhysique()">⌨️ Scanner physique</button>
         </div>
       </div>
 
@@ -1911,17 +1656,6 @@ html, body {
   </div>
 </div>
 
-<!-- ===== MODALE PAIEMENTS BORNE EN ATTENTE ===== -->
-<div class="borne-modal" id="borne-modal-attente">
-  <div class="borne-modal-content">
-    <div class="borne-modal-head">
-      <div class="borne-modal-titre">🔔 Commandes borne en attente</div>
-      <button class="borne-modal-close" onclick="fermerPaiementsAttente()">✕ Fermer</button>
-    </div>
-    <div id="borne-attente-liste"></div>
-  </div>
-</div>
-
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
@@ -1938,7 +1672,8 @@ const sb = supabase.createClient(SB_URL, SB_KEY);
 // ============================================
 let produits = [];        // tous les produits chargés
 let categories = [];      // catégories
-let catActive = 'tout';   // filtre catégorie actif
+let catActive = null;       // filtre catégorie actif (auto-sélection 1ère cat top-level)
+let catParente = null;      // si on a cliqué sur une cat avec sous-cats, ID du parent en mémoire
 let ticket = [];          // [{produit_id, nom, prix, quantite, stock_actif, stock}]
 let modePaiement = 'especes';
 let canalVente = 'sur_place';
@@ -1956,245 +1691,6 @@ let remise = null;  // { type: 'pct'|'montant', valeur: number }  ou null
 
 // --- Historique (mémorise les ventes du jour pour générer les tickets) ---
 let ventesDuJour = [];
-
-// ============================================
-//  🔔 PAIEMENTS BORNE EN ATTENTE
-// ============================================
-let paiementsBorneAttente = [];
-let subBorneAttente = null;
-
-async function chargerPaiementsBorneAttente() {
-  try {
-    const { data, error } = await sb
-      .from('ventes')
-      .select('id, numero, total, mode_service, cree_le, client_id')
-      .eq('restaurant_id', RESTO_ID)
-      .eq('statut', 'en_attente')
-      .order('cree_le', { ascending: true });
-
-    if (error) {
-      console.error('Erreur chargement paiements attente:', error);
-      return;
-    }
-
-    // Pour chaque vente, charger les lignes
-    const ventesAvecLignes = await Promise.all((data || []).map(async (v) => {
-      const { data: lignes } = await sb
-        .from('lignes_vente')
-        .select('nom_produit, quantite, prix_unitaire, sous_total')
-        .eq('vente_id', v.id);
-      return { ...v, lignes: lignes || [] };
-    }));
-
-    paiementsBorneAttente = ventesAvecLignes;
-    majAffichageBorneAttente();
-  } catch (e) {
-    console.error('Erreur:', e);
-  }
-}
-
-function majAffichageBorneAttente() {
-  const nb = paiementsBorneAttente.length;
-  const btn = document.getElementById('btn-borne-attente');
-  const badge = document.getElementById('nb-borne-attente');
-
-  if (nb > 0) {
-    btn.style.display = 'inline-flex';
-    badge.textContent = nb;
-  } else {
-    btn.style.display = 'none';
-  }
-
-  // Si la modale est ouverte, on rafraîchit
-  if (document.getElementById('borne-modal-attente').classList.contains('actif')) {
-    afficherListePaiementsAttente();
-  }
-}
-
-function subscribeBorneAttente() {
-  // Realtime sur les ventes en attente
-  if (subBorneAttente) {
-    sb.removeChannel(subBorneAttente);
-  }
-  subBorneAttente = sb
-    .channel('borne-attente')
-    .on('postgres_changes',
-      { event: '*', schema: 'public', table: 'ventes', filter: `restaurant_id=eq.${RESTO_ID}` },
-      () => { chargerPaiementsBorneAttente(); }
-    )
-    .subscribe();
-}
-
-function ouvrirPaiementsAttente() {
-  document.getElementById('borne-modal-attente').classList.add('actif');
-  afficherListePaiementsAttente();
-}
-
-function fermerPaiementsAttente() {
-  document.getElementById('borne-modal-attente').classList.remove('actif');
-}
-
-function afficherListePaiementsAttente() {
-  const zone = document.getElementById('borne-attente-liste');
-  if (paiementsBorneAttente.length === 0) {
-    zone.innerHTML = `
-      <div class="borne-attente-vide">
-        <div class="big">✅</div>
-        <p>Aucune commande borne en attente</p>
-      </div>`;
-    return;
-  }
-
-  let html = '<div class="borne-attente-grid">';
-  paiementsBorneAttente.forEach(v => {
-    const heure = new Date(v.cree_le).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
-    const mode = v.mode_service === 'sur_place' ? '🍽️ Sur place' : '🥡 À emporter';
-    const total = Number(v.total || 0).toFixed(2).replace('.', ',');
-    let lignesHtml = '';
-    v.lignes.forEach(l => {
-      lignesHtml += `<div class="borne-attente-ligne">${l.quantite}× ${l.nom_produit}</div>`;
-    });
-    html += `
-      <div class="borne-attente-card">
-        <div class="borne-attente-numero">#${v.numero}</div>
-        <div class="borne-attente-mode">${mode}</div>
-        <div class="borne-attente-heure">${heure}</div>
-        <div class="borne-attente-lignes">${lignesHtml}</div>
-        <div class="borne-attente-total">${total} €</div>
-        <div class="borne-attente-actions">
-          <button class="btn-annuler-borne" onclick="annulerBorne('${v.id}')">Annuler</button>
-          <button class="btn-encaisser" onclick="encaisserBorne('${v.id}', ${v.total})">💰 Encaisser</button>
-        </div>
-      </div>
-    `;
-  });
-  html += '</div>';
-  zone.innerHTML = html;
-}
-
-// ID de la vente borne en cours d'encaissement (pour link la finalisation)
-let venteBorneEnCours = null;
-
-async function encaisserBorne(venteId, total) {
-  // On charge la commande borne dans le ticket actuel pour que le caissier encaisse normalement
-  try {
-    // Trouver la commande dans la liste
-    const venteBorne = paiementsBorneAttente.find(v => v.id === venteId);
-    if (!venteBorne) {
-      alert('Commande non trouvée');
-      return;
-    }
-
-    // Si le ticket actuel n'est pas vide, demander confirmation
-    if (ticket.length > 0) {
-      if (!confirm('Le ticket actuel sera remplacé par la commande borne. Continuer ?')) return;
-    }
-
-    // Vider le ticket actuel
-    ticket = [];
-    clientFid = null;
-    remise = null;
-    platOffertApplique = false;
-
-    // Reset le mode paiement (le caissier va choisir)
-    modePaiement = 'especes';
-
-    // Charger les plats de la borne dans le ticket
-    for (const ligne of venteBorne.lignes) {
-      // Trouver le produit complet dans la liste
-      const produit = produits.find(p => p.id === ligne.produit_id) ||
-                      produits.find(p => p.nom === ligne.nom_produit);
-      if (produit) {
-        const dansLeTicket = ticket.find(l => l.produit_id === produit.id);
-        if (dansLeTicket) {
-          dansLeTicket.quantite += ligne.quantite;
-        } else {
-          ticket.push({
-            produit_id: produit.id,
-            nom: produit.nom,
-            prix: parseFloat(ligne.prix_unitaire),
-            quantite: ligne.quantite,
-            stock_actif: produit.stock_actif,
-            stock: produit.stock,
-            categorie_id: produit.categorie_id
-          });
-        }
-      } else {
-        // Produit non trouvé (peut-être supprimé) → on ajoute quand même avec produit_id fictif
-        ticket.push({
-          produit_id: ligne.produit_id,
-          nom: ligne.nom_produit,
-          prix: parseFloat(ligne.prix_unitaire),
-          quantite: ligne.quantite,
-          stock_actif: false,
-          stock: 0,
-          categorie_id: null
-        });
-      }
-    }
-
-    // Charger le canal (sur_place / emporter)
-    canalVente = venteBorne.mode_service || 'sur_place';
-    if (typeof choisirCanal === 'function') {
-      // Mettre à jour l'UI du canal
-      document.querySelectorAll('[data-canal]').forEach(el => {
-        el.classList.toggle('active', el.dataset.canal === canalVente);
-      });
-    }
-
-    // Charger le client si fidélité
-    if (venteBorne.client_id) {
-      const { data: client } = await sb
-        .from('clients')
-        .select('*')
-        .eq('id', venteBorne.client_id)
-        .single();
-      if (client) {
-        clientFid = client;
-      }
-    }
-
-    // Mémoriser la vente borne pour la finaliser au lieu d'en créer une nouvelle
-    venteBorneEnCours = venteId;
-
-    // Afficher l'état dans le ticket avec une mention "Commande borne #X"
-    document.getElementById('ticket-num').innerHTML =
-      `🍜 Commande borne <b style="color:var(--gold)">#${venteBorne.numero}</b>`;
-
-    afficherTicket();
-    if (typeof majFidelite === 'function') majFidelite();
-
-    // Fermer la modale
-    fermerPaiementsAttente();
-
-    // Toast informatif
-    const toast = document.getElementById('toast');
-    document.getElementById('toast-title').textContent = '🍜 Commande borne chargée';
-    document.getElementById('toast-sub').textContent = `Cliquez sur Encaisser pour valider`;
-    toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 3000);
-
-  } catch (e) {
-    console.error('Erreur:', e);
-    alert('Erreur : ' + e.message);
-  }
-}
-
-async function annulerBorne(venteId) {
-  if (!confirm('Annuler cette commande borne ? Le client ne sera pas servi.')) return;
-
-  try {
-    const { error } = await sb
-      .from('ventes')
-      .update({ statut: 'annulé', annulee: true })
-      .eq('id', venteId);
-
-    if (error) throw error;
-    await chargerPaiementsBorneAttente();
-  } catch (e) {
-    alert('Erreur : ' + e.message);
-  }
-}
 
 // ============================================
 //  HORLOGE
@@ -2222,8 +1718,6 @@ async function init() {
     }
     gate.classList.add('hidden');
     await chargerMenu();
-    await chargerPaiementsBorneAttente();
-    subscribeBorneAttente();
   } catch (e) {
     gateMsg.textContent = 'Erreur de connexion : ' + e.message;
     gate.querySelector('.spinner').style.display = 'none';
@@ -2255,15 +1749,79 @@ async function chargerMenu() {
 
 function afficherCats() {
   const zone = document.getElementById('cats');
-  let html = `<div class="cat-chip ${catActive==='tout'?'active':''}" onclick="filtrerCat('tout')">Tout</div>`;
-  categories.forEach(c => {
-    html += `<div class="cat-chip ${catActive===c.id?'active':''}" onclick="filtrerCat('${c.id}')">${c.nom}</div>`;
+  
+  // Catégories TOP-LEVEL (pas de parent) qui ont du contenu (produits OU sous-cats)
+  const topCats = categories.filter(c => !c.parent_id);
+  const catsAvecContenu = topCats.filter(c => {
+    const aProduits = produits.some(p => p.categorie_id === c.id);
+    const aSousCats = categories.some(sc => sc.parent_id === c.id);
+    return aProduits || aSousCats;
   });
+  
+  // Auto-sélection : 1ère catégorie au démarrage
+  if (!catActive && catsAvecContenu.length > 0) {
+    const premiere = catsAvecContenu[0];
+    catActive = premiere.id;
+  }
+  
+  // Trouver la catégorie active et son parent éventuel
+  const catActiveObj = categories.find(c => c.id === catActive);
+  const parentActif = catActiveObj && catActiveObj.parent_id ? catActiveObj.parent_id : catActive;
+  
+  let html = '';
+  
+  // Tabs des cat TOP-LEVEL
+  catsAvecContenu.forEach(c => {
+    const isActive = (c.id === parentActif);
+    html += `<div class="cat-chip ${isActive?'active':''}" onclick="filtrerCat('${c.id}')">${c.nom}</div>`;
+  });
+  
   zone.innerHTML = html;
+  
+  // Affiche aussi les sous-cats si on est dans une cat parente
+  afficherSousCats(parentActif);
+}
+
+function afficherSousCats(parentId) {
+  let zoneSC = document.getElementById('sous-cats');
+  
+  const sousCats = categories
+    .filter(sc => sc.parent_id === parentId)
+    .sort((a, b) => (a.ordre || 999) - (b.ordre || 999));
+  
+  // Si pas de sous-cats, on cache la zone
+  if (sousCats.length === 0) {
+    if (zoneSC) zoneSC.innerHTML = '';
+    return;
+  }
+  
+  // Créer la zone si elle n'existe pas
+  if (!zoneSC) {
+    zoneSC = document.createElement('div');
+    zoneSC.id = 'sous-cats';
+    zoneSC.className = 'sous-cats';
+    document.getElementById('cats').after(zoneSC);
+  }
+  
+  let html = '';
+  sousCats.forEach(sc => {
+    const isActive = (sc.id === catActive);
+    html += `<div class="sous-cat-chip ${isActive?'active':''}" onclick="filtrerCat('${sc.id}')">${sc.nom}</div>`;
+  });
+  zoneSC.innerHTML = html;
 }
 
 function filtrerCat(id) {
-  catActive = id;
+  // Si la cat a des sous-cats, on sélectionne automatiquement la 1ère sous-cat
+  const sousCats = categories
+    .filter(sc => sc.parent_id === id)
+    .sort((a, b) => (a.ordre || 999) - (b.ordre || 999));
+  
+  if (sousCats.length > 0) {
+    catActive = sousCats[0].id;  // active la 1ère sous-cat
+  } else {
+    catActive = id;
+  }
   afficherCats();
   afficherProduits();
 }
@@ -2271,12 +1829,12 @@ function filtrerCat(id) {
 function afficherProduits() {
   const grid = document.getElementById('produits-grid');
   let liste = produits;
-  if (catActive !== 'tout') liste = produits.filter(p => p.categorie_id === catActive);
+  if (catActive) liste = produits.filter(p => p.categorie_id === catActive);
 
   if (liste.length === 0) {
     grid.innerHTML = `<div class="empty-state">
       <div class="big">🍜</div>
-      <p>Aucun produit dans le menu.<br>Ajoutez vos plats dans la table <b>produits</b> de Supabase,<br>ou via la page Gestion.</p>
+      <p>Aucun produit dans cette catégorie.</p>
     </div>`;
     return;
   }
@@ -2292,7 +1850,7 @@ function afficherProduits() {
     }
     const hasImage = p.image_url && p.image_url.trim() !== '';
     return `
-      <div class="produit-card ${rupture?'rupture':''} ${hasImage?'has-image':''}" onclick="ajouter('${p.id}')"
+      <div class="produit-card ${rupture?'rupture':''} ${hasImage?'has-image':''}" onclick="ajouterAvecParcours('${p.id}')"
            ${hasImage?`style="background-image:url('${p.image_url}')"`:''}>
         ${rupture ? '<div class="badge-rupture">Épuisé</div>' : ''}
         <div class="produit-bandeau">
@@ -2307,7 +1865,549 @@ function afficherProduits() {
 }
 
 // ============================================
-//  GESTION DU TICKET
+//  AJOUT AVEC PARCOURS (options_base, retirables, suppléments, sauces, formules)
+// ============================================
+let parcoursPlat = null;
+
+function ajouterAvecParcours(produitId) {
+  const p = produits.find(x => x.id === produitId);
+  if (!p) return;
+
+  // Vérifier stock
+  if (p.stock_actif && p.stock <= 0) { flashStock(); return; }
+
+  // Si pas d'options ni de parcours, ajouter directement
+  const aOptionsBase = p.options_base && Array.isArray(p.options_base) && p.options_base.length > 0;
+  const aRetirables = p.ingredients_retirable && p.ingredients_retirable.length > 0;
+  const aSupplements = p.supplements_ids && p.supplements_ids.length > 0;
+  const aSauces = p.sauces_ids && p.sauces_ids.length > 0;
+  const aVariantes = p.variantes && Array.isArray(p.variantes) && p.variantes.length > 0;
+  const estFormule = p.est_formule === true;
+
+  if (!aOptionsBase && !aRetirables && !aSupplements && !aSauces && !aVariantes && !estFormule) {
+    // Plat simple → ajout direct
+    ajouterSimple(p);
+    return;
+  }
+
+  // Lancer le parcours
+  parcoursPlat = {
+    produit: p,
+    options_base: {},
+    retirables: [],
+    supplements: [],
+    sauces: [],
+    variante: null,
+    est_formule: estFormule,
+    formule_boisson_id: null,
+    formule_entree_id: null,
+    formule_entree_label: null,
+    etape: 'variante'
+  };
+
+  // Démarrer la 1ère étape applicable
+  passerEtapeParcours();
+}
+
+function passerEtapeParcours() {
+  if (!parcoursPlat) return;
+  const p = parcoursPlat.produit;
+  const e = parcoursPlat.etape;
+
+  if (e === 'variante') {
+    if (p.variantes && p.variantes.length > 0) {
+      afficherModaleVariante();
+      return;
+    }
+    parcoursPlat.etape = 'options_base';
+    passerEtapeParcours();
+  } else if (e === 'options_base') {
+    if (p.options_base && p.options_base.length > 0) {
+      afficherModaleOptionsBase();
+      return;
+    }
+    parcoursPlat.etape = 'retirables';
+    passerEtapeParcours();
+  } else if (e === 'retirables') {
+    if (p.ingredients_retirable && p.ingredients_retirable.length > 0) {
+      afficherModaleRetirables();
+      return;
+    }
+    parcoursPlat.etape = 'supplements';
+    passerEtapeParcours();
+  } else if (e === 'supplements') {
+    if (p.supplements_ids && p.supplements_ids.length > 0) {
+      afficherModaleSupplements();
+      return;
+    }
+    parcoursPlat.etape = 'sauces';
+    passerEtapeParcours();
+  } else if (e === 'sauces') {
+    if (p.sauces_ids && p.sauces_ids.length > 0) {
+      afficherModaleSauces();
+      return;
+    }
+    parcoursPlat.etape = 'formule_boisson';
+    passerEtapeParcours();
+  } else if (e === 'formule_boisson') {
+    if (parcoursPlat.est_formule) {
+      afficherModaleFormuleBoisson();
+      return;
+    }
+    finaliserParcours();
+  } else if (e === 'formule_entree') {
+    afficherModaleFormuleEntree();
+  } else if (e === 'fini') {
+    finaliserParcours();
+  }
+}
+
+function finaliserParcours() {
+  if (!parcoursPlat) return;
+  const p = parcoursPlat.produit;
+  
+  // Calculer prix unitaire (avec variante éventuelle)
+  let prixUnit = parseFloat(p.prix);
+  let nomFinal = p.nom;
+  if (parcoursPlat.variante) {
+    prixUnit = parseFloat(parcoursPlat.variante.prix);
+    nomFinal = p.nom + ' (' + parcoursPlat.variante.label + ')';
+  }
+
+  // Ajouter le plat principal
+  ticket.push({
+    produit_id: p.id,
+    nom: nomFinal,
+    prix: prixUnit,
+    quantite: 1,
+    stock_actif: p.stock_actif,
+    stock: p.stock,
+    categorie_id: p.categorie_id,
+    options_base: parcoursPlat.options_base,
+    retirables: parcoursPlat.retirables
+  });
+
+  // Ajouter les suppléments en lignes séparées
+  parcoursPlat.supplements.forEach(suppId => {
+    const supp = produits.find(pp => pp.id === suppId);
+    if (supp) {
+      ticket.push({
+        produit_id: supp.id,
+        nom: '  ↳ ' + supp.nom,
+        prix: parseFloat(supp.prix),
+        quantite: 1,
+        stock_actif: false,
+        stock: 0,
+        categorie_id: supp.categorie_id,
+        lien_plat: p.id
+      });
+    }
+  });
+
+  // Ajouter les sauces payantes
+  const saucesPayantes = !p.sauces_incluses;
+  if (saucesPayantes) {
+    parcoursPlat.sauces.forEach(sauceId => {
+      const sauce = produits.find(pp => pp.id === sauceId);
+      if (sauce && parseFloat(sauce.prix) > 0) {
+        ticket.push({
+          produit_id: sauce.id,
+          nom: '  ↳ ' + sauce.nom,
+          prix: parseFloat(sauce.prix),
+          quantite: 1,
+          stock_actif: false,
+          stock: 0,
+          categorie_id: sauce.categorie_id,
+          lien_plat: p.id
+        });
+      }
+    });
+  }
+
+  // Si formule : boisson + entrée OFFERTES
+  if (parcoursPlat.est_formule) {
+    if (parcoursPlat.formule_boisson_id) {
+      const boisson = produits.find(pp => pp.id === parcoursPlat.formule_boisson_id);
+      if (boisson) {
+        ticket.push({
+          produit_id: boisson.id,
+          nom: '  ↳ ' + boisson.nom + ' (formule)',
+          prix: 0,
+          quantite: 1,
+          stock_actif: false,
+          stock: 0,
+          categorie_id: boisson.categorie_id,
+          lien_plat: p.id
+        });
+      }
+    }
+    if (parcoursPlat.formule_entree_id) {
+      const entree = produits.find(pp => pp.id === parcoursPlat.formule_entree_id);
+      if (entree) {
+        ticket.push({
+          produit_id: entree.id,
+          nom: '  ↳ ' + (parcoursPlat.formule_entree_label || entree.nom) + ' (formule)',
+          prix: 0,
+          quantite: 1,
+          stock_actif: false,
+          stock: 0,
+          categorie_id: entree.categorie_id,
+          lien_plat: p.id
+        });
+      }
+    }
+  }
+
+  // Fermer la modale et reset
+  fermerModaleParcours();
+  parcoursPlat = null;
+  afficherTicket();
+}
+
+function fermerModaleParcours() {
+  const modal = document.getElementById('modal-parcours-pos');
+  if (modal) modal.classList.remove('actif');
+  if (modal) modal.innerHTML = '';
+}
+
+function annulerParcours() {
+  parcoursPlat = null;
+  fermerModaleParcours();
+}
+
+// ============================================
+//  MODALES DU PARCOURS
+// ============================================
+function afficherModaleVariante() {
+  ouvrirModaleParcours();
+  const p = parcoursPlat.produit;
+  const variantes = p.variantes;
+  const modal = document.getElementById('modal-parcours-pos');
+  modal.innerHTML = `
+    <div class="mpp-content">
+      <div class="mpp-head">
+        <h3>${p.nom}</h3>
+        <p>Choisissez la quantité</p>
+      </div>
+      <div class="mpp-options">
+        ${variantes.map((v, i) => `
+          <button class="mpp-option" onclick="choisirVariante(${i})">
+            <div class="mpp-opt-lbl">${v.label}</div>
+            <div class="mpp-opt-prix">${fmt(v.prix)}</div>
+          </button>
+        `).join('')}
+      </div>
+      <div class="mpp-actions">
+        <button class="btn-annuler" onclick="annulerParcours()">Annuler</button>
+      </div>
+    </div>`;
+}
+
+function choisirVariante(idx) {
+  parcoursPlat.variante = parcoursPlat.produit.variantes[idx];
+  parcoursPlat.etape = 'options_base';
+  passerEtapeParcours();
+}
+
+function afficherModaleOptionsBase() {
+  ouvrirModaleParcours();
+  const p = parcoursPlat.produit;
+  const modal = document.getElementById('modal-parcours-pos');
+  
+  let html = `
+    <div class="mpp-content">
+      <div class="mpp-head">
+        <h3>${p.nom}</h3>
+        <p>Personnalisez votre plat</p>
+      </div>`;
+  
+  p.options_base.forEach((opt, idx) => {
+    html += `
+      <div class="mpp-bloc">
+        <div class="mpp-lbl">${opt.label}</div>
+        <div class="mpp-options">
+          ${opt.choix.map(c => `
+            <button class="mpp-option" onclick="choisirOptionBase(${idx}, '${c.replace(/'/g, "\\'")}', this)">
+              ${c}
+            </button>
+          `).join('')}
+        </div>
+      </div>`;
+  });
+  
+  html += `
+      <div class="mpp-actions">
+        <button class="btn-annuler" onclick="annulerParcours()">Annuler</button>
+        <button class="btn-valider" onclick="validerOptionsBase()" id="btn-valider-opt-pos">Suivant</button>
+      </div>
+    </div>`;
+  modal.innerHTML = html;
+}
+
+function choisirOptionBase(idx, choix, btn) {
+  const opt = parcoursPlat.produit.options_base[idx];
+  parcoursPlat.options_base[opt.label] = choix;
+  // Visuel : marque le bouton actif dans son groupe
+  btn.parentElement.querySelectorAll('.mpp-option').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function validerOptionsBase() {
+  // Vérif que toutes les options sont remplies
+  const p = parcoursPlat.produit;
+  const tousChoisis = p.options_base.every(opt => parcoursPlat.options_base[opt.label]);
+  if (!tousChoisis) { alert('Veuillez sélectionner toutes les options'); return; }
+  parcoursPlat.etape = 'retirables';
+  passerEtapeParcours();
+}
+
+function afficherModaleRetirables() {
+  ouvrirModaleParcours();
+  const p = parcoursPlat.produit;
+  const modal = document.getElementById('modal-parcours-pos');
+  
+  modal.innerHTML = `
+    <div class="mpp-content">
+      <div class="mpp-head">
+        <h3>${p.nom}</h3>
+        <p>Personnalisez (décochez pour retirer)</p>
+      </div>
+      <div class="mpp-options">
+        ${p.ingredients_retirable.map(ing => `
+          <button class="mpp-option active" onclick="toggleRetirable('${ing.replace(/'/g, "\\'")}', this)">
+            ✓ ${ing}
+          </button>
+        `).join('')}
+      </div>
+      <div class="mpp-actions">
+        <button class="btn-annuler" onclick="annulerParcours()">Annuler</button>
+        <button class="btn-valider" onclick="validerRetirables()">Suivant</button>
+      </div>
+    </div>`;
+}
+
+function toggleRetirable(ing, btn) {
+  const idx = parcoursPlat.retirables.indexOf(ing);
+  if (idx >= 0) {
+    parcoursPlat.retirables.splice(idx, 1);
+    btn.classList.add('active');
+    btn.innerHTML = '✓ ' + ing;
+  } else {
+    parcoursPlat.retirables.push(ing);
+    btn.classList.remove('active');
+    btn.innerHTML = '✗ ' + ing;
+  }
+}
+
+function validerRetirables() {
+  parcoursPlat.etape = 'supplements';
+  passerEtapeParcours();
+}
+
+function afficherModaleSupplements() {
+  ouvrirModaleParcours();
+  const p = parcoursPlat.produit;
+  const supps = produits.filter(pp => p.supplements_ids.includes(pp.id));
+  const modal = document.getElementById('modal-parcours-pos');
+  
+  modal.innerHTML = `
+    <div class="mpp-content">
+      <div class="mpp-head">
+        <h3>${p.nom}</h3>
+        <p>Suppléments (optionnels)</p>
+      </div>
+      <div class="mpp-options">
+        ${supps.map(s => `
+          <button class="mpp-option" onclick="toggleSupplement('${s.id}', this)">
+            ${s.nom} <span class="mpp-prix">+${fmt(s.prix)}</span>
+          </button>
+        `).join('')}
+      </div>
+      <div class="mpp-actions">
+        <button class="btn-annuler" onclick="annulerParcours()">Annuler</button>
+        <button class="btn-valider" onclick="validerSupplements()">Suivant</button>
+      </div>
+    </div>`;
+}
+
+function toggleSupplement(suppId, btn) {
+  const idx = parcoursPlat.supplements.indexOf(suppId);
+  if (idx >= 0) {
+    parcoursPlat.supplements.splice(idx, 1);
+    btn.classList.remove('active');
+  } else {
+    parcoursPlat.supplements.push(suppId);
+    btn.classList.add('active');
+  }
+}
+
+function validerSupplements() {
+  parcoursPlat.etape = 'sauces';
+  passerEtapeParcours();
+}
+
+function afficherModaleSauces() {
+  ouvrirModaleParcours();
+  const p = parcoursPlat.produit;
+  const saucesList = produits.filter(pp => p.sauces_ids.includes(pp.id));
+  const max = p.sauces_max || 3;
+  const incluses = p.sauces_incluses;
+  const modal = document.getElementById('modal-parcours-pos');
+  
+  modal.innerHTML = `
+    <div class="mpp-content">
+      <div class="mpp-head">
+        <h3>${p.nom}</h3>
+        <p>Sauces (max ${max})${incluses ? ' — incluses' : ' — +0,50€ par sauce'}</p>
+      </div>
+      <div class="mpp-options" id="mpp-sauces-grid">
+        ${saucesList.map(s => `
+          <button class="mpp-option" onclick="toggleSauce('${s.id}', ${max}, this)" data-sauce="${s.id}">
+            ${s.nom}${incluses || parseFloat(s.prix) === 0 ? '' : ' <span class="mpp-prix">+' + fmt(s.prix) + '</span>'}
+          </button>
+        `).join('')}
+      </div>
+      <div class="mpp-actions">
+        <button class="btn-annuler" onclick="annulerParcours()">Annuler</button>
+        <button class="btn-valider" onclick="validerSauces()">Suivant</button>
+      </div>
+    </div>`;
+}
+
+function toggleSauce(sauceId, max, btn) {
+  const idx = parcoursPlat.sauces.indexOf(sauceId);
+  if (idx >= 0) {
+    parcoursPlat.sauces.splice(idx, 1);
+    btn.classList.remove('active');
+  } else {
+    if (parcoursPlat.sauces.length >= max) {
+      alert(`Maximum ${max} sauces`);
+      return;
+    }
+    parcoursPlat.sauces.push(sauceId);
+    btn.classList.add('active');
+  }
+}
+
+function validerSauces() {
+  parcoursPlat.etape = 'formule_boisson';
+  passerEtapeParcours();
+}
+
+function afficherModaleFormuleBoisson() {
+  ouvrirModaleParcours();
+  const catBoissons = categories.find(c => c.nom === 'Boissons');
+  if (!catBoissons) { parcoursPlat.etape = 'fini'; passerEtapeParcours(); return; }
+  
+  const boissons = produits.filter(p => {
+    if (p.categorie_id !== catBoissons.id || p.actif === false) return false;
+    return p.nom.includes('33cl') || p.nom.toLowerCase().includes('cristalline');
+  });
+  
+  const modal = document.getElementById('modal-parcours-pos');
+  modal.innerHTML = `
+    <div class="mpp-content">
+      <div class="mpp-head">
+        <h3>🍹 Boisson (incluse)</h3>
+        <p>Choisissez votre boisson</p>
+      </div>
+      <div class="mpp-options">
+        ${boissons.map(b => `
+          <button class="mpp-option" onclick="choisirFormuleBoissonPos('${b.id}')">
+            ${b.nom.replace(' 33cl','').replace(' 50cl','')}
+          </button>
+        `).join('')}
+      </div>
+      <div class="mpp-actions">
+        <button class="btn-annuler" onclick="annulerParcours()">Annuler</button>
+      </div>
+    </div>`;
+}
+
+function choisirFormuleBoissonPos(boissonId) {
+  parcoursPlat.formule_boisson_id = boissonId;
+  parcoursPlat.etape = 'formule_entree';
+  passerEtapeParcours();
+}
+
+function afficherModaleFormuleEntree() {
+  ouvrirModaleParcours();
+  const catEntrees = categories.find(c => c.nom === 'Entrées');
+  if (!catEntrees) { parcoursPlat.etape = 'fini'; passerEtapeParcours(); return; }
+  
+  const entrees = produits.filter(p => p.categorie_id === catEntrees.id && p.actif !== false);
+  
+  const items = entrees.map(e => {
+    if (e.variantes && Array.isArray(e.variantes) && e.variantes.length > 0) {
+      const variante2p = e.variantes.find(v => v.label && v.label.includes('2 pi')) || { label: '2 pièces', prix: 0 };
+      return { id: e.id, label: e.nom + ' (' + variante2p.label + ')' };
+    }
+    return { id: e.id, label: e.nom };
+  });
+  
+  const modal = document.getElementById('modal-parcours-pos');
+  modal.innerHTML = `
+    <div class="mpp-content">
+      <div class="mpp-head">
+        <h3>🥟 Entrée (incluse)</h3>
+        <p>Choisissez votre entrée</p>
+      </div>
+      <div class="mpp-options">
+        ${items.map(it => `
+          <button class="mpp-option" onclick="choisirFormuleEntreePos('${it.id}', '${it.label.replace(/'/g, "\\'")}')">
+            ${it.label}
+          </button>
+        `).join('')}
+      </div>
+      <div class="mpp-actions">
+        <button class="btn-annuler" onclick="annulerParcours()">Annuler</button>
+      </div>
+    </div>`;
+}
+
+function choisirFormuleEntreePos(entreeId, label) {
+  parcoursPlat.formule_entree_id = entreeId;
+  parcoursPlat.formule_entree_label = label;
+  parcoursPlat.etape = 'fini';
+  passerEtapeParcours();
+}
+
+function ouvrirModaleParcours() {
+  let modal = document.getElementById('modal-parcours-pos');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'modal-parcours-pos';
+    modal.className = 'mpp-modal';
+    document.body.appendChild(modal);
+  }
+  modal.classList.add('actif');
+}
+
+// Ajout simple sans parcours
+function ajouterSimple(p) {
+  const ligne = ticket.find(l => l.produit_id === p.id);
+  if (p.stock_actif) {
+    const dejaDansTicket = ligne ? ligne.quantite : 0;
+    if (dejaDansTicket >= p.stock) { flashStock(); return; }
+  }
+  if (ligne) {
+    ligne.quantite++;
+  } else {
+    ticket.push({
+      produit_id: p.id,
+      nom: p.nom,
+      prix: parseFloat(p.prix),
+      quantite: 1,
+      stock_actif: p.stock_actif,
+      stock: p.stock,
+      categorie_id: p.categorie_id
+    });
+  }
+  afficherTicket();
+}
+
+// ============================================
+//  GESTION DU TICKET (ancien : ajout direct)
 // ============================================
 function ajouter(produitId) {
   const p = produits.find(x => x.id === produitId);
@@ -2788,62 +2888,14 @@ async function validerVente() {
     let canalPourBase = canalVente;
     if (canalVente === 'cc_enligne' || canalVente === 'cc_comptoir') canalPourBase = 'click_collect';
 
-    let data;
-
-    // ✨ NOUVEAU : Si on encaisse une vente borne en attente, on la finalise au lieu d'en créer une nouvelle
-    if (venteBorneEnCours) {
-      // Update du mode_paiement et passage en validé
-      const { data: venteMaj, error: errUpdate } = await sb
-        .from('ventes')
-        .update({
-          mode_paiement: modePaiement,
-          statut: 'validé'
-        })
-        .eq('id', venteBorneEnCours)
-        .select('numero, total')
-        .single();
-
-      if (errUpdate) throw errUpdate;
-
-      data = {
-        vente_id: venteBorneEnCours,
-        numero: venteMaj.numero,
-        total: venteMaj.total
-      };
-
-      // 🧾 Déclencher l'impression cuisine maintenant (vente validée)
-      try {
-        await fetch('/.netlify/functions/imprimer-ticket', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            vente_id: venteBorneEnCours,
-            numero: venteMaj.numero,
-            mode_service: canalVente,
-            origine: 'borne',
-            lignes: lignes
-          })
-        });
-      } catch (e) {
-        console.error('Impression KO:', e);
-      }
-
-      // Reset la variable
-      venteBorneEnCours = null;
-
-    } else {
-      // Cas normal : nouvelle vente caisse
-      const { data: dataRpc, error } = await sb.rpc('enregistrer_vente', {
-        p_restaurant_id: RESTO_ID,
-        p_mode_paiement: modePaiement,
-        p_lignes: lignes,
-        p_canal: canalPourBase,
-        p_taux_commission: CANAUX_COMMISSION.includes(canalVente) ? tauxCommission : null,
-        p_client_id: clientFid ? clientFid.id : null
-      });
-      if (error) throw error;
-      data = dataRpc;
-    }
+    const { data, error } = await sb.rpc('enregistrer_vente', {
+      p_restaurant_id: RESTO_ID,
+      p_mode_paiement: modePaiement,
+      p_lignes: lignes,
+      p_canal: canalPourBase,
+      p_taux_commission: CANAUX_COMMISSION.includes(canalVente) ? tauxCommission : null
+    });
+    if (error) throw error;
 
     // Succès — la vente est enregistrée
     const numero = data?.numero ?? '?';
@@ -2879,7 +2931,6 @@ async function validerVente() {
     clientFid = null;
     platOffertApplique = false;
     remise = null;
-    venteBorneEnCours = null;
     afficherClientFid();
     afficherTicket();
     await chargerMenu(); // recharge le stock à jour
@@ -2922,7 +2973,6 @@ function ouvrirScanFid() {
 function fermerScanFid() {
   arreterCamera();
   arreterEcoutePhysique();
-  arreterRechercheTel();
   document.getElementById('overlay-scan').classList.remove('show');
 }
 
@@ -2931,23 +2981,13 @@ function fermerScanFid() {
 // très vite puis envoie Entrée. On capte ça dans un champ caché.
 function basculerPhysique() {
   arreterCamera();
-  arreterRechercheTel();
   document.getElementById('mode-physique').style.display = 'block';
   document.getElementById('mode-camera').style.display = 'none';
-  document.getElementById('mode-telephone').style.display = 'none';
-  majOngletActif('physique');
   const status = document.getElementById('scan-status');
   status.textContent = 'En attente du scan…';
   status.className = 'scan-status';
   scanEnCours = false;
   demarrerEcoutePhysique();
-}
-
-// Met en évidence l'onglet actif dans la barre de tabs
-function majOngletActif(mode) {
-  document.querySelectorAll('.scan-tab').forEach(t => {
-    t.classList.toggle('active', t.dataset.mode === mode);
-  });
 }
 
 let inputScanHandler = null;
@@ -2987,11 +3027,8 @@ function arreterEcoutePhysique() {
 // --- MODE CAMÉRA (secours) ---
 function basculerCamera() {
   arreterEcoutePhysique();
-  arreterRechercheTel();
   document.getElementById('mode-physique').style.display = 'none';
   document.getElementById('mode-camera').style.display = 'block';
-  document.getElementById('mode-telephone').style.display = 'none';
-  majOngletActif('camera');
   const status = document.getElementById('scan-status-cam');
   status.textContent = 'Ouverture de la caméra…';
   status.className = 'scan-status';
@@ -3015,218 +3052,6 @@ function arreterCamera() {
   if (scannerFid) {
     scannerFid.stop().then(() => scannerFid.clear()).catch(() => {});
     scannerFid = null;
-  }
-}
-
-// --- MODE TÉLÉPHONE (recherche client par numéro / commande téléphone) ---
-let _telSearchTimer = null;
-
-function basculerTelephone() {
-  arreterCamera();
-  arreterEcoutePhysique();
-  document.getElementById('mode-physique').style.display = 'none';
-  document.getElementById('mode-camera').style.display = 'none';
-  document.getElementById('mode-telephone').style.display = 'block';
-  majOngletActif('telephone');
-
-  // Vue par défaut = recherche
-  document.getElementById('tel-vue-recherche').style.display = 'block';
-  document.getElementById('tel-vue-creation').style.display = 'none';
-
-  // Reset
-  const input = document.getElementById('tel-search');
-  input.value = '';
-  document.getElementById('tel-resultats').innerHTML = '';
-  document.getElementById('tel-status').textContent = 'Saisissez au moins 4 chiffres…';
-  document.getElementById('tel-status').className = 'scan-status';
-
-  // Focus auto + ouverture clavier mobile
-  setTimeout(() => input.focus(), 100);
-
-  // Listener qui déclenche la recherche en live
-  input.oninput = () => {
-    clearTimeout(_telSearchTimer);
-    _telSearchTimer = setTimeout(() => rechercherClientTel(input.value), 250);
-  };
-}
-
-function arreterRechercheTel() {
-  clearTimeout(_telSearchTimer);
-  const input = document.getElementById('tel-search');
-  if (input) input.oninput = null;
-}
-
-// Recherche les clients dont le téléphone contient la chaîne saisie
-async function rechercherClientTel(saisie) {
-  const status = document.getElementById('tel-status');
-  const zone = document.getElementById('tel-resultats');
-
-  // Nettoie : ne garde que les chiffres
-  const chiffres = (saisie || '').replace(/\D/g, '');
-
-  if (chiffres.length < 4) {
-    status.textContent = 'Saisissez au moins 4 chiffres…';
-    status.className = 'scan-status';
-    zone.innerHTML = '';
-    return;
-  }
-
-  status.textContent = 'Recherche…';
-  status.className = 'scan-status';
-
-  try {
-    // Recherche par "like" sur le téléphone (insensible aux espaces/tirets)
-    // On récupère un peu plus large et on filtre côté client pour gérer les formats variés
-    const { data, error } = await sb.from('clients')
-      .select('id, nom, telephone, points, nb_visites, derniere_visite')
-      .eq('restaurant_id', RESTO_ID)
-      .ilike('telephone', '%' + chiffres + '%')
-      .limit(10);
-
-    if (error) throw error;
-
-    // Re-filtre robuste en comparant uniquement les chiffres
-    const resultats = (data || []).filter(c => {
-      const telChiffres = String(c.telephone || '').replace(/\D/g, '');
-      return telChiffres.includes(chiffres);
-    });
-
-    if (resultats.length === 0) {
-      status.textContent = 'Aucun client trouvé';
-      status.className = 'scan-status';
-      zone.innerHTML = `
-        <div class="tel-pas-resultat">
-          <p>Aucun client avec ce numéro dans la base.</p>
-          <button class="tel-btn-creer" onclick="ouvrirCreationClient('${chiffres}')">+ Créer un nouveau client</button>
-        </div>`;
-      return;
-    }
-
-    status.textContent = resultats.length + ' résultat' + (resultats.length > 1 ? 's' : '');
-    status.className = 'scan-status ok';
-
-    zone.innerHTML = resultats.map(c => {
-      const initiale = (c.nom || '?').charAt(0).toUpperCase();
-      const points = Number(c.points || 0);
-      const dernier = c.derniere_visite ? joursDepuisVisite(c.derniere_visite) : '—';
-      return `
-        <div class="tel-resultat-row" onclick="attacherClientDepuisTel('${c.id}')">
-          <div class="tel-resultat-avatar">${initiale}</div>
-          <div class="tel-resultat-info">
-            <div class="tel-resultat-nom">${escapeHtmlPos(c.nom || 'Sans nom')}</div>
-            <div class="tel-resultat-meta">${formatTel(c.telephone)} · ${dernier}</div>
-          </div>
-          <div class="tel-resultat-tampons">${points}/10</div>
-        </div>`;
-    }).join('');
-  } catch (e) {
-    status.textContent = 'Erreur : ' + e.message;
-    status.className = 'scan-status err';
-  }
-}
-
-// Format téléphone pour affichage
-function formatTel(tel) {
-  if (!tel) return '';
-  const c = String(tel).replace(/\D/g, '');
-  if (c.length === 10) return c.replace(/(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, '$1 $2 $3 $4 $5');
-  return tel;
-}
-
-// Texte "il y a X jours" depuis une date
-function joursDepuisVisite(dateStr) {
-  if (!dateStr) return 'jamais';
-  const d = new Date(dateStr);
-  const diff = Math.floor((Date.now() - d.getTime()) / (1000 * 60 * 60 * 24));
-  if (diff <= 0) return 'aujourd\'hui';
-  if (diff === 1) return 'hier';
-  if (diff < 7) return 'il y a ' + diff + ' j';
-  if (diff < 30) return 'il y a ' + Math.floor(diff / 7) + ' sem';
-  return 'il y a ' + Math.floor(diff / 30) + ' mois';
-}
-
-// Echappement HTML
-function escapeHtmlPos(s) {
-  if (!s) return '';
-  return String(s).replace(/[&<>"']/g, c =>
-    ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
-}
-
-// Attache un client trouvé via la recherche téléphone
-async function attacherClientDepuisTel(clientId) {
-  try {
-    const { data: c, error } = await sb.from('clients').select('*').eq('id', clientId).single();
-    if (error || !c) throw new Error('Client introuvable');
-    clientFid = c;
-    afficherClientFid();
-    fermerScanFid();
-  } catch (e) {
-    alert('Erreur : ' + e.message);
-  }
-}
-
-// Ouvre la vue de création rapide avec le numéro pré-rempli
-function ouvrirCreationClient(telephonePrefill) {
-  document.getElementById('tel-vue-recherche').style.display = 'none';
-  document.getElementById('tel-vue-creation').style.display = 'block';
-  document.getElementById('new-client-nom').value = '';
-  document.getElementById('new-client-tel').value = telephonePrefill || '';
-  document.getElementById('new-client-anniv').value = '';
-  // Date max anniversaire = aujourd'hui
-  document.getElementById('new-client-anniv').max = new Date().toISOString().slice(0, 10);
-  // Focus sur le nom
-  setTimeout(() => document.getElementById('new-client-nom').focus(), 100);
-}
-
-// Retour à la vue de recherche
-function retourRechercheTel() {
-  document.getElementById('tel-vue-creation').style.display = 'none';
-  document.getElementById('tel-vue-recherche').style.display = 'block';
-}
-
-// Crée un nouveau client + l'attache au ticket
-async function creerClientRapide() {
-  const nom = document.getElementById('new-client-nom').value.trim();
-  const tel = document.getElementById('new-client-tel').value.trim();
-  const anniv = document.getElementById('new-client-anniv').value || null;
-
-  if (!nom) { alert('Indiquez le prénom du client'); return; }
-  if (!tel || tel.replace(/\D/g, '').length < 8) { alert('Numéro de téléphone invalide'); return; }
-
-  const btn = document.getElementById('btn-creer-client');
-  btn.disabled = true;
-  const labelOrig = btn.textContent;
-  btn.textContent = 'Création…';
-
-  try {
-    // Déjà existant ?
-    const { data: existant } = await sb.from('clients')
-      .select('id').eq('telephone', tel).eq('restaurant_id', RESTO_ID).maybeSingle();
-
-    let nouveauClient;
-    if (existant) {
-      // Récupère le client existant
-      const { data: c, error } = await sb.from('clients').select('*').eq('id', existant.id).single();
-      if (error) throw error;
-      nouveauClient = c;
-    } else {
-      const insertData = {
-        nom, telephone: tel, restaurant_id: RESTO_ID,
-        points: 0, total_points_gagnes: 0, nb_visites: 0
-      };
-      if (anniv) insertData.date_anniversaire = anniv;
-      const { data, error } = await sb.from('clients').insert(insertData).select().single();
-      if (error) throw error;
-      nouveauClient = data;
-    }
-
-    clientFid = nouveauClient;
-    afficherClientFid();
-    fermerScanFid();
-  } catch (e) {
-    alert('Erreur : ' + e.message);
-    btn.disabled = false;
-    btn.textContent = labelOrig;
   }
 }
 
@@ -3338,26 +3163,16 @@ function ymdAujourdhui() {
 // CAS SPÉCIAL : si le plat offert a été utilisé, on remet les tampons à 0
 // (visite "récompense") sans ajouter de nouveau tampon.
 // Renvoie un message à afficher, ou null si rien à signaler.
-// ============================================
-//  TAMPON FIDELITE
-// ============================================
-//  ⚠️ Depuis le SQL NF525, la fonction enregistrer_vente gère
-//  automatiquement nb_visites, derniere_visite, points et total_points_gagnes
-//  quand p_client_id est fourni.
-//
-//  Cette fonction sert UNIQUEMENT à :
-//  - Afficher le toast informatif au caissier
-//  - Gérer le cas "plat offert utilisé" (reset des points)
-//  - Gérer les cas spéciaux (montant min, anti-doublon visuel)
 async function appliquerTampon(totalVente) {
   if (!clientFid) return null;
 
-  // CAS RÉCOMPENSE : le client a utilisé son plat offert → reset à 0
-  // Comme la fonction SQL ajoute +1 point automatiquement, on doit RE-resetter à 0 ici
+  // CAS RÉCOMPENSE : le client a utilisé son plat offert → remise à 0
   if (platOffertApplique) {
     try {
       const { error } = await sb.from('clients').update({
-        points: 0
+        points: 0,
+        nb_visites: (clientFid.nb_visites || 0) + 1,
+        derniere_visite: ymdAujourdhui()
       }).eq('id', clientFid.id);
       if (error) throw error;
       return { titre: '🎁 Plat offert utilisé', sous: `${clientFid.nom} : carte repartie à 0/10` };
@@ -3368,29 +3183,36 @@ async function appliquerTampon(totalVente) {
 
   // Condition minimum de commande
   if (totalVente < MIN_TAMPON) {
-    // ⚠️ La fonction SQL a déjà ajouté +1 point. On doit le RETIRER puisque la commande est trop petite
-    try {
-      const newPoints = Math.max(0, (clientFid.points || 0));
-      const newVisites = Math.max(0, (clientFid.nb_visites || 0));
-      const newTotal = Math.max(0, (clientFid.total_points_gagnes || 0));
-      await sb.from('clients').update({
-        points: newPoints,
-        nb_visites: newVisites,
-        total_points_gagnes: newTotal
-      }).eq('id', clientFid.id);
-    } catch (e) { /* silencieux */ }
     return { titre: 'Vente enregistrée', sous: `${clientFid.nom} : pas de tampon (min. ${fmt(MIN_TAMPON)})` };
   }
 
-  // ✅ Cas normal : le SQL a déjà fait l'incrément
-  // On affiche juste le toast de confirmation au caissier
-  const nouveauxPoints = ((clientFid.points || 0) + 1) > 10 ? 1 : ((clientFid.points || 0) + 1);
-  const recompense = (nouveauxPoints === OBJECTIF_FID);
-
-  if (recompense) {
-    return { titre: '🎉 Plat offert débloqué !', sous: `${clientFid.nom} a atteint 10 tampons` };
+  // Anti-doublon : 1 tampon par jour max
+  const aujourdhui = ymdAujourdhui();
+  if (clientFid.derniere_visite === aujourdhui) {
+    return { titre: 'Vente enregistrée', sous: `${clientFid.nom} : tampon déjà ajouté aujourd'hui` };
   }
-  return { titre: 'Vente enregistrée', sous: `${clientFid.nom} : +1 tampon (${nouveauxPoints}/10)` };
+
+  // Calcul du nouveau total de points (même logique que le scanner)
+  let points = (clientFid.points || 0) + 1;
+  if (points > OBJECTIF_FID) points = 1;
+  const recompense = (points === OBJECTIF_FID);
+
+  try {
+    const { error } = await sb.from('clients').update({
+      points,
+      total_points_gagnes: (clientFid.total_points_gagnes || 0) + 1,
+      nb_visites: (clientFid.nb_visites || 0) + 1,
+      derniere_visite: aujourdhui
+    }).eq('id', clientFid.id);
+    if (error) throw error;
+
+    if (recompense) {
+      return { titre: '🎉 Plat offert débloqué !', sous: `${clientFid.nom} a atteint 10 tampons` };
+    }
+    return { titre: 'Vente enregistrée', sous: `${clientFid.nom} : +1 tampon (${points}/10)` };
+  } catch (e) {
+    return { titre: 'Vente enregistrée', sous: 'Tampon non ajouté : ' + e.message };
+  }
 }
 
 // ============================================
