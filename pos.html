@@ -3972,26 +3972,15 @@ async function validerVente() {
       p_mode_service: 'sur_place',
       p_canal: canalPourBase,
       p_taux_commission: CANAUX_COMMISSION.includes(canalVente) ? tauxCommission : null,
-      p_client_id: clientFid ? clientFid.id : null
+      p_client_id: clientFid ? clientFid.id : null,
+      p_caissier_id: caissierActif ? caissierActif.id : null,
+      p_caissier_nom: caissierActif ? caissierActif.nom : null
     });
     if (error) throw error;
 
 // Succès — la vente est enregistrée
     const numero = data?.numero ?? '?';
     const totalVente = data?.total ?? totalTicket();
-    
-    // ✨ Enregistrer le caissier sur la vente (UPDATE par numéro + restaurant_id)
-    if (caissierActif && numero !== '?') {
-      try {
-        const { error: errMaj } = await sb.from('ventes')
-          .update({ caissier_id: caissierActif.id, caissier_nom: caissierActif.nom })
-          .eq('restaurant_id', RESTO_ID)
-          .eq('numero', numero);
-        if (errMaj) console.error('Erreur enregistrement caissier:', errMaj);
-      } catch (e) {
-        console.error('Erreur enregistrement caissier:', e);
-      }
-    }
 
     // Construit un objet "vente" local pour l'aperçu du ticket (avant réinitialisation)
     const venteLocale = {
