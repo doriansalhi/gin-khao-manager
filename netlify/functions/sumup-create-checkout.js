@@ -1,76 +1,101 @@
-// netlify/functions/sumup-create-checkout.js
 // ============================================================
-// SumUp Online Payments — Création d'un checkout
+// 💳 SumUp — Création d'une session de paiement
 // ============================================================
-// Variables d'environnement requises :
-//   SUMUP_API_KEY        = ta clé API SumUp (sup_sk_...)
-//   SUMUP_MERCHANT_CODE  = ton code marchand SumUp (MCXXXX)
+// Cette fonction est appelée par la borne quand le client choisit
+// "Paiement terminal". Elle crée un "checkout" SumUp et renvoie
+// l'ID, que la borne utilise pour suivre le statut.
+//
+// Variables d'environnement requises (à mettre dans Netlify) :
+//   - SUMUP_API_KEY      : ta clé secrète SumUp (sk_live_xxxx)
+//   - SUMUP_MERCHANT_CODE : ton code marchand SumUp (ex: MQXXXXX)
 // ============================================================
 
-exports.handler = async function (event) {
-  if (event.httpMethod !== 'POST') {
-    return jsonResp(405, { ok: false, erreur: 'Method not allowed' });
+exports.handler = async (event, context) => {
+  // CORS
+  const headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Content-Type': 'application/json'
+  };
+
+  if (event.httpMethod === 'OPTIONS') {
+    return { statusCode: 200, headers, body: '' };
   }
 
-  const SUMUP_API_KEY = process.env.SUMUP_API_KEY;
-  const SUMUP_MERCHANT_CODE = process.env.SUMUP_MERCHANT_CODE;
-
-  if (!SUMUP_API_KEY) return jsonResp(500, { ok: false, erreur: 'SUMUP_API_KEY manquante' });
-  if (!SUMUP_MERCHANT_CODE) return jsonResp(500, { ok: false, erreur: 'SUMUP_MERCHANT_CODE manquant' });
-
-  let body;
-  try { body = JSON.parse(event.body || '{}'); }
-  catch { return jsonResp(400, { ok: false, erreur: 'JSON invalide' }); }
-
-  const montant = parseFloat(body.montant);
-  if (!montant || montant <= 0) {
-    return jsonResp(400, { ok: false, erreur: 'Montant invalide' });
+  if (event.httpMethod !== 'POST') {
+    return {
+      statusCode: 405,
+      headers,
+      body: JSON.stringify({ ok: false, erreur: 'Méthode non autorisée' })
+    };
   }
 
   try {
-    // Référence unique pour ce checkout
-    const ref = 'GK-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7).toUpperCase();
+    // 1. Récupérer config env
+    const SUMUP_API_KEY = process.env.SUMUP_API_KEY;
+    const SUMUP_MERCHANT_CODE = process.env.SUMUP_MERCHANT_CODE;
+    
+    if (!SUMUP_API_KEY || !SUMUP_MERCHANT_CODE) {
+      throw new Error('Configuration SumUp manquante (SUMUP_API_KEY ou SUMUP_MERCHANT_CODE)');
+    }
 
-    const res = await fetch('https://api.sumup.com/v0.1/checkouts', {
+    // 2. Parser le body envoyé par la borne
+    const { montant, description, return_url } = JSON.parse(event.body);
+    
+    if (!montant || isNaN(parseFloat(montant)) || parseFloat(montant) <= 0) {
+      throw new Error('Montant invalide');
+    }
+
+    // 3. Générer un identifiant unique pour cette commande
+    // (sert de référence côté SumUp pour réconcilier les ventes)
+    const referenceId = 'GINKHAO-' + Date.now() + '-' + Math.random().toString(36).substring(2, 8);
+
+    // 4. Appel à l'API SumUp Checkouts
+    // Docs : https://developer.sumup.com/api/checkouts/v1
+    const sumupResponse = await fetch('https://api.sumup.com/v0.1/checkouts', {
       method: 'POST',
       headers: {
         'Authorization': 'Bearer ' + SUMUP_API_KEY,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        checkout_reference: ref,
-        amount: montant,
+        checkout_reference: referenceId,
+        amount: parseFloat(montant),
         currency: 'EUR',
         merchant_code: SUMUP_MERCHANT_CODE,
-        description: body.description || 'Gin Khao - Borne',
-        return_url: body.return_url || null
+        description: description || 'Gin Khao - Borne',
+        return_url: return_url || ''
       })
     });
 
-    const data = await res.json();
-    if (!res.ok) {
-      console.error('Erreur SumUp:', data);
-      return jsonResp(500, { ok: false, erreur: data.message || data.error_code || 'Erreur SumUp', details: data });
+    const sumupData = await sumupResponse.json();
+
+    if (!sumupResponse.ok) {
+      console.error('Erreur SumUp:', sumupData);
+      throw new Error(sumupData.message || 'Erreur API SumUp : ' + sumupResponse.status);
     }
 
-    return jsonResp(200, {
-      ok: true,
-      checkout_id: data.id,
-      checkout_reference: ref,
-      status: data.status,
-      checkout_url: data.checkout_url || null
-    });
+    // 5. Renvoyer l'ID checkout à la borne
+    return {
+      statusCode: 200,
+      headers,
+      body: JSON.stringify({
+        ok: true,
+        checkout_id: sumupData.id,
+        reference: referenceId,
+        amount: sumupData.amount,
+        currency: sumupData.currency,
+        status: sumupData.status
+      })
+    };
 
   } catch (e) {
-    console.error('Exception:', e);
-    return jsonResp(500, { ok: false, erreur: e.message });
+    console.error('Erreur lancement checkout:', e);
+    return {
+      statusCode: 500,
+      headers,
+      body: JSON.stringify({ ok: false, erreur: e.message })
+    };
   }
 };
-
-function jsonResp(code, obj) {
-  return {
-    statusCode: code,
-    headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
-    body: JSON.stringify(obj)
-  };
-}
