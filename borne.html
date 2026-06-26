@@ -1619,6 +1619,156 @@ body {
   text-align: center;
   margin-bottom: 32px;
 }
+
+/* ============================================================ */
+/* ✨ HEADER NAVIGATION DANS LES MODALES (← Retour + ✕ Fermer)  */
+/* ============================================================ */
+.parcours-head-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.parcours-btn-retour {
+  background: rgba(255, 107, 53, 0.1);
+  color: var(--orange);
+  border: 2px solid var(--orange);
+  padding: 10px 18px;
+  font-size: 15px;
+  font-weight: 700;
+  border-radius: 999px;
+  cursor: pointer;
+  font-family: var(--font);
+  transition: all 0.2s;
+}
+.parcours-btn-retour:active {
+  transform: scale(0.95);
+  background: var(--orange);
+  color: #FFFFFF;
+}
+.parcours-btn-close {
+  background: #f3f4f6;
+  color: #6b7280;
+  border: none;
+  width: 44px;
+  height: 44px;
+  font-size: 22px;
+  font-weight: 700;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+.parcours-btn-close:active {
+  transform: scale(0.92);
+  background: #ef4444;
+  color: #FFFFFF;
+}
+
+/* ============================================================ */
+/* ✨ ÉCRANS FORMULE PLEIN ÉCRAN (Entrée → Plat → Boisson)      */
+/* ============================================================ */
+#ecran-formule-step {
+  background: var(--bg-deep, #f8f9fa);
+  flex-direction: column;
+  padding: 0;
+}
+.formule-step-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 24px;
+  background: #FFFFFF;
+  border-bottom: 2px solid var(--border-soft);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.formule-step-num {
+  background: var(--orange);
+  color: #FFFFFF;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+.formule-step-titre {
+  text-align: center;
+  padding: 24px 24px 16px;
+}
+.formule-step-titre h2 {
+  font-family: var(--display);
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 6px;
+}
+.formule-step-titre p {
+  color: var(--text-mute);
+  font-size: 15px;
+}
+.formule-grille {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-auto-rows: max-content;
+  gap: 18px;
+}
+.formule-card {
+  background: #FFFFFF;
+  border: 3px solid var(--border-soft);
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  aspect-ratio: 4 / 5;
+  position: relative;
+  overflow: hidden;
+  background-size: cover;
+  background-position: center;
+  box-shadow: var(--shadow-sm, 0 4px 12px rgba(0,0,0,0.08));
+}
+.formule-card:active {
+  transform: scale(0.96);
+  border-color: var(--orange);
+}
+.formule-card.has-image {
+  background-color: var(--orange-pale, #FFF5F0);
+}
+.formule-card-emoji {
+  font-size: 70px;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.formule-card-bandeau {
+  background: #FFFFFF;
+  padding: 14px;
+  text-align: center;
+  border-top: 1px solid var(--border-soft);
+  z-index: 2;
+}
+.formule-card-nom {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1.25;
+  margin-bottom: 4px;
+}
+.formule-card-prix {
+  font-family: var(--display);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--orange);
+}
 .parcours-etape {
   display: inline-block;
   background: var(--orange);
@@ -2359,6 +2509,18 @@ function filtrerCatEtAller(catId) {
     afficherSousCategories(catId);
     return;
   }
+  
+  // ✨ NOUVEAU : si c'est une SOUS-CATÉGORIE FORMULE (parent = "Formules"),
+  // on lance le parcours formule en plein écran (Entrée → Plat → Boisson)
+  const cat = categories.find(c => c.id === catId);
+  if (cat && cat.parent_id) {
+    const parent = categories.find(p => p.id === cat.parent_id);
+    if (parent && parent.nom === 'Formules') {
+      lancerParcoursFormule(cat);
+      return;
+    }
+  }
+  
   // Sinon : comportement normal (afficher les produits de cette cat)
   catActive = catId;
   afficherCats();
@@ -2659,12 +2821,12 @@ function declencherUpsellEntrees() {
 function declencherUpsellBoissons() {
   const cat = categories.find(c => c.nom === 'Boissons');
   if (!cat) {
-    ouvrirPanierFinal();
+    declencherUpsellDesserts();
     return;
   }
   const boissons = produits.filter(p => p.categorie_id === cat.id && p.actif !== false);
   if (boissons.length === 0) {
-    ouvrirPanierFinal();
+    declencherUpsellDesserts();
     return;
   }
   afficherUpsellGrille({
@@ -2672,6 +2834,28 @@ function declencherUpsellBoissons() {
     sous: 'Ajoutez autant que vous voulez',
     items: boissons,
     type: 'boisson',
+    onNext: () => declencherUpsellDesserts(),
+    onSkip: () => declencherUpsellDesserts()
+  });
+}
+
+// ✨ NOUVEAU : Upsell desserts à la fin
+function declencherUpsellDesserts() {
+  const cat = categories.find(c => c.nom === 'Desserts');
+  if (!cat) {
+    ouvrirPanierFinal();
+    return;
+  }
+  const desserts = produits.filter(p => p.categorie_id === cat.id && p.actif !== false);
+  if (desserts.length === 0) {
+    ouvrirPanierFinal();
+    return;
+  }
+  afficherUpsellGrille({
+    titre: '🍰 Un petit dessert ?',
+    sous: 'Pour finir en douceur',
+    items: desserts,
+    type: 'dessert',
     onNext: () => ouvrirPanierFinal(),
     onSkip: () => ouvrirPanierFinal()
   });
@@ -2686,6 +2870,10 @@ function afficherUpsellGrille(config) {
 
   const html = `
     <div class="upsell-content-v2">
+      <div class="parcours-head-nav" style="padding: 16px 20px 0;">
+        <div style="visibility:hidden;">←</div>
+        <button class="parcours-btn-close" onclick="fermerUpsellEtContinuer('${config.type}', 'skip')" title="Fermer">✕</button>
+      </div>
       <div class="upsell-head-v2">
         <h2 class="upsell-titre-v2">${config.titre}</h2>
         <p class="upsell-sous-v2">${config.sous}</p>
@@ -2825,6 +3013,9 @@ function fermerUpsellEtContinuer(type, action) {
 let parcoursPlatEnCours = null;
 
 function demarrerParcoursPlat(produit) {
+  // Reset la pile de navigation
+  pileEtapes = [];
+  
   parcoursPlatEnCours = {
     produit: produit,
     retirables: [],
@@ -2836,6 +3027,8 @@ function demarrerParcoursPlat(produit) {
     formule_boisson_id: null,
     formule_entree_id: null,
     formule_entree_label: null,  // pour les variantes (2 pièces)
+    formule_plat_id: null,       // ✨ NOUVEAU : plat choisi dans la formule
+    formule_plat_obj: null,
     etape: 'options_base'
   };
 
@@ -2850,41 +3043,40 @@ function demarrerParcoursPlat(produit) {
 function passerEtapeSuivante() {
   const p = parcoursPlatEnCours.produit;
   const estFormule = parcoursPlatEnCours.est_formule;
+  const etapeActuelle = parcoursPlatEnCours.etape;
 
-  if (parcoursPlatEnCours.etape === 'options_base') {
+  if (etapeActuelle === 'options_base') {
+    pileEtapes.push('options_base');
     parcoursPlatEnCours.etape = 'retirables';
     if (p.ingredients_retirable && p.ingredients_retirable.length > 0) {
       afficherModaleRetirables();
     } else {
       passerEtapeSuivante();
     }
-  } else if (parcoursPlatEnCours.etape === 'retirables') {
+  } else if (etapeActuelle === 'retirables') {
+    pileEtapes.push('retirables');
     parcoursPlatEnCours.etape = 'supplements';
     if (p.supplements_ids && p.supplements_ids.length > 0) {
       afficherModaleSupplements();
     } else {
       passerEtapeSuivante();
     }
-  } else if (parcoursPlatEnCours.etape === 'supplements') {
+  } else if (etapeActuelle === 'supplements') {
+    pileEtapes.push('supplements');
     parcoursPlatEnCours.etape = 'sauces';
     if (p.sauces_ids && p.sauces_ids.length > 0) {
       afficherModaleSauces();
     } else {
       passerEtapeSuivante();
     }
-  } else if (parcoursPlatEnCours.etape === 'sauces') {
-    // ✨ NOUVEAU : si formule, on passe par boisson puis entrée
-    if (estFormule) {
-      parcoursPlatEnCours.etape = 'formule_boisson';
-      afficherModaleFormuleBoisson();
+  } else if (etapeActuelle === 'sauces') {
+    pileEtapes.push('sauces');
+    // ✨ Si formule : aller à l'écran boisson plein écran
+    if (parcoursPlatEnCours.est_formule) {
+      afficherEcranFormuleBoisson();
     } else {
       finaliserParcoursPlat();
     }
-  } else if (parcoursPlatEnCours.etape === 'formule_boisson') {
-    parcoursPlatEnCours.etape = 'formule_entree';
-    afficherModaleFormuleEntree();
-  } else if (parcoursPlatEnCours.etape === 'formule_entree') {
-    finaliserParcoursPlat();
   }
 }
 
@@ -2966,133 +3158,304 @@ function finaliserParcoursPlat() {
 
   majBarrePanier();
   fermerModaleParcours();
+  const etaitFormule = parcoursPlatEnCours.est_formule;
   parcoursPlatEnCours = null;
 
-  // Déclencher l'upsell (boissons + extras) — désactivé pour les formules
-  // declencherUpsell est déjà no-op désormais
-  declencherUpsell(p);
+  // ✨ NOUVEAU : si pas une formule, déclencher mini-upsell boisson après le plat
+  // Si formule : pas d'upsell (le combo est complet, retour à l'accueil)
+  if (etaitFormule) {
+    // Retour à l'accueil catégories après une formule
+    allerEcran('ecran-accueil-cats');
+  } else {
+    // Mini-upsell boisson par catégorie : on propose juste la boisson
+    declencherMiniUpsellBoisson(p);
+  }
+}
+
+// ✨ NOUVEAU : Mini upsell boisson après chaque plat
+function declencherMiniUpsellBoisson(produitAjoute) {
+  // Si le plat ajouté EST une boisson, on ne propose pas une boisson
+  const catBoisson = categories.find(c => c.nom === 'Boissons');
+  if (catBoisson && produitAjoute.categorie_id === catBoisson.id) {
+    return;  // pas de mini-upsell après une boisson
+  }
+  
+  if (!catBoisson) return;
+  const boissons = produits.filter(p => p.categorie_id === catBoisson.id && p.actif !== false);
+  if (boissons.length === 0) return;
+  
+  afficherUpsellGrille({
+    titre: '🍹 Une boisson avec ça ?',
+    sous: 'Ou continuez vos achats',
+    items: boissons,
+    type: 'boisson',
+    onNext: () => fermerUpsellModal(),
+    onSkip: () => fermerUpsellModal()
+  });
+}
+
+function fermerUpsellModal() {
+  const modal = document.getElementById('modal-upsell');
+  if (modal) {
+    modal.classList.remove('actif');
+    modal.innerHTML = '';
+  }
 }
 
 // ============================================================
-//  ✨ MODALE FORMULE BOISSON (toutes les 33cl + Cristalline)
+//  ✨ PARCOURS FORMULE PLEIN ÉCRAN (Entrée → Plat → Boisson)
 // ============================================================
-function afficherModaleFormuleBoisson() {
-  const modal = document.getElementById('modal-parcours');
-  modal.classList.add('actif');
 
-  // Trouver toutes les boissons éligibles : 33cl + Cristalline
+// État formule en cours
+let formuleEnCours = null;
+
+// Démarre le parcours formule complet (depuis le clic sur sous-cat formule)
+function lancerParcoursFormule(sousCatFormule) {
+  // sousCatFormule = ex { nom: "Formule Pad Thaï", parent_id: ... }
+  
+  // Récupérer la catégorie SOURCE correspondante (sans "Formule ")
+  const nomSource = sousCatFormule.nom.replace(/^Formule\s+/, '');
+  const catSource = categories.find(c => c.nom === nomSource && !c.parent_id);
+  if (!catSource) {
+    alert('Catégorie source introuvable : ' + nomSource);
+    return;
+  }
+  
+  // Initialiser l'état
+  formuleEnCours = {
+    sousCatFormule: sousCatFormule,    // ex: Formule Pad Thaï
+    catSource: catSource,              // ex: Pad Thaï
+    entree_id: null,
+    entree_label: null,
+    plat: null,                        // plat (Formule) choisi
+    boisson_id: null,
+    boisson_obj: null
+  };
+  
+  // Étape 1 : afficher écran Entrée
+  afficherEcranFormuleEntree();
+}
+
+function afficherEcranFormuleEntree() {
+  const catEntrees = categories.find(c => c.nom === 'Entrées');
+  if (!catEntrees) {
+    alert('Catégorie Entrées introuvable');
+    return;
+  }
+  const entrees = produits.filter(p => p.categorie_id === catEntrees.id && p.actif !== false);
+  
+  // Pour chaque entrée, prendre la variante 2 pièces ou label par défaut
+  const items = entrees.map(e => {
+    if (e.variantes && Array.isArray(e.variantes) && e.variantes.length > 0) {
+      const variante2p = e.variantes.find(v => v.label && v.label.includes('2 pi')) || { label: '2 pièces', prix: 0 };
+      return { id: e.id, nom: e.nom, label: e.nom + ' (' + variante2p.label + ')', image_url: e.image_url };
+    }
+    return { id: e.id, nom: e.nom, label: e.nom, image_url: e.image_url };
+  });
+  
+  let ecran = document.getElementById('ecran-formule-step');
+  if (!ecran) {
+    ecran = document.createElement('div');
+    ecran.id = 'ecran-formule-step';
+    ecran.className = 'ecran';
+    document.body.appendChild(ecran);
+  }
+  
+  ecran.innerHTML = `
+    <div class="formule-step-header">
+      <button class="btn-retour-cats" onclick="annulerFormule()">← Annuler</button>
+      <div class="logo">${formuleEnCours.sousCatFormule.nom}</div>
+      <div class="formule-step-num">Étape 1/3</div>
+    </div>
+    <div class="formule-step-titre">
+      <h2>🥟 Choisissez votre entrée</h2>
+      <p>Incluse dans la formule</p>
+    </div>
+    <div class="formule-grille">
+      ${items.map(it => {
+        const hasImage = it.image_url && it.image_url.trim() !== '';
+        return `
+          <div class="formule-card ${hasImage?'has-image':''}" onclick="choisirFormuleEntree('${it.id}', '${it.label.replace(/'/g, "\\'")}')"
+               ${hasImage?`style="background-image:url('${it.image_url}')"`:''}>
+            ${!hasImage ? `<div class="formule-card-emoji">🥟</div>` : ''}
+            <div class="formule-card-bandeau">
+              <div class="formule-card-nom">${it.label}</div>
+            </div>
+          </div>
+        `;
+      }).join('')}
+    </div>
+  `;
+  
+  allerEcran('ecran-formule-step');
+}
+
+function choisirFormuleEntree(entreeId, label) {
+  formuleEnCours.entree_id = entreeId;
+  formuleEnCours.entree_label = label;
+  // Petite anim feedback
+  setTimeout(() => afficherEcranFormulePlat(), 200);
+}
+
+function afficherEcranFormulePlat() {
+  // Lister les plats de la sous-cat formule (les versions "(Formule)")
+  const platsFormule = produits.filter(p => p.categorie_id === formuleEnCours.sousCatFormule.id && p.actif !== false);
+  
+  const ecran = document.getElementById('ecran-formule-step');
+  ecran.innerHTML = `
+    <div class="formule-step-header">
+      <button class="btn-retour-cats" onclick="afficherEcranFormuleEntree()">← Retour</button>
+      <div class="logo">${formuleEnCours.sousCatFormule.nom}</div>
+      <div class="formule-step-num">Étape 2/3</div>
+    </div>
+    <div class="formule-step-titre">
+      <h2>🍜 Choisissez votre plat</h2>
+      <p>Personnalisez vos options ensuite</p>
+    </div>
+    <div class="formule-grille">
+      ${platsFormule.map(p => {
+        const hasImage = p.image_url && p.image_url.trim() !== '';
+        const nomPropre = p.nom.replace(/ \(Formule\)$/, '');
+        return `
+          <div class="formule-card ${hasImage?'has-image':''}" onclick="choisirFormulePlat('${p.id}')"
+               ${hasImage?`style="background-image:url('${p.image_url}')"`:''}>
+            ${!hasImage ? `<div class="formule-card-emoji">🍜</div>` : ''}
+            <div class="formule-card-bandeau">
+              <div class="formule-card-nom">${nomPropre}</div>
+              <div class="formule-card-prix">${parseFloat(p.prix).toFixed(2).replace('.', ',')} €</div>
+            </div>
+          </div>
+        `;
+      }).join('')}
+    </div>
+  `;
+}
+
+function choisirFormulePlat(platId) {
+  const plat = produits.find(p => p.id === platId);
+  if (!plat) return;
+  formuleEnCours.plat = plat;
+  
+  // Démarrer le parcours classique du plat (Spicy/Normal, sauces, suppléments)
+  // À la fin, on enchaînera sur l'écran Boisson
+  // On utilise une variante de demarrerParcoursPlat qui sait qu'on est en mode formule
+  demarrerParcoursPlatFormule(plat);
+}
+
+// Variante de demarrerParcoursPlat pour le mode formule
+function demarrerParcoursPlatFormule(produit) {
+  pileEtapes = [];
+  parcoursPlatEnCours = {
+    produit: produit,
+    retirables: [],
+    supplements: [],
+    sauces: [],
+    options_base: {},
+    est_formule: true,
+    formule_boisson_id: null,
+    formule_entree_id: formuleEnCours.entree_id,
+    formule_entree_label: formuleEnCours.entree_label,
+    formule_plat_id: produit.id,
+    etape: 'options_base'
+  };
+  
+  if (produit.options_base && Array.isArray(produit.options_base) && produit.options_base.length > 0) {
+    afficherModaleOptionsBase();
+  } else {
+    passerEtapeSuivante();
+  }
+}
+
+function afficherEcranFormuleBoisson() {
   const catBoissons = categories.find(c => c.nom === 'Boissons');
   if (!catBoissons) {
-    passerEtapeSuivante();
+    finaliserFormule();
     return;
   }
   const boissons = produits.filter(p => {
     if (p.categorie_id !== catBoissons.id || p.actif === false) return false;
     return p.nom.includes('33cl') || p.nom.toLowerCase().includes('cristalline');
   });
-
-  const html = `
-    <div class="parcours-content">
-      <div class="parcours-head">
-        <div class="parcours-etape">Formule — Boisson</div>
-        <h2 class="parcours-titre">🍹 Choisissez votre boisson</h2>
-        <p class="parcours-sous">Incluse dans la formule</p>
-      </div>
-      <div class="parcours-grille-images">
-        ${boissons.map(b => {
-          const hasImage = b.image_url && b.image_url.trim() !== '';
-          return `
-            <div class="parcours-card-image ${hasImage?'has-image':''}" onclick="choisirFormuleBoisson('${b.id}', this)"
-                 ${hasImage?`style="background-image:url('${b.image_url}')"`:''}>
-              ${!hasImage ? `<div class="parcours-card-emoji">🍹</div>` : ''}
-              <div class="parcours-card-bandeau">
-                <div class="parcours-card-nom">${b.nom.replace(' 33cl','').replace(' 50cl','')}</div>
-              </div>
-            </div>
-          `;
-        }).join('')}
-      </div>
-    </div>
-  `;
-  modal.innerHTML = html;
-}
-
-function choisirFormuleBoisson(boissonId, element) {
-  document.querySelectorAll('.parcours-card-image').forEach(el => el.classList.remove('actif'));
-  element.classList.add('actif');
-  parcoursPlatEnCours.formule_boisson_id = boissonId;
-  setTimeout(() => passerEtapeSuivante(), 400);
-}
-
-// ============================================================
-//  ✨ MODALE FORMULE ENTRÉE (toutes en 2 pièces)
-// ============================================================
-function afficherModaleFormuleEntree() {
+  
+  // Fermer la modale parcours (Spicy/sauces/etc.) si encore ouverte
   const modal = document.getElementById('modal-parcours');
-  modal.classList.add('actif');
-
-  const catEntrees = categories.find(c => c.nom === 'Entrées');
-  if (!catEntrees) {
-    finaliserParcoursPlat();
-    return;
+  if (modal) {
+    modal.classList.remove('actif');
+    modal.innerHTML = '';
   }
-  const entrees = produits.filter(p => p.categorie_id === catEntrees.id && p.actif !== false);
-
-  // Pour chaque entrée, on construit la liste des options affichables
-  // - Si variantes : on cherche la variante "2 pièces" (ou la première si pas de 2p)
-  // - Si pas de variantes : on affiche tel quel
-  const items = entrees.map(e => {
-    if (e.variantes && Array.isArray(e.variantes) && e.variantes.length > 0) {
-      // Trouver la variante 2 pièces, sinon prendre la première
-      const variante2p = e.variantes.find(v => v.label && v.label.includes('2 pi')) || e.variantes[0];
-      return {
-        id: e.id,
-        nom: e.nom,
-        label: e.nom + ' (' + variante2p.label + ')',
-        image_url: e.image_url
-      };
-    } else {
-      return {
-        id: e.id,
-        nom: e.nom,
-        label: e.nom,
-        image_url: e.image_url
-      };
-    }
-  });
-
-  const html = `
-    <div class="parcours-content">
-      <div class="parcours-head">
-        <div class="parcours-etape">Formule — Entrée</div>
-        <h2 class="parcours-titre">🥟 Choisissez votre entrée</h2>
-        <p class="parcours-sous">Incluse dans la formule</p>
-      </div>
-      <div class="parcours-grille-images">
-        ${items.map(it => {
-          const hasImage = it.image_url && it.image_url.trim() !== '';
-          return `
-            <div class="parcours-card-image ${hasImage?'has-image':''}" onclick="choisirFormuleEntree('${it.id}', '${it.label.replace(/'/g, "\\'")}', this)"
-                 ${hasImage?`style="background-image:url('${it.image_url}')"`:''}>
-              ${!hasImage ? `<div class="parcours-card-emoji">🥟</div>` : ''}
-              <div class="parcours-card-bandeau">
-                <div class="parcours-card-nom">${it.label}</div>
-              </div>
+  
+  let ecran = document.getElementById('ecran-formule-step');
+  if (!ecran) {
+    ecran = document.createElement('div');
+    ecran.id = 'ecran-formule-step';
+    ecran.className = 'ecran';
+    document.body.appendChild(ecran);
+  }
+  
+  ecran.innerHTML = `
+    <div class="formule-step-header">
+      <button class="btn-retour-cats" onclick="afficherEcranFormulePlat()">← Retour</button>
+      <div class="logo">${formuleEnCours.sousCatFormule.nom}</div>
+      <div class="formule-step-num">Étape 3/3</div>
+    </div>
+    <div class="formule-step-titre">
+      <h2>🍹 Choisissez votre boisson</h2>
+      <p>Incluse dans la formule</p>
+    </div>
+    <div class="formule-grille">
+      ${boissons.map(b => {
+        const hasImage = b.image_url && b.image_url.trim() !== '';
+        return `
+          <div class="formule-card ${hasImage?'has-image':''}" onclick="choisirFormuleBoissonEcran('${b.id}')"
+               ${hasImage?`style="background-image:url('${b.image_url}')"`:''}>
+            ${!hasImage ? `<div class="formule-card-emoji">🍹</div>` : ''}
+            <div class="formule-card-bandeau">
+              <div class="formule-card-nom">${b.nom.replace(' 33cl','').replace(' 50cl','')}</div>
             </div>
-          `;
-        }).join('')}
-      </div>
+          </div>
+        `;
+      }).join('')}
     </div>
   `;
-  modal.innerHTML = html;
+  
+  allerEcran('ecran-formule-step');
 }
 
-function choisirFormuleEntree(entreeId, label, element) {
-  document.querySelectorAll('.parcours-card-image').forEach(el => el.classList.remove('actif'));
-  element.classList.add('actif');
-  parcoursPlatEnCours.formule_entree_id = entreeId;
-  parcoursPlatEnCours.formule_entree_label = label;
-  setTimeout(() => passerEtapeSuivante(), 400);
+function choisirFormuleBoissonEcran(boissonId) {
+  formuleEnCours.boisson_id = boissonId;
+  formuleEnCours.boisson_obj = produits.find(p => p.id === boissonId);
+  // Synchroniser avec parcoursPlatEnCours pour la finalisation
+  if (parcoursPlatEnCours) {
+    parcoursPlatEnCours.formule_boisson_id = boissonId;
+  }
+  setTimeout(() => finaliserFormule(), 200);
+}
+
+function finaliserFormule() {
+  // On utilise la finalisation classique du parcours (qui sait gérer les formules)
+  if (parcoursPlatEnCours) {
+    finaliserParcoursPlat();
+  }
+  
+  // Nettoyer
+  formuleEnCours = null;
+  
+  // Retour à l'accueil catégories
+  allerEcran('ecran-accueil-cats');
+}
+
+function annulerFormule() {
+  if (!confirm('Annuler la formule ?')) return;
+  formuleEnCours = null;
+  parcoursPlatEnCours = null;
+  fermerModaleParcours();
+  // Retour à l'accueil catégories
+  const formulesCat = categories.find(c => c.nom === 'Formules' && !c.parent_id);
+  if (formulesCat) {
+    afficherSousCategories(formulesCat.id);
+  } else {
+    allerEcran('ecran-accueil-cats');
+  }
 }
 
 // ============================================================
@@ -3121,11 +3484,7 @@ function afficherModaleOptionsBase() {
 
   const html = `
     <div class="parcours-content">
-      <div class="parcours-head">
-        <div class="parcours-etape">Personnalisation</div>
-        <h2 class="parcours-titre">${groupeEnCours.groupe}</h2>
-        <p class="parcours-sous">${groupeEnCours.obligatoire ? 'Sélection obligatoire' : 'Optionnel'}</p>
-      </div>
+      ${headerParcours(groupeEnCours.groupe, 'Personnalisation', groupeEnCours.obligatoire ? 'Sélection obligatoire' : 'Optionnel')}
       <div class="parcours-options">
         ${groupeEnCours.choix.map(choix => `
           <div class="parcours-option-radio" onclick="selectionnerOptionBase('${groupeEnCours.groupe.replace(/'/g, "\\'")}', '${choix.replace(/'/g, "\\'")}', this)">
@@ -3162,11 +3521,7 @@ function afficherModaleRetirables() {
 
   const html = `
     <div class="parcours-content">
-      <div class="parcours-head">
-        <div class="parcours-etape">Personnalisation</div>
-        <h2 class="parcours-titre">🌿 Personnaliser votre ${p.nom}</h2>
-        <p class="parcours-sous">Décochez les ingrédients que vous ne voulez pas</p>
-      </div>
+      ${headerParcours('🌿 Personnaliser votre ' + p.nom, 'Personnalisation', 'Décochez les ingrédients que vous ne voulez pas')}
       <div class="parcours-options">
         ${p.ingredients_retirable.map(ing => `
           <label class="parcours-option" data-ing="${ing}">
@@ -3206,11 +3561,7 @@ function afficherModaleSupplements() {
 
   const html = `
     <div class="parcours-content">
-      <div class="parcours-head">
-        <div class="parcours-etape">Suppléments</div>
-        <h2 class="parcours-titre">➕ Suppléments ?</h2>
-        <p class="parcours-sous">Ajoutez des protéines à votre ${p.nom}</p>
-      </div>
+      ${headerParcours('➕ Suppléments ?', 'Suppléments', 'Ajoutez des protéines à votre ' + p.nom)}
       <div class="parcours-options">
         ${supps.map(s => `
           <label class="parcours-option-pay" data-supp="${s.id}">
@@ -3267,12 +3618,8 @@ function afficherModaleSauces() {
 
   const html = `
     <div class="parcours-content">
-      <div class="parcours-head">
-        <div class="parcours-etape">Sauces</div>
-        <h2 class="parcours-titre">${titre}</h2>
-        <p class="parcours-sous" id="parcours-sauces-compteur">${sous}</p>
-      </div>
-      <div class="parcours-options">
+      ${headerParcours(titre, 'Sauces', sous)}
+      <div class="parcours-options" id="parcours-sauces-zone">
         ${sauces.map(s => {
           const dejaChoisie = dejaChoisies.includes(s.id);
           const prixAffiche = (!incluses && parseFloat(s.prix) > 0)
@@ -3287,7 +3634,7 @@ function afficherModaleSauces() {
         }).join('')}
       </div>
       <div class="parcours-actions">
-        ${obligatoire ? '' : '<button class="parcours-btn-passer" onclick="parcoursPlatEnCours.sauces = []; passerEtapeSuivante()">Aucune sauce →</button>'}
+        <button class="parcours-btn-passer" onclick="parcoursPlatEnCours.sauces = []; passerEtapeSuivante()">Passer (aucune sauce) →</button>
         <button class="parcours-btn-valider" id="parcours-btn-valider" ${(obligatoire && dejaChoisies.length === 0) ? 'disabled' : ''} onclick="passerEtapeSuivante()">Valider ✓</button>
       </div>
     </div>
@@ -3356,6 +3703,59 @@ function fermerModaleParcours() {
 function annulerParcoursPlat() {
   parcoursPlatEnCours = null;
   fermerModaleParcours();
+}
+
+// ============================================================
+//  🔙 NAVIGATION RETOUR DANS LE PARCOURS
+// ============================================================
+// Pile des étapes parcourues pour retour
+let pileEtapes = [];
+
+function pushEtape(etape) {
+  pileEtapes.push(etape);
+}
+
+function revenirEtapePrecedente() {
+  if (!parcoursPlatEnCours) {
+    fermerModaleParcours();
+    return;
+  }
+  if (pileEtapes.length === 0) {
+    // Pas d'étape précédente → on annule tout
+    annulerParcoursPlat();
+    return;
+  }
+  // Retirer l'étape actuelle de la pile et y revenir
+  const etapePrecedente = pileEtapes.pop();
+  parcoursPlatEnCours.etape = etapePrecedente;
+  
+  // Rejouer l'affichage de l'étape précédente
+  if (etapePrecedente === 'options_base') afficherModaleOptionsBase();
+  else if (etapePrecedente === 'retirables') afficherModaleRetirables();
+  else if (etapePrecedente === 'supplements') afficherModaleSupplements();
+  else if (etapePrecedente === 'sauces') afficherModaleSauces();
+  else if (etapePrecedente === 'formule_entree') afficherModaleFormuleEntree();
+  else if (etapePrecedente === 'formule_plat') afficherEcranFormulePlat();
+  else if (etapePrecedente === 'formule_boisson') afficherModaleFormuleBoisson();
+}
+
+// Helper : génère le header avec ← Retour et ✕ Fermer
+function headerParcours(titre, etape, sousTitre = '') {
+  const peutRevenir = pileEtapes.length > 0;
+  return `
+    <div class="parcours-head-nav">
+      <button class="parcours-btn-retour" onclick="revenirEtapePrecedente()" ${peutRevenir ? '' : 'style="visibility:hidden;"'}>
+        ← Retour
+      </button>
+      <button class="parcours-btn-close" onclick="annulerParcoursPlat()" title="Fermer">
+        ✕
+      </button>
+    </div>
+    <div class="parcours-head">
+      <div class="parcours-etape">${etape}</div>
+      <h2 class="parcours-titre">${titre}</h2>
+      ${sousTitre ? '<p class="parcours-sous">' + sousTitre + '</p>' : ''}
+    </div>`;
 }
 
 // ============================================================
