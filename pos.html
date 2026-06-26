@@ -661,7 +661,7 @@ html, body {
   display: none;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 8000;
   padding: 20px;
 }
 .overlay.show { display: flex; animation: fadeIn 0.2s ease; }
@@ -1263,7 +1263,7 @@ html, body {
   inset: 0;
   background: rgba(5, 4, 3, 0.92);
   backdrop-filter: blur(10px);
-  z-index: 4500;
+  z-index: 7000;
   display: none;
   align-items: center;
   justify-content: center;
@@ -1271,6 +1271,38 @@ html, body {
   gap: 24px;
   text-align: center;
   padding: 24px;
+  pointer-events: auto;
+}
+.bloque-caisse.actif { display: flex; }
+.bloque-caisse h2 {
+  font-family: var(--display);
+  font-size: 32px;
+  font-weight: 500;
+  color: var(--gold);
+}
+.bloque-caisse p {
+  color: var(--text-mute);
+  font-size: 15px;
+  max-width: 360px;
+  line-height: 1.6;
+}
+.bloque-caisse .big-ic {
+  font-size: 60px;
+}
+.bloque-caisse .btn-connecter {
+  background: linear-gradient(135deg, var(--sriracha), var(--sriracha-soft));
+  color: #fff;
+  border: none;
+  padding: 16px 32px;
+  font-size: 16px;
+  font-weight: 700;
+  border-radius: 999px;
+  cursor: pointer;
+  font-family: var(--body);
+  box-shadow: 0 10px 30px rgba(230,57,70,0.4);
+  position: relative;
+  z-index: 7001;
+  pointer-events: auto;
 }
 .bloque-caisse.actif { display: flex; }
 .bloque-caisse h2 {
