@@ -3968,8 +3968,11 @@ async function validerVente() {
       p_restaurant_id: RESTO_ID,
       p_mode_paiement: modePaiement,
       p_lignes: lignes,
+      p_origine: 'caisse',
+      p_mode_service: 'sur_place',
       p_canal: canalPourBase,
-      p_taux_commission: CANAUX_COMMISSION.includes(canalVente) ? tauxCommission : null
+      p_taux_commission: CANAUX_COMMISSION.includes(canalVente) ? tauxCommission : null,
+      p_client_id: clientFid ? clientFid.id : null
     });
     if (error) throw error;
 
