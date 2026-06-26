@@ -1210,6 +1210,371 @@ html, body {
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
+/* ===== MENU HAMBURGER (Drawer) ===== */
+.btn-hamburger {
+  padding: 8px 12px !important;
+}
+.drawer-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 6000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s;
+}
+.drawer-overlay.actif {
+  opacity: 1;
+  pointer-events: auto;
+}
+.drawer {
+  position: fixed;
+  top: 0;
+  right: -380px;
+  width: 360px;
+  max-width: 90vw;
+  height: 100vh;
+  background: var(--surface);
+  border-left: 1px solid var(--border);
+  z-index: 6001;
+  display: flex;
+  flex-direction: column;
+  transition: right 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: -20px 0 50px rgba(0,0,0,0.5);
+}
+.drawer.actif { right: 0; }
+.drawer-head {
+  padding: 22px 24px 18px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.drawer-title {
+  font-family: var(--display);
+  font-size: 22px;
+  font-weight: 500;
+}
+.drawer-close {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--text-soft);
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.drawer-close:hover { color: var(--text); }
+.drawer-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px;
+}
+.drawer-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  font-family: var(--body);
+  color: var(--text);
+  transition: all 0.18s;
+  text-align: left;
+}
+.drawer-item:hover {
+  border-color: var(--gold-soft);
+  background: rgba(228,184,96,0.05);
+}
+.drawer-icon {
+  font-size: 28px;
+  width: 44px;
+  text-align: center;
+  flex-shrink: 0;
+}
+.drawer-label { flex: 1; min-width: 0; }
+.drawer-label b {
+  display: block;
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+.drawer-label span {
+  font-size: 12px;
+  color: var(--text-mute);
+  font-weight: 400;
+}
+.drawer-arrow {
+  font-size: 24px;
+  color: var(--text-dim);
+  flex-shrink: 0;
+}
+
+/* ===== MODALE CALENDRIER ===== */
+.modal-calendrier {
+  max-width: 580px;
+  max-height: 92vh;
+  display: flex;
+  flex-direction: column;
+}
+.cal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+  flex-shrink: 0;
+}
+.cal-mois {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  flex-shrink: 0;
+}
+.cal-mois-nom {
+  font-family: var(--display);
+  font-size: 19px;
+  font-weight: 500;
+  color: var(--gold);
+  text-transform: capitalize;
+}
+.cal-nav {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  font-size: 20px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.cal-nav:hover { border-color: var(--gold); color: var(--gold); }
+.cal-jours-sem {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  margin-bottom: 6px;
+  text-align: center;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-mute);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.cal-grille {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  margin-bottom: 18px;
+  flex-shrink: 0;
+}
+.cal-jour {
+  aspect-ratio: 1;
+  background: var(--surface-2);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-soft);
+  font-family: var(--mono);
+  transition: all 0.15s;
+  position: relative;
+}
+.cal-jour:hover {
+  border-color: var(--gold-soft);
+  background: var(--surface);
+}
+.cal-jour.vide {
+  border: none;
+  background: transparent;
+  cursor: default;
+}
+.cal-jour.vide:hover { background: transparent; }
+.cal-jour.aujourdhui {
+  border-color: var(--gold);
+  color: var(--gold);
+  font-weight: 800;
+}
+.cal-jour.selectionne {
+  background: var(--sriracha);
+  border-color: var(--sriracha);
+  color: #fff;
+  font-weight: 700;
+}
+.cal-jour.has-ventes::after {
+  content: '';
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--lime);
+}
+.cal-jour.futur {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* Stats du jour sélectionné */
+.cal-stats {
+  flex: 1;
+  overflow-y: auto;
+  border-top: 1px solid var(--border);
+  padding-top: 18px;
+}
+.cal-stats-titre {
+  font-family: var(--display);
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--gold);
+  margin-bottom: 14px;
+  text-align: center;
+}
+.cal-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-bottom: 18px;
+}
+.cal-stat-card {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  text-align: center;
+}
+.cal-stat-card .ic { font-size: 18px; margin-bottom: 4px; }
+.cal-stat-card .lbl {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-mute);
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.cal-stat-card .val {
+  font-family: var(--display);
+  font-size: 22px;
+  font-weight: 500;
+  color: var(--text);
+}
+.cal-stat-card.gold .val { color: var(--gold); }
+.cal-stat-card.lime .val { color: var(--lime); }
+.cal-section {
+  margin-bottom: 16px;
+}
+.cal-section-titre {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-mute);
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.cal-paie-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.cal-paie-row .cz-paie-card { flex: 1; }
+.cal-top-prod {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+  margin-bottom: 6px;
+}
+.cal-top-prod .rang {
+  font-family: var(--display);
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--gold);
+  min-width: 24px;
+}
+.cal-top-prod .nom {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cal-top-prod .qte {
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-mute);
+}
+.cal-heures {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 2px;
+  align-items: end;
+  height: 80px;
+  margin-bottom: 6px;
+}
+.cal-heure-bar {
+  background: var(--surface-2);
+  border-radius: 2px 2px 0 0;
+  position: relative;
+  min-height: 2px;
+}
+.cal-heure-bar.actif {
+  background: linear-gradient(to top, var(--sriracha), var(--gold));
+}
+.cal-heure-bar:hover::after {
+  content: attr(data-info);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg-deep);
+  border: 1px solid var(--gold);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  white-space: nowrap;
+  z-index: 10;
+  margin-bottom: 4px;
+}
+.cal-heures-labels {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 2px;
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--text-mute);
+  text-align: center;
+}
+.cal-vide-jour {
+  text-align: center;
+  padding: 30px 16px;
+  color: var(--text-mute);
+}
+.cal-vide-jour .big { font-size: 36px; margin-bottom: 10px; }
+
 /* ===== MODALE PARCOURS PLAT (sauces/suppl/retirables/etc.) ===== */
 .mpp-modal {
   position: fixed;
@@ -1408,6 +1773,9 @@ html, body {
         <button class="link-btn" onclick="ouvrirHistorique()">🧾 Historique</button>
         <button class="link-btn" onclick="ouvrirCloture()">🔒 Clôture Z</button>
         <a href="index.html" class="link-btn">← Gestion</a>
+        <button class="link-btn btn-hamburger" onclick="ouvrirMenuHamburger()" title="Menu">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
       </div>
     </div>
 
@@ -1644,6 +2012,93 @@ html, body {
       <button class="btn-annuler" onclick="fermerCloture()">Fermer</button>
       <button class="btn-valider" id="btn-cloturer" onclick="confirmerCloture()">🔒 Clôturer la journée</button>
     </div>
+  </div>
+</div>
+
+<!-- ===== MENU HAMBURGER (Drawer) ===== -->
+<div class="drawer-overlay" id="drawer-overlay" onclick="fermerMenuHamburger()"></div>
+<div class="drawer" id="drawer">
+  <div class="drawer-head">
+    <div class="drawer-title">Menu</div>
+    <button class="drawer-close" onclick="fermerMenuHamburger()">✕</button>
+  </div>
+  <div class="drawer-content">
+    <button class="drawer-item" onclick="ouvrirCalendrier()">
+      <span class="drawer-icon">📅</span>
+      <span class="drawer-label">
+        <b>Calendrier</b>
+        <span>Stats par jour</span>
+      </span>
+      <span class="drawer-arrow">›</span>
+    </button>
+    <button class="drawer-item" onclick="ouvrirVentesAnnulees()">
+      <span class="drawer-icon">❌</span>
+      <span class="drawer-label">
+        <b>Ventes annulées</b>
+        <span>Historique des annulations</span>
+      </span>
+      <span class="drawer-arrow">›</span>
+    </button>
+    <button class="drawer-item" onclick="ouvrirCloturesPassees()">
+      <span class="drawer-icon">🔒</span>
+      <span class="drawer-label">
+        <b>Clôtures Z passées</b>
+        <span>Voir tous les Z archivés</span>
+      </span>
+      <span class="drawer-arrow">›</span>
+    </button>
+  </div>
+</div>
+
+<!-- ===== MODALE CALENDRIER + STATS ===== -->
+<div class="overlay" id="overlay-calendrier">
+  <div class="modal modal-calendrier">
+    <div class="cal-head">
+      <h3>📅 Statistiques par jour</h3>
+      <button class="link-btn" onclick="fermerCalendrier()">Fermer</button>
+    </div>
+    
+    <!-- Le calendrier -->
+    <div class="cal-mois">
+      <button class="cal-nav" onclick="changerMois(-1)">‹</button>
+      <div class="cal-mois-nom" id="cal-mois-nom">—</div>
+      <button class="cal-nav" onclick="changerMois(1)">›</button>
+    </div>
+    <div class="cal-jours-sem">
+      <div>L</div><div>M</div><div>M</div><div>J</div><div>V</div><div>S</div><div>D</div>
+    </div>
+    <div class="cal-grille" id="cal-grille"></div>
+    
+    <!-- Stats du jour sélectionné -->
+    <div class="cal-stats" id="cal-stats">
+      <div style="text-align:center; padding:30px; color: var(--text-mute);">
+        Sélectionnez un jour dans le calendrier
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODALE VENTES ANNULÉES ===== -->
+<div class="overlay" id="overlay-annulees">
+  <div class="modal modal-histo">
+    <div class="histo-head">
+      <h3>❌ Ventes annulées</h3>
+      <button class="link-btn" onclick="fermerVentesAnnulees()">Fermer</button>
+    </div>
+    <div class="histo-sub" id="annul-sub">Chargement…</div>
+    <div class="histo-liste" id="annul-liste"></div>
+  </div>
+</div>
+
+<!-- ===== MODALE CLÔTURES PASSÉES ===== -->
+<div class="overlay" id="overlay-clotures-pass">
+  <div class="modal modal-histo">
+    <div class="histo-head">
+      <h3>🔒 Clôtures Z passées</h3>
+      <button class="link-btn" onclick="fermerCloturesPassees()">Fermer</button>
+    </div>
+    <div class="histo-sub" id="clot-sub">Chargement…</div>
+    <div class="histo-liste" id="clot-liste"></div>
   </div>
 </div>
 
@@ -3675,6 +4130,390 @@ async function confirmerCloture() {
     clotureEnCours = false;
   }
 }
+
+// ============================================
+//  ☰ MENU HAMBURGER + CALENDRIER + STATS
+// ============================================
+function ouvrirMenuHamburger() {
+  document.getElementById('drawer').classList.add('actif');
+  document.getElementById('drawer-overlay').classList.add('actif');
+}
+function fermerMenuHamburger() {
+  document.getElementById('drawer').classList.remove('actif');
+  document.getElementById('drawer-overlay').classList.remove('actif');
+}
+
+// --- État du calendrier ---
+let calMois = new Date();   // mois affiché (1er du mois)
+calMois.setDate(1);
+let calJourSelectionne = null;  // ISO YYYY-MM-DD
+let calVentesParJour = {};   // {YYYY-MM-DD: nb_ventes} pour montrer les pastilles
+
+function ouvrirCalendrier() {
+  fermerMenuHamburger();
+  document.getElementById('overlay-calendrier').classList.add('show');
+  // Aujourd'hui par défaut
+  const auj = new Date();
+  calMois = new Date(auj.getFullYear(), auj.getMonth(), 1);
+  calJourSelectionne = ymdAujourdhui();
+  afficherCalendrier();
+  chargerStatsJour(calJourSelectionne);
+}
+
+function fermerCalendrier() {
+  document.getElementById('overlay-calendrier').classList.remove('show');
+}
+
+function changerMois(delta) {
+  calMois = new Date(calMois.getFullYear(), calMois.getMonth() + delta, 1);
+  afficherCalendrier();
+}
+
+async function afficherCalendrier() {
+  const mois = calMois.getMonth();
+  const annee = calMois.getFullYear();
+  const nomMois = calMois.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
+  document.getElementById('cal-mois-nom').textContent = nomMois;
+
+  // Charger les jours avec ventes pour ce mois (pour les pastilles)
+  await chargerVentesParJourDuMois(annee, mois);
+
+  // Construire la grille
+  const premierJour = new Date(annee, mois, 1);
+  let dayOfWeek = premierJour.getDay();  // 0=dim, 1=lun...
+  dayOfWeek = dayOfWeek === 0 ? 6 : dayOfWeek - 1;  // → 0=lun, 6=dim
+  const dernierJour = new Date(annee, mois + 1, 0).getDate();
+  
+  const aujISO = ymdAujourdhui();
+  const aujDate = new Date();
+  aujDate.setHours(0, 0, 0, 0);
+
+  let html = '';
+  // Cases vides au début
+  for (let i = 0; i < dayOfWeek; i++) {
+    html += '<div class="cal-jour vide"></div>';
+  }
+  // Jours du mois
+  for (let j = 1; j <= dernierJour; j++) {
+    const d = new Date(annee, mois, j);
+    const iso = d.toISOString().slice(0, 10);
+    const estAuj = iso === aujISO;
+    const estFutur = d > aujDate;
+    const estSelect = iso === calJourSelectionne;
+    const aVentes = calVentesParJour[iso] > 0;
+    
+    let cls = 'cal-jour';
+    if (estAuj) cls += ' aujourdhui';
+    if (estSelect) cls += ' selectionne';
+    if (estFutur) cls += ' futur';
+    if (aVentes) cls += ' has-ventes';
+    
+    const onclick = estFutur ? '' : `onclick="selectionnerJour('${iso}')"`;
+    html += `<div class="${cls}" ${onclick}>${j}</div>`;
+  }
+  document.getElementById('cal-grille').innerHTML = html;
+}
+
+async function chargerVentesParJourDuMois(annee, mois) {
+  const debut = new Date(annee, mois, 1).toISOString();
+  const fin = new Date(annee, mois + 1, 0, 23, 59, 59).toISOString();
+  
+  try {
+    const { data } = await sb.from('ventes')
+      .select('cree_le')
+      .eq('restaurant_id', RESTO_ID)
+      .eq('statut', 'validee')
+      .gte('cree_le', debut)
+      .lte('cree_le', fin);
+    
+    calVentesParJour = {};
+    (data || []).forEach(v => {
+      const iso = new Date(v.cree_le).toISOString().slice(0, 10);
+      calVentesParJour[iso] = (calVentesParJour[iso] || 0) + 1;
+    });
+  } catch (e) {
+    console.error('Erreur chargement mois:', e);
+  }
+}
+
+function selectionnerJour(iso) {
+  calJourSelectionne = iso;
+  afficherCalendrier();  // pour le visuel
+  chargerStatsJour(iso);
+}
+
+async function chargerStatsJour(iso) {
+  const zone = document.getElementById('cal-stats');
+  zone.innerHTML = '<div style="text-align:center; padding:30px;"><div class="spinner" style="margin:0 auto;"></div></div>';
+  
+  const debut = iso + 'T00:00:00';
+  const fin = iso + 'T23:59:59';
+  
+  try {
+    const { data: ventes, error } = await sb.from('ventes')
+      .select('id, numero, total, mode_paiement, statut, cree_le, canal, client_id, lignes_vente(nom_produit, quantite, prix_unitaire)')
+      .eq('restaurant_id', RESTO_ID)
+      .gte('cree_le', debut)
+      .lte('cree_le', fin);
+    
+    if (error) throw error;
+    
+    const valides = (ventes || []).filter(v => v.statut === 'validee');
+    const annulees = (ventes || []).filter(v => v.statut === 'annulee');
+    
+    if (valides.length === 0) {
+      const dateLue = new Date(iso).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+      zone.innerHTML = `
+        <div class="cal-stats-titre" style="text-transform:capitalize;">${dateLue}</div>
+        <div class="cal-vide-jour">
+          <div class="big">📭</div>
+          <p>Aucune vente ce jour-là</p>
+        </div>`;
+      return;
+    }
+    
+    // Calculs
+    const ca = valides.reduce((s, v) => s + Number(v.total || 0), 0);
+    const especes = valides.filter(v => v.mode_paiement === 'especes').reduce((s, v) => s + Number(v.total || 0), 0);
+    const carte = valides.filter(v => v.mode_paiement === 'carte').reduce((s, v) => s + Number(v.total || 0), 0);
+    const plateforme = valides.filter(v => v.mode_paiement === 'plateforme').reduce((s, v) => s + Number(v.total || 0), 0);
+    
+    // Top produits (uniquement les ventes validées, pas les remises/plats offerts)
+    const prodMap = {};
+    valides.forEach(v => {
+      (v.lignes_vente || []).forEach(l => {
+        if (Number(l.prix_unitaire) <= 0) return;  // skip remises
+        const nom = l.nom_produit.replace(/^  ↳ /, '').trim();
+        prodMap[nom] = (prodMap[nom] || 0) + Number(l.quantite || 0);
+      });
+    });
+    const topProds = Object.entries(prodMap)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5);
+    
+    // Clients uniques
+    const clientsUniques = new Set(valides.filter(v => v.client_id).map(v => v.client_id)).size;
+    
+    // Heures de pointe (par tranche 2h, 10h-22h)
+    const heures = {};
+    valides.forEach(v => {
+      const h = new Date(v.cree_le).getHours();
+      heures[h] = (heures[h] || 0) + 1;
+    });
+    const heuresList = [];
+    let maxHeure = 0;
+    for (let h = 10; h <= 22; h += 1) {
+      const nb = heures[h] || 0;
+      heuresList.push({ h, nb });
+      if (nb > maxHeure) maxHeure = nb;
+    }
+    const heuresHtml = heuresList.slice(0, 12).map(it => {
+      const pct = maxHeure > 0 ? (it.nb / maxHeure) * 100 : 0;
+      return `<div class="cal-heure-bar ${it.nb > 0 ? 'actif' : ''}" style="height:${pct}%" data-info="${it.h}h : ${it.nb} ventes"></div>`;
+    }).join('');
+    const heuresLabels = heuresList.slice(0, 12).map(it => `<div>${it.h}h</div>`).join('');
+    
+    const dateLue = new Date(iso).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+    
+    zone.innerHTML = `
+      <div class="cal-stats-titre" style="text-transform:capitalize;">${dateLue}</div>
+      
+      <div class="cal-stats-grid">
+        <div class="cal-stat-card gold">
+          <div class="ic">💰</div>
+          <div class="lbl">CA Total</div>
+          <div class="val">${fmt(ca)}</div>
+        </div>
+        <div class="cal-stat-card">
+          <div class="ic">🧾</div>
+          <div class="lbl">Ventes</div>
+          <div class="val">${valides.length}</div>
+        </div>
+        <div class="cal-stat-card">
+          <div class="ic">👥</div>
+          <div class="lbl">Clients fid.</div>
+          <div class="val">${clientsUniques}</div>
+        </div>
+        <div class="cal-stat-card">
+          <div class="ic">📊</div>
+          <div class="lbl">Panier moy.</div>
+          <div class="val">${fmt(ca / valides.length)}</div>
+        </div>
+      </div>
+      
+      <div class="cal-section">
+        <div class="cal-section-titre">Répartition des paiements</div>
+        <div class="cal-paie-row">
+          <div class="cz-paie-card">
+            <div class="ic">💵</div>
+            <div class="lbl">Espèces</div>
+            <div class="val">${fmt(especes)}</div>
+          </div>
+          <div class="cz-paie-card">
+            <div class="ic">💳</div>
+            <div class="lbl">Carte</div>
+            <div class="val">${fmt(carte)}</div>
+          </div>
+          ${plateforme > 0 ? `
+          <div class="cz-paie-card">
+            <div class="ic">🛵</div>
+            <div class="lbl">Plateformes</div>
+            <div class="val">${fmt(plateforme)}</div>
+          </div>` : ''}
+        </div>
+      </div>
+      
+      ${topProds.length > 0 ? `
+      <div class="cal-section">
+        <div class="cal-section-titre">Top 5 produits vendus</div>
+        ${topProds.map((p, i) => `
+          <div class="cal-top-prod">
+            <div class="rang">#${i+1}</div>
+            <div class="nom">${escapeHtmlPos(p[0])}</div>
+            <div class="qte">${p[1]} vendus</div>
+          </div>
+        `).join('')}
+      </div>` : ''}
+      
+      <div class="cal-section">
+        <div class="cal-section-titre">Affluence par heure</div>
+        <div class="cal-heures">${heuresHtml}</div>
+        <div class="cal-heures-labels">${heuresLabels}</div>
+      </div>
+      
+      ${annulees.length > 0 ? `
+        <div class="cal-section">
+          <div class="cal-section-titre" style="color: var(--danger);">
+            ⚠️ ${annulees.length} vente${annulees.length > 1 ? 's' : ''} annulée${annulees.length > 1 ? 's' : ''}
+          </div>
+        </div>` : ''}
+    `;
+  } catch (e) {
+    zone.innerHTML = `<div style="text-align:center; padding:30px; color: var(--danger);">Erreur : ${e.message}</div>`;
+  }
+}
+
+// ============================================
+//  ❌ VENTES ANNULÉES
+// ============================================
+async function ouvrirVentesAnnulees() {
+  fermerMenuHamburger();
+  document.getElementById('overlay-annulees').classList.add('show');
+  await chargerVentesAnnulees();
+}
+function fermerVentesAnnulees() {
+  document.getElementById('overlay-annulees').classList.remove('show');
+}
+
+async function chargerVentesAnnulees() {
+  const liste = document.getElementById('annul-liste');
+  const sub = document.getElementById('annul-sub');
+  liste.innerHTML = '<div class="histo-vide"><div class="spinner" style="margin:0 auto 12px;"></div>Chargement…</div>';
+  
+  try {
+    const { data, error } = await sb.from('ventes')
+      .select('id, numero, total, mode_paiement, cree_le, lignes_vente(nom_produit, quantite)')
+      .eq('restaurant_id', RESTO_ID)
+      .eq('statut', 'annulee')
+      .order('cree_le', { ascending: false })
+      .limit(100);
+    
+    if (error) throw error;
+    
+    if (!data || data.length === 0) {
+      liste.innerHTML = '<div class="histo-vide"><div class="ic">✅</div>Aucune vente annulée</div>';
+      sub.textContent = '0 annulation';
+      return;
+    }
+    
+    sub.innerHTML = `<b>${data.length}</b> annulation${data.length > 1 ? 's' : ''} (100 dernières)`;
+    
+    liste.innerHTML = data.map(v => {
+      const d = new Date(v.cree_le);
+      const dateLue = d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' });
+      const heure = String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+      const articles = (v.lignes_vente || []).map(l => l.quantite + '× ' + l.nom_produit).join(', ') || '—';
+      
+      return `
+        <div class="histo-vente annulee">
+          <div class="hv-num">#${v.numero}</div>
+          <div class="hv-info">
+            <div class="hv-heure">${dateLue} · ${heure}</div>
+            <div class="hv-detail">${articles}</div>
+          </div>
+          <div class="hv-total">${fmt(v.total)}</div>
+          <div class="hv-badge-annulee">Annulée</div>
+        </div>`;
+    }).join('');
+  } catch (e) {
+    liste.innerHTML = `<div class="histo-vide"><div class="ic">⚠️</div>Erreur : ${e.message}</div>`;
+  }
+}
+
+// ============================================
+//  🔒 CLÔTURES Z PASSÉES
+// ============================================
+async function ouvrirCloturesPassees() {
+  fermerMenuHamburger();
+  document.getElementById('overlay-clotures-pass').classList.add('show');
+  await chargerCloturesPassees();
+}
+function fermerCloturesPassees() {
+  document.getElementById('overlay-clotures-pass').classList.remove('show');
+}
+
+async function chargerCloturesPassees() {
+  const liste = document.getElementById('clot-liste');
+  const sub = document.getElementById('clot-sub');
+  liste.innerHTML = '<div class="histo-vide"><div class="spinner" style="margin:0 auto 12px;"></div>Chargement…</div>';
+  
+  try {
+    const { data, error } = await sb.from('clotures')
+      .select('*')
+      .eq('restaurant_id', RESTO_ID)
+      .order('periode_fin', { ascending: false })
+      .limit(60);
+    
+    if (error) throw error;
+    
+    if (!data || data.length === 0) {
+      liste.innerHTML = '<div class="histo-vide"><div class="ic">🔒</div>Aucune clôture pour l\'instant</div>';
+      sub.textContent = '0 clôture';
+      return;
+    }
+    
+    sub.innerHTML = `<b>${data.length}</b> clôture${data.length > 1 ? 's' : ''} (60 dernières)`;
+    
+    liste.innerHTML = data.map(c => {
+      const d = new Date(c.periode_fin);
+      const dateLue = d.toLocaleDateString('fr-FR', { weekday: 'short', day: '2-digit', month: 'short' });
+      const heure = String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+      
+      return `
+        <div class="histo-vente">
+          <div class="hv-num">Z#${c.numero_z}</div>
+          <div class="hv-info">
+            <div class="hv-heure">${dateLue} · ${heure}</div>
+            <div class="hv-detail">${c.nb_ventes} ventes · 💵 ${fmt(c.total_especes)} · 💳 ${fmt(c.total_carte)}</div>
+          </div>
+          <div class="hv-total">${fmt(c.total_ttc)}</div>
+        </div>`;
+    }).join('');
+  } catch (e) {
+    liste.innerHTML = `<div class="histo-vide"><div class="ic">⚠️</div>Erreur : ${e.message}</div>`;
+  }
+}
+
+// Fermer les nouvelles modales en cliquant dehors
+document.getElementById('overlay-calendrier').addEventListener('click', e => {
+  if (e.target.id === 'overlay-calendrier') fermerCalendrier();
+});
+document.getElementById('overlay-annulees').addEventListener('click', e => {
+  if (e.target.id === 'overlay-annulees') fermerVentesAnnulees();
+});
+document.getElementById('overlay-clotures-pass').addEventListener('click', e => {
+  if (e.target.id === 'overlay-clotures-pass') fermerCloturesPassees();
+});
 
 // ============================================
 //  UTILITAIRES
