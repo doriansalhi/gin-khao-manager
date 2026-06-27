@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#0A0908">
-<!-- VERSION 2026-06-26-v4 -->
+<!-- VERSION 2026-06-26-v5-FIX -->
 <title>Gin Khao · Borne de commande</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -3904,25 +3904,6 @@ function afficherUpsell(produitAjoute, suggestions) {
 
 function fermerUpsell() {
   document.getElementById('modal-upsell').classList.remove('actif');
-}
-
-function ajouterUpsell(produitId, btnEl) {
-  const p = produits.find(x => x.id === produitId);
-  if (!p) return;
-  const cat = categories.find(c => c.id === p.categorie_id);
-  const emoji = emojiCat(cat ? cat.nom : '');
-
-  // Ajout direct au panier (SANS redéclencher l'upsell)
-  const ligne = panier.find(l => l.produit_id === produitId);
-  if (ligne) ligne.quantite++;
-  else panier.push({ produit_id: p.id, nom: p.nom, prix: parseFloat(p.prix), quantite: 1, emoji });
-  majBarrePanier();
-
-  // Animation visuelle d'ajout
-  if (btnEl) {
-    btnEl.classList.add('upsell-ajoute');
-    setTimeout(() => fermerUpsell(), 600);
-  }
 }
 
 function modifierQte(produitId, delta) {
