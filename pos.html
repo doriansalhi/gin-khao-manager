@@ -1861,6 +1861,97 @@ html, body {
 }
 .kds-vide .ic { font-size: 36px; margin-bottom: 10px; opacity: 0.5; }
 
+/* ===== ENCART COMMANDES BORNE EN ATTENTE ===== */
+.encart-attente {
+  margin: 12px 20px 0;
+  background: linear-gradient(135deg, #fff, #fffaf0);
+  border: 2px solid var(--sriracha);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 6px 20px rgba(230, 57, 70, 0.15);
+  animation: pulseAttente 2s ease-in-out infinite;
+  flex-shrink: 0;
+}
+@keyframes pulseAttente {
+  0%, 100% { box-shadow: 0 6px 20px rgba(230, 57, 70, 0.15); }
+  50% { box-shadow: 0 6px 30px rgba(230, 57, 70, 0.35); }
+}
+.encart-attente-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: var(--sriracha);
+  color: #fff;
+}
+.encart-attente-titre {
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.encart-attente-count {
+  background: #fff;
+  color: var(--sriracha);
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+}
+.encart-attente-liste {
+  max-height: 280px;
+  overflow-y: auto;
+  padding: 8px;
+}
+.encart-attente-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-bottom: 6px;
+  cursor: pointer;
+  transition: all 0.18s;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.encart-attente-item:hover {
+  border-color: var(--sriracha);
+  background: #fff5f5;
+  transform: translateX(-2px);
+}
+.encart-attente-item:active { transform: scale(0.98); }
+.encart-attente-info {
+  flex: 1;
+  min-width: 0;
+}
+.encart-attente-numero {
+  font-family: var(--display);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+}
+.encart-attente-articles {
+  font-size: 11px;
+  color: var(--text-mute);
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.encart-attente-total {
+  font-family: var(--display);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--gold);
+}
+.encart-attente-arrow {
+  color: var(--sriracha);
+  font-size: 18px;
+  font-weight: 700;
+}
+
 /* ===== BOUTON CAISSIER (rouge/vert) ===== */
 .btn-caissier {
   display: inline-flex;
@@ -2679,6 +2770,15 @@ html, body {
     <div class="ticket-head">
       <h2>Commande</h2>
       <div class="num" id="ticket-num">Nouveau ticket</div>
+    </div>
+
+    <!-- ✨ ENCART COMMANDES BORNE EN ATTENTE DE PAIEMENT COMPTOIR -->
+    <div class="encart-attente" id="encart-attente" style="display:none;">
+      <div class="encart-attente-head">
+        <span class="encart-attente-titre">🔔 Borne — À encaisser</span>
+        <span class="encart-attente-count" id="encart-attente-count">0</span>
+      </div>
+      <div class="encart-attente-liste" id="encart-attente-liste"></div>
     </div>
 
     <div class="ticket-lignes" id="ticket-lignes">
@@ -4511,6 +4611,23 @@ async function validerVente() {
         console.error('Erreur enregistrement caissier:', e);
       }
     }
+    
+    // ✨ Si la vente vient d'une commande borne en attente, lier + passer en "à préparer"
+    if (window.commandeEnCoursLiee) {
+      try {
+        await sb.from('commandes_en_cours')
+          .update({ 
+            statut: 'a_preparer',
+            vente_id: venteId,
+            vu_caisse: true,
+            vu_le: new Date().toISOString()
+          })
+          .eq('id', window.commandeEnCoursLiee);
+      } catch (e) {
+        console.error('Erreur MAJ commande_en_cours:', e);
+      }
+      window.commandeEnCoursLiee = null;
+    }
 
     // Construit un objet "vente" local pour l'aperçu du ticket (avant réinitialisation)
     const venteLocale = {
@@ -4542,6 +4659,15 @@ async function validerVente() {
     clientFid = null;
     platOffertApplique = false;
     remise = null;
+    
+    // Reset visuel ticket-num
+    const ticketNumEl = document.getElementById('ticket-num');
+    if (ticketNumEl) {
+      ticketNumEl.textContent = 'Nouveau ticket';
+      ticketNumEl.style.color = '';
+      ticketNumEl.style.fontWeight = '';
+    }
+    
     afficherClientFid();
     afficherTicket();
     await chargerMenu(); // recharge le stock à jour
@@ -6523,6 +6649,87 @@ function majBadgeKDS() {
   if (drawerBadge) {
     drawerBadge.textContent = actives > 0 ? actives + ' commande' + (actives > 1 ? 's' : '') + ' en cours' : 'Aucune en cours';
   }
+  
+  // ✨ Mettre à jour l'encart "Borne — À encaisser"
+  majEncartAttente();
+}
+
+// ============================================
+//  💵 ENCART BORNE À ENCAISSER (paiement comptoir)
+// ============================================
+function majEncartAttente() {
+  const encart = document.getElementById('encart-attente');
+  const liste = document.getElementById('encart-attente-liste');
+  const cnt = document.getElementById('encart-attente-count');
+  if (!encart || !liste) return;
+  
+  const enAttente = kdsCommandes.filter(c => c.statut === 'paiement_comptoir');
+  
+  if (enAttente.length === 0) {
+    encart.style.display = 'none';
+    return;
+  }
+  
+  encart.style.display = 'block';
+  if (cnt) cnt.textContent = enAttente.length;
+  
+  liste.innerHTML = enAttente.map(c => {
+    const articles = (c.lignes || []).map(l => 
+      (l.quantite || 1) + '× ' + (l.nom || '?')
+    ).join(' · ');
+    return `
+      <div class="encart-attente-item" onclick="chargerCommandeAttente('${c.id}')">
+        <div class="encart-attente-info">
+          <div class="encart-attente-numero">${escapeHtmlPos(c.numero || '?')}</div>
+          <div class="encart-attente-articles">${escapeHtmlPos(articles)}</div>
+        </div>
+        <div style="text-align:right;">
+          <div class="encart-attente-total">${fmt(c.total || 0)}</div>
+        </div>
+        <div class="encart-attente-arrow">→</div>
+      </div>
+    `;
+  }).join('');
+}
+
+async function chargerCommandeAttente(id) {
+  // ⚠️ Bloquer si un ticket est déjà en cours
+  if (ticket && ticket.length > 0) {
+    alert('⚠️ Un ticket est déjà en cours.\n\nVeuillez d\'abord l\'encaisser ou le vider avant de charger une commande de la borne.');
+    return;
+  }
+  
+  const cmd = kdsCommandes.find(c => c.id === id);
+  if (!cmd) {
+    alert('Commande introuvable');
+    return;
+  }
+  
+  // Charger les articles dans le ticket
+  ticket = (cmd.lignes || []).map(l => ({
+    produit_id: l.produit_id || null,
+    nom: l.nom || '?',
+    prix: Number(l.prix || 0),
+    quantite: Number(l.quantite || 1),
+    sous_total: Number(l.prix || 0) * Number(l.quantite || 1)
+  }));
+  
+  // Stocker l'ID de la commande_en_cours liée (pour MAJ après encaissement)
+  window.commandeEnCoursLiee = id;
+  
+  // Afficher
+  afficherTicket();
+  majTotal();
+  
+  // Indication visuelle
+  const ticketNum = document.getElementById('ticket-num');
+  if (ticketNum) {
+    ticketNum.innerHTML = '🔔 Commande borne ' + escapeHtmlPos(cmd.numero || '');
+    ticketNum.style.color = 'var(--sriracha)';
+    ticketNum.style.fontWeight = '700';
+  }
+  
+  toast('✅ Commande chargée — Prête à encaisser');
 }
 
 function afficherPopupNotif(commande) {
