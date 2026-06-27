@@ -6700,6 +6700,14 @@ document.getElementById('overlay-kds').addEventListener('click', e => {
 function fmt(n) {
   return Number(n).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
 }
+
+// Échappe le HTML pour éviter les injections
+function escapeHtmlPos(s) {
+  if (s === null || s === undefined) return '';
+  return String(s).replace(/[&<>"']/g, c => ({
+    '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'
+  }[c]));
+}
 function flashStock() {
   // petit retour visuel quand on dépasse le stock
   const t = document.getElementById('clock');
