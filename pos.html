@@ -10,23 +10,23 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700&family=Manrope:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root {
-  /* 🎨 NOUVELLE PALETTE — Blanc chic avec touches or/rouge */
-  --bg-deep:       #F5F2EC;   /* Beige très clair, élégant */
-  --bg-soft:       #FAF7F2;   /* Beige encore plus clair */
-  --surface:       #FFFFFF;   /* Blanc pur pour cartes */
-  --surface-2:     #FAF7F2;   /* Blanc cassé pour zones sec */
-  --border:        #E8E0D0;   /* Bordure douce dorée */
-  --border-soft:   #F0EAD8;   /* Bordure très douce */
+  /* 🎨 PALETTE BLANCHE chic */
+  --bg-deep:       #F5F2EC;
+  --bg-soft:       #FAF7F2;
+  --surface:       #FFFFFF;
+  --surface-2:     #FAF7F2;
+  --border:        #E8E0D0;
+  --border-soft:   #F0EAD8;
 
-  --sriracha:      #E63946;   /* Rouge accent (inchangé) */
+  --sriracha:      #E63946;
   --sriracha-soft: #C42E3B;
-  --gold:          #C9A55A;   /* Or plus sombre pour contraste sur blanc */
+  --gold:          #C9A55A;
   --gold-soft:     #B8924E;
-  --gold-light:    #E4B860;   /* Or clair pour décor */
-  --lime:          #5BA800;   /* Vert plus sombre */
+  --gold-light:    #E4B860;
+  --lime:          #5BA800;
   --lime-soft:     #4A8700;
 
-  --text:          #1A1612;   /* Texte sombre sur fond blanc */
+  --text:          #1A1612;
   --text-soft:     #4A4239;
   --text-mute:     #8B7E6F;
   --text-dim:      #B5A89A;
@@ -63,69 +63,21 @@ html, body {
 .caisse {
   height: 100vh;
   display: grid;
-  grid-template-columns: 240px 1fr 420px;  /* SIDEBAR + Produits + Ticket */
+  grid-template-columns: 240px 1fr 420px;
   background:
     radial-gradient(circle at 15% 20%, rgba(201, 165, 90, 0.04), transparent 45%),
     radial-gradient(circle at 85% 80%, rgba(230, 57, 70, 0.03), transparent 45%),
     var(--bg-deep);
 }
 
-/* ===== ZONE PRODUITS (gauche) ===== */
-.produits-zone {
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  border-right: 1px solid var(--border);
-}
-
-/* ===== TOPBAR ===== */
-.topbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 18px 28px;
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
-  flex-shrink: 0;
-  box-shadow: var(--shadow-sm);
-}
-.topbar-titre {
-  font-family: var(--display);
-  font-size: 24px;
-  font-weight: 600;
-  color: var(--text);
-  text-transform: capitalize;
-}
-.topbar-right { display: flex; align-items: center; gap: 14px; }
-.clock {
-  font-family: var(--mono);
-  font-size: 14px;
-  color: var(--text-mute);
-  font-weight: 500;
-}
-.link-btn {
-  font-size: 12px;
-  color: var(--text-soft);
-  text-decoration: none;
-  padding: 10px 16px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-xs);
-  transition: all 0.2s;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  background: var(--surface);
-  font-family: var(--body);
-  cursor: pointer;
-}
-.link-btn:hover { color: var(--gold); border-color: var(--gold); }
-
-/* ===== SIDEBAR CATÉGORIES ===== */
+/* ===== SIDEBAR CATÉGORIES (gauche) ===== */
 .sidebar-cats {
   background: var(--surface);
   border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
   box-shadow: var(--shadow-sm);
+  overflow: hidden;
 }
 .sidebar-logo {
   padding: 24px 20px;
@@ -153,15 +105,13 @@ html, body {
   flex: 1;
   overflow-y: auto;
   padding: 12px;
-  scrollbar-width: thin;
 }
 .sidebar-list::-webkit-scrollbar { width: 6px; }
 .sidebar-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-
 .cat-item {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
   padding: 14px 14px;
   margin-bottom: 6px;
   border-radius: 14px;
@@ -169,18 +119,16 @@ html, body {
   transition: all 0.18s;
   border: 2px solid transparent;
 }
-.cat-item:hover {
-  background: var(--bg-soft);
-}
+.cat-item:hover { background: var(--bg-soft); }
 .cat-item.active {
   background: linear-gradient(135deg, rgba(201,165,90,0.12), rgba(201,165,90,0.04));
   border-color: var(--gold);
   box-shadow: 0 4px 14px rgba(201,165,90,0.15);
 }
 .cat-item-icon {
-  font-size: 28px;
-  width: 44px;
-  height: 44px;
+  font-size: 26px;
+  width: 42px;
+  height: 42px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -200,7 +148,7 @@ html, body {
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.cat-item.active .cat-item-nom { color: var(--gold); }
+.cat-item.active .cat-item-nom { color: var(--gold-soft); }
 .cat-item-nb {
   font-size: 11px;
   color: var(--text-mute);
@@ -208,8 +156,55 @@ html, body {
   margin-top: 2px;
 }
 
-/* ===== SOUS-CATÉGORIES (en bandeau sous topbar) ===== */
-.sous-cats-bar {
+/* ===== ZONE PRODUITS (gauche) ===== */
+.produits-zone {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-right: 1px solid var(--border);
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 28px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  box-shadow: var(--shadow-sm);
+}
+.brand {
+  display: none; /* Le logo est dans la sidebar maintenant */
+}
+.topbar-right { display: flex; align-items: center; gap: 14px; }
+.clock {
+  font-family: var(--mono);
+  font-size: 14px;
+  color: var(--text-mute);
+  font-weight: 500;
+}
+.link-btn {
+  font-size: 12px;
+  color: var(--text-soft);
+  text-decoration: none;
+  padding: 10px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+  transition: all 0.2s;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  background: var(--surface);
+  font-family: var(--body);
+  cursor: pointer;
+}
+.link-btn:hover { color: var(--gold); border-color: var(--gold); }
+
+/* Filtres catégories (ANCIENNE BARRE — masquée car remplacée par sidebar) */
+.cats {
+  display: none;
+}
+.sous-cats {
   display: flex;
   gap: 8px;
   padding: 14px 28px;
@@ -219,7 +214,7 @@ html, body {
   flex-shrink: 0;
   scrollbar-width: none;
 }
-.sous-cats-bar::-webkit-scrollbar { display: none; }
+.sous-cats::-webkit-scrollbar { display: none; }
 .sous-cat-chip {
   flex-shrink: 0;
   padding: 8px 16px;
@@ -233,14 +228,14 @@ html, body {
   transition: all 0.18s;
   white-space: nowrap;
 }
-.sous-cat-chip:hover { border-color: var(--gold); color: var(--gold); }
+.sous-cat-chip:hover { border-color: var(--gold); color: var(--gold-soft); }
 .sous-cat-chip.active {
   background: var(--sriracha);
   border-color: var(--sriracha);
   color: #fff;
 }
 
-/* ===== GRILLE PRODUITS (cartes plus grandes) ===== */
+/* Grille produits — cartes plus grandes */
 .produits-grid {
   flex: 1;
   overflow-y: auto;
@@ -259,11 +254,13 @@ html, body {
   background: var(--surface);
   border: 2px solid var(--border);
   border-radius: var(--radius);
+  padding: 18px 16px;
   cursor: pointer;
   transition: all 0.18s;
   display: flex;
   flex-direction: column;
-  min-height: 240px;
+  justify-content: space-between;
+  min-height: 140px;
   overflow: hidden;
   box-shadow: var(--shadow-sm);
 }
@@ -281,7 +278,8 @@ html, body {
 .produit-card.has-image {
   background-size: cover;
   background-position: center;
-  min-height: 260px;
+  min-height: 220px;
+  padding: 0;
 }
 .produit-card.has-image::before {
   content: '';
@@ -306,30 +304,29 @@ html, body {
   color: #fff;
   text-shadow: 0 2px 6px rgba(0,0,0,0.5);
 }
-
-.produit-card:not(.has-image) {
-  padding: 20px 18px;
-  justify-content: space-between;
-}
-.produit-bandeau {
-  display: flex;
-  flex-direction: column;
+.produit-card.has-image .produit-stock {
+  background: rgba(255,255,255,0.9);
+  color: var(--text);
 }
 .produit-nom {
-  font-size: 17px;
+  font-size: 16px;
   font-weight: 700;
   line-height: 1.3;
   color: var(--text);
-  margin-bottom: 12px;
+  position: relative;
+  z-index: 1;
 }
 .produit-bas {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
+  margin-top: 12px;
+  position: relative;
+  z-index: 1;
 }
 .produit-prix {
   font-family: var(--display);
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 600;
   color: var(--gold);
 }
@@ -344,6 +341,18 @@ html, body {
 }
 .produit-stock.warn { color: var(--warning); background: rgba(201,165,90,0.1); }
 .produit-stock.crit { color: var(--danger); background: rgba(230,57,70,0.1); }
+.badge-rupture {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: var(--danger);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 999px;
+  z-index: 5;
+}
 .badge-rupture {
   position: absolute;
   top: 10px;
@@ -373,29 +382,25 @@ html, body {
 .ticket-zone {
   display: flex;
   flex-direction: column;
-  background: var(--surface);
-  border-left: 1px solid var(--border);
+  background: var(--bg-soft);
   overflow: hidden;
-  box-shadow: -2px 0 8px rgba(28, 24, 20, 0.04);
 }
 .ticket-head {
-  padding: 26px 28px 18px;
+  padding: 22px 24px 16px;
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
-  background: linear-gradient(135deg, rgba(201,165,90,0.05), transparent);
 }
 .ticket-head h2 {
   font-family: var(--display);
-  font-size: 26px;
-  font-weight: 600;
+  font-size: 22px;
+  font-weight: 500;
   letter-spacing: -0.01em;
-  color: var(--text);
 }
 .ticket-head .num {
   font-size: 12px;
   color: var(--text-mute);
   font-family: var(--mono);
-  margin-top: 4px;
+  margin-top: 2px;
 }
 
 .ticket-lignes {
@@ -672,29 +677,26 @@ html, body {
 }
 .total-row .val span { color: var(--gold); }
 
-.actions { display: flex; flex-direction: column; gap: 12px; }
+.actions { display: flex; flex-direction: column; gap: 10px; }
 .btn-pay {
   width: 100%;
-  padding: 22px;
+  padding: 18px;
   border: none;
   border-radius: var(--radius);
-  font-size: 18px;
-  font-weight: 800;
+  font-size: 16px;
+  font-weight: 700;
   cursor: pointer;
   transition: all 0.18s;
   font-family: var(--body);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  letter-spacing: 0.02em;
 }
 .btn-pay:disabled { opacity: 0.35; cursor: not-allowed; }
 .btn-encaisser {
   background: linear-gradient(135deg, var(--sriracha) 0%, var(--sriracha-soft) 100%);
   color: #fff;
-  box-shadow: 0 10px 30px -8px rgba(230,57,70,0.5);
-  font-size: 20px;
-  padding: 26px;
+  box-shadow: 0 8px 24px -8px rgba(230,57,70,0.5);
 }
-.btn-encaisser:not(:disabled):hover { transform: translateY(-2px); box-shadow: 0 16px 40px -10px rgba(230,57,70,0.7); }
+.btn-encaisser:not(:disabled):hover { transform: translateY(-2px); box-shadow: 0 12px 30px -8px rgba(230,57,70,0.6); }
 .btn-encaisser:not(:disabled):active { transform: translateY(0); }
 .btn-vider {
   background: transparent;
@@ -1580,23 +1582,22 @@ html, body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: var(--surface-2);
+  background: var(--surface);
   border: 1px solid var(--border);
   color: var(--text);
-  width: 38px;
-  height: 38px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
-  font-size: 16px;
+  font-size: 18px;
   cursor: pointer;
-  margin-right: 8px;
   padding: 0;
 }
 .btn-notif-kds:hover { border-color: var(--gold); }
 .btn-notif-kds.has-notifs {
   border-color: var(--sriracha);
-  animation: pulseNotif 1.5s ease-in-out infinite;
+  animation: pulseNotifKds 1.5s ease-in-out infinite;
 }
-@keyframes pulseNotif {
+@keyframes pulseNotifKds {
   0%, 100% { box-shadow: 0 0 0 0 rgba(230, 57, 70, 0.6); }
   50% { box-shadow: 0 0 0 8px rgba(230, 57, 70, 0); }
 }
@@ -1614,9 +1615,7 @@ html, body {
   text-align: center;
   display: none;
 }
-.btn-notif-kds.has-notifs .notif-badge {
-  display: inline-block;
-}
+.btn-notif-kds.has-notifs .notif-badge { display: inline-block; }
 
 /* ===== POPUP NOUVELLE COMMANDE ===== */
 .popup-notif-nouvelle {
@@ -1635,10 +1634,7 @@ html, body {
   opacity: 0;
   transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s;
 }
-.popup-notif-nouvelle.actif {
-  transform: translateX(0);
-  opacity: 1;
-}
+.popup-notif-nouvelle.actif { transform: translateX(0); opacity: 1; }
 .popup-notif-content { text-align: center; }
 .popup-notif-flash {
   font-size: 48px;
@@ -1707,7 +1703,7 @@ html, body {
   font-family: var(--body);
 }
 
-/* ===== MODALE KDS (Kitchen Display System) ===== */
+/* ===== MODALE KDS ===== */
 .modal-kds {
   max-width: 720px;
   max-height: 92vh;
@@ -1717,7 +1713,7 @@ html, body {
 .kds-filtres {
   display: flex;
   gap: 6px;
-  background: var(--bg-deep);
+  background: var(--bg-soft);
   padding: 4px;
   border-radius: 12px;
   border: 1px solid var(--border);
@@ -1742,10 +1738,7 @@ html, body {
   justify-content: center;
   gap: 5px;
 }
-.kds-filtre-btn.active {
-  background: var(--surface-2);
-  color: var(--gold);
-}
+.kds-filtre-btn.active { background: var(--surface); color: var(--gold-soft); box-shadow: var(--shadow-sm); }
 .kds-cnt {
   background: var(--sriracha);
   color: #fff;
@@ -1753,28 +1746,24 @@ html, body {
   border-radius: 999px;
   font-size: 10px;
 }
-.kds-filtre-btn:not(.active) .kds-cnt {
-  background: var(--surface-2);
-  color: var(--text-mute);
-}
-
+.kds-filtre-btn:not(.active) .kds-cnt { background: var(--surface); color: var(--text-mute); }
 .kds-commande {
-  background: var(--surface-2);
+  background: var(--surface);
   border: 2px solid var(--border);
   border-radius: 14px;
   padding: 16px;
   margin-bottom: 12px;
+  box-shadow: var(--shadow-sm);
 }
-.kds-commande.statut-nouvelle { border-color: var(--sriracha); animation: pulseNew 2s infinite; }
+.kds-commande.statut-nouvelle { border-color: var(--sriracha); animation: pulseNewKds 2s infinite; }
 .kds-commande.statut-a_preparer { border-color: var(--sriracha); }
 .kds-commande.statut-en_preparation { border-color: #f59e0b; }
 .kds-commande.statut-prete { border-color: var(--lime); }
 .kds-commande.statut-recuperee { opacity: 0.5; border-color: var(--border); }
-@keyframes pulseNew {
+@keyframes pulseNewKds {
   0%, 100% { box-shadow: 0 0 0 0 rgba(230, 57, 70, 0.6); }
   50% { box-shadow: 0 0 0 6px rgba(230, 57, 70, 0); }
 }
-
 .kds-cmd-head {
   display: flex;
   align-items: center;
@@ -1791,20 +1780,19 @@ html, body {
   font-size: 10px;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  background: var(--bg-deep);
+  background: var(--bg-soft);
   padding: 4px 10px;
   border-radius: 999px;
   font-weight: 700;
   color: var(--text-soft);
 }
 .kds-cmd-source.borne { background: var(--gold); color: #1a1a1a; }
-.kds-cmd-source.click_collect, .kds-cmd-source.click-collect { background: #3b82f6; color: #fff; }
+.kds-cmd-source.click_collect { background: #3b82f6; color: #fff; }
 .kds-cmd-source.uber_eats { background: #000; color: #06c167; }
 .kds-cmd-source.deliveroo { background: #00ccbc; color: #fff; }
 .kds-cmd-source.just_eat { background: #ff8000; color: #fff; }
 .kds-cmd-source.app, .kds-cmd-source.site { background: #6366f1; color: #fff; }
 .kds-cmd-source.caisse { background: var(--surface); color: var(--text-soft); }
-
 .kds-cmd-time {
   font-size: 11px;
   color: var(--text-mute);
@@ -1816,7 +1804,7 @@ html, body {
   margin-bottom: 8px;
 }
 .kds-cmd-articles {
-  background: var(--bg-deep);
+  background: var(--bg-soft);
   border-radius: 8px;
   padding: 10px 12px;
   margin-bottom: 10px;
@@ -1865,9 +1853,7 @@ html, body {
 .kds-btn:hover { border-color: var(--gold); }
 .kds-btn.prep { border-color: #f59e0b; color: #f59e0b; }
 .kds-btn.prete { border-color: var(--lime); color: var(--lime); }
-.kds-btn.recup { background: linear-gradient(135deg, var(--lime), #16a34a); color: #fff; border: none; }
-.kds-btn.imprimer { background: var(--surface-2); }
-
+.kds-btn.recup { background: linear-gradient(135deg, var(--lime), #4a8700); color: #fff; border: none; }
 .kds-vide {
   text-align: center;
   padding: 40px 20px;
@@ -2644,7 +2630,7 @@ html, body {
 
 <div class="caisse">
   <!-- ===== GAUCHE : SIDEBAR CATÉGORIES ===== -->
-  <aside class="sidebar-cats" id="sidebar-cats">
+  <aside class="sidebar-cats">
     <div class="sidebar-logo">
       <div class="logo">Gin <span>Khao</span></div>
       <div class="tag">Caisse</div>
@@ -2655,7 +2641,10 @@ html, body {
   <!-- ===== CENTRE : PRODUITS ===== -->
   <div class="produits-zone">
     <div class="topbar">
-      <div class="topbar-titre" id="topbar-titre">Sélectionnez une catégorie</div>
+      <div class="brand">
+        <div class="logo">Gin <span>Khao</span></div>
+        <div class="tag">Caisse</div>
+      </div>
       <div class="topbar-right">
         <div class="clock" id="clock">--:--</div>
         <button class="btn-notif-kds" id="btn-notif-kds" onclick="ouvrirKDS()" title="Commandes en cours">
@@ -2675,7 +2664,7 @@ html, body {
       </div>
     </div>
 
-    <div id="sous-cats-wrap"></div>
+    <div class="cats" id="cats"></div>
 
     <div class="produits-grid" id="produits-grid">
       <div class="empty-state">
@@ -2953,9 +2942,7 @@ html, body {
     </div>
     
     <div id="kds-zone" style="overflow-y: auto; flex: 1;">
-      <div style="text-align:center; padding:40px; color: var(--text-mute);">
-        <div class="spinner" style="margin:0 auto 12px;"></div>Chargement…
-      </div>
+      <div class="kds-vide"><div class="ic">📭</div><p>Aucune commande</p></div>
     </div>
   </div>
 </div>
@@ -3364,17 +3351,6 @@ function afficherCats() {
   
   // Affiche aussi les sous-cats si on est dans une cat parente
   afficherSousCats(parentActif);
-  
-  // Met à jour le titre dans la topbar
-  const titre = document.getElementById('topbar-titre');
-  if (titre && catActiveObj) {
-    if (catActiveObj.parent_id) {
-      const parent = categories.find(p => p.id === catActiveObj.parent_id);
-      titre.textContent = (parent ? parent.nom + ' › ' : '') + catActiveObj.nom;
-    } else {
-      titre.textContent = catActiveObj.nom;
-    }
-  }
 }
 
 // Emojis pour les catégories courantes
@@ -3400,25 +3376,32 @@ function emojiPourCat(nom) {
 }
 
 function afficherSousCats(parentId) {
-  const wrap = document.getElementById('sous-cats-wrap');
-  if (!wrap) return;
+  let zoneSC = document.getElementById('sous-cats');
   
   const sousCats = categories
     .filter(sc => sc.parent_id === parentId)
     .sort((a, b) => (a.ordre || 999) - (b.ordre || 999));
   
+  // Si pas de sous-cats, on cache la zone
   if (sousCats.length === 0) {
-    wrap.innerHTML = '';
+    if (zoneSC) zoneSC.innerHTML = '';
     return;
   }
   
-  let html = '<div class="sous-cats-bar">';
+  // Créer la zone si elle n'existe pas
+  if (!zoneSC) {
+    zoneSC = document.createElement('div');
+    zoneSC.id = 'sous-cats';
+    zoneSC.className = 'sous-cats';
+    document.getElementById('cats').after(zoneSC);
+  }
+  
+  let html = '';
   sousCats.forEach(sc => {
     const isActive = (sc.id === catActive);
     html += `<div class="sous-cat-chip ${isActive?'active':''}" onclick="filtrerCat('${sc.id}')">${sc.nom}</div>`;
   });
-  html += '</div>';
-  wrap.innerHTML = html;
+  zoneSC.innerHTML = html;
 }
 
 function filtrerCat(id) {
@@ -6437,15 +6420,12 @@ let kdsFiltreActif = 'actives';
 let popupNotifTimeout = null;
 let audioContextNotif = null;
 
-// Son de notification (généré en Web Audio sans fichier externe)
 function jouerSonNotif() {
   try {
     if (!audioContextNotif) {
       audioContextNotif = new (window.AudioContext || window.webkitAudioContext)();
     }
     const ctx = audioContextNotif;
-    
-    // Bell tone : 2 notes ding-dong
     [880, 660].forEach((freq, i) => {
       setTimeout(() => {
         const osc = ctx.createOscillator();
@@ -6461,84 +6441,65 @@ function jouerSonNotif() {
         osc.stop(ctx.currentTime + 0.6);
       }, i * 200);
     });
-  } catch (e) {
-    console.error('Erreur son notif:', e);
-  }
+  } catch (e) { console.error('Son notif:', e); }
 }
 
-// Démarrer l'écoute en temps réel
 function demarrerKDSRealtime() {
   if (kdsRealtimeChannel) return;
+  
+  // Charger d'abord puis s'abonner
+  chargerCommandesKDS();
   
   kdsRealtimeChannel = sb
     .channel('kds-commandes')
     .on('postgres_changes', {
-      event: 'INSERT',
-      schema: 'public',
-      table: 'commandes_en_cours',
+      event: 'INSERT', schema: 'public', table: 'commandes_en_cours',
       filter: 'restaurant_id=eq.' + RESTO_ID
     }, (payload) => {
       const nouvelle = payload.new;
-      console.log('🔔 Nouvelle commande:', nouvelle);
-      
-      // Ajouter à la liste locale
       kdsCommandes.unshift(nouvelle);
       majBadgeKDS();
-      
-      // Notifier visuellement + son
       afficherPopupNotif(nouvelle);
       jouerSonNotif();
-      
-      // Si la modale KDS est ouverte, refresh
       if (document.getElementById('overlay-kds').classList.contains('show')) {
         afficherKDS();
       }
     })
     .on('postgres_changes', {
-      event: 'UPDATE',
-      schema: 'public',
-      table: 'commandes_en_cours',
+      event: 'UPDATE', schema: 'public', table: 'commandes_en_cours',
       filter: 'restaurant_id=eq.' + RESTO_ID
     }, (payload) => {
-      // Mettre à jour dans la liste locale
       const idx = kdsCommandes.findIndex(c => c.id === payload.new.id);
       if (idx >= 0) kdsCommandes[idx] = payload.new;
-      
       majBadgeKDS();
       if (document.getElementById('overlay-kds').classList.contains('show')) {
         afficherKDS();
       }
     })
     .subscribe();
-  
-  // Charger les commandes initiales
-  chargerCommandesKDS();
 }
 
 async function chargerCommandesKDS() {
   try {
-    // Garder les commandes des 24 dernières heures
     const il_y_a_24h = new Date(Date.now() - 24*3600*1000).toISOString();
     const { data, error } = await sb.from('commandes_en_cours')
       .select('*')
       .eq('restaurant_id', RESTO_ID)
       .gte('cree_le', il_y_a_24h)
       .order('cree_le', { ascending: false });
-    
     if (error) throw error;
     kdsCommandes = data || [];
     majBadgeKDS();
   } catch (e) {
     console.error('Erreur chargement KDS:', e);
+    kdsCommandes = [];
   }
 }
 
 function majBadgeKDS() {
-  // Compter les commandes actives (= nouvelle / a_preparer / en_preparation / prete)
   const actives = kdsCommandes.filter(c => 
     ['nouvelle', 'a_preparer', 'en_preparation', 'prete'].includes(c.statut)
   ).length;
-  
   const btn = document.getElementById('btn-notif-kds');
   const badge = document.getElementById('notif-badge');
   if (badge) badge.textContent = actives;
@@ -6546,25 +6507,18 @@ function majBadgeKDS() {
     if (actives > 0) btn.classList.add('has-notifs');
     else btn.classList.remove('has-notifs');
   }
-  
-  // Mettre à jour les compteurs des filtres
   const cntActives = kdsCommandes.filter(c => ['nouvelle','a_preparer','en_preparation','prete'].includes(c.statut)).length;
   const cntAprep = kdsCommandes.filter(c => ['nouvelle','a_preparer'].includes(c.statut)).length;
   const cntEncours = kdsCommandes.filter(c => c.statut === 'en_preparation').length;
   const cntPretes = kdsCommandes.filter(c => c.statut === 'prete').length;
-  
   const els = {
-    'kds-cnt-actives': cntActives,
-    'kds-cnt-aprep': cntAprep,
-    'kds-cnt-encours': cntEncours,
-    'kds-cnt-pretes': cntPretes
+    'kds-cnt-actives': cntActives, 'kds-cnt-aprep': cntAprep,
+    'kds-cnt-encours': cntEncours, 'kds-cnt-pretes': cntPretes
   };
   for (const id in els) {
     const el = document.getElementById(id);
     if (el) el.textContent = els[id];
   }
-  
-  // Maj badge drawer
   const drawerBadge = document.getElementById('drawer-kds-badge');
   if (drawerBadge) {
     drawerBadge.textContent = actives > 0 ? actives + ' commande' + (actives > 1 ? 's' : '') + ' en cours' : 'Aucune en cours';
@@ -6573,28 +6527,18 @@ function majBadgeKDS() {
 
 function afficherPopupNotif(commande) {
   const popup = document.getElementById('popup-notif-nouvelle');
-  
   document.getElementById('popup-notif-source').textContent = sourceLabel(commande.source);
   document.getElementById('popup-notif-numero').textContent = '#' + commande.numero;
   document.getElementById('popup-notif-total').textContent = fmt(commande.total || 0);
-  
-  // Articles
   const lignes = commande.lignes || [];
   const articlesHtml = '<ul>' + lignes.map(l => 
     '<li><b>' + (l.quantite || 1) + '×</b> ' + escapeHtmlPos(l.nom) + '</li>'
   ).join('') + '</ul>';
   document.getElementById('popup-notif-articles').innerHTML = articlesHtml;
-  
   popup.classList.add('actif');
-  
-  // Stocker l'ID pour le bouton "Voir et imprimer"
   popup.dataset.commandeId = commande.id;
-  
-  // Auto-disparition après 8 secondes
   if (popupNotifTimeout) clearTimeout(popupNotifTimeout);
-  popupNotifTimeout = setTimeout(() => {
-    popup.classList.remove('actif');
-  }, 8000);
+  popupNotifTimeout = setTimeout(() => popup.classList.remove('actif'), 8000);
 }
 
 async function vuEtOuvrirKDS() {
@@ -6602,44 +6546,28 @@ async function vuEtOuvrirKDS() {
   const id = popup.dataset.commandeId;
   popup.classList.remove('actif');
   if (popupNotifTimeout) clearTimeout(popupNotifTimeout);
-  
-  // ✨ Ouvrir IMMÉDIATEMENT la modale KDS
-  // (sans attendre l'UPDATE Supabase qui peut être lent)
   await ouvrirKDS();
-  
-  // En parallèle : marquer comme vue + imprimer
   if (id) {
     sb.from('commandes_en_cours')
       .update({ statut: 'a_preparer', vu_caisse: true, vu_le: new Date().toISOString() })
       .eq('id', id)
       .then(() => {
-        // MAJ locale aussi au cas où le Realtime UPDATE n'arrive pas tout de suite
         const idx = kdsCommandes.findIndex(c => c.id === id);
         if (idx >= 0) {
           kdsCommandes[idx].statut = 'a_preparer';
-          kdsCommandes[idx].vu_caisse = true;
           afficherKDS();
           majBadgeKDS();
         }
-        // Imprimer le ticket cuisine
-        imprimerCommandeKDS(id);
       })
-      .catch(err => {
-        console.error('Erreur update commande:', err);
-      });
+      .catch(err => console.error(err));
   }
 }
 
 function sourceLabel(source) {
   const labels = {
-    'borne': 'Borne',
-    'click_collect': 'Click & Collect',
-    'app': 'Application',
-    'site': 'Site web',
-    'uber_eats': 'Uber Eats',
-    'deliveroo': 'Deliveroo',
-    'just_eat': 'Just Eat',
-    'caisse': 'Caisse'
+    'borne': 'Borne', 'click_collect': 'Click & Collect', 'app': 'Application',
+    'site': 'Site web', 'uber_eats': 'Uber Eats', 'deliveroo': 'Deliveroo',
+    'just_eat': 'Just Eat', 'caisse': 'Caisse'
   };
   return labels[source] || source || 'Inconnu';
 }
@@ -6651,11 +6579,13 @@ async function ouvrirKDS() {
   document.querySelectorAll('.kds-filtre-btn').forEach(b => {
     b.classList.toggle('active', b.dataset.statut === 'actives');
   });
-  
-  // ✨ Forcer le rechargement des commandes à chaque ouverture
-  document.getElementById('kds-zone').innerHTML = '<div style="text-align:center; padding:40px;"><div class="spinner" style="margin:0 auto;"></div></div>';
-  await chargerCommandesKDS();
+  // Afficher tout de suite ce qu'on a (pas de spinner infini)
   afficherKDS();
+  // Refresh en parallèle
+  try {
+    await chargerCommandesKDS();
+    afficherKDS();
+  } catch (e) { console.error(e); }
 }
 
 function fermerKDS() {
@@ -6672,8 +6602,8 @@ function filtrerKDS(statut) {
 
 function afficherKDS() {
   const zone = document.getElementById('kds-zone');
+  if (!zone) return;
   
-  // Filtrer
   let commandes;
   if (kdsFiltreActif === 'actives') {
     commandes = kdsCommandes.filter(c => ['nouvelle','a_preparer','en_preparation','prete'].includes(c.statut));
@@ -6690,7 +6620,7 @@ function afficherKDS() {
   }
   
   if (commandes.length === 0) {
-    zone.innerHTML = '<div class="kds-vide"><div class="ic">📭</div><p>Aucune commande</p></div>';
+    zone.innerHTML = '<div class="kds-vide"><div class="ic">📭</div><p>Aucune commande dans cette catégorie</p></div>';
     return;
   }
   
@@ -6706,19 +6636,11 @@ function afficherKDS() {
     
     let actionsHtml = '';
     if (c.statut === 'nouvelle' || c.statut === 'a_preparer') {
-      actionsHtml = `
-        <button class="kds-btn prep" onclick="changerStatutKDS('${c.id}', 'en_preparation')">🟡 En préparation</button>
-        <button class="kds-btn imprimer" onclick="imprimerCommandeKDS('${c.id}')">🖨️</button>
-      `;
+      actionsHtml = `<button class="kds-btn prep" onclick="changerStatutKDS('${c.id}', 'en_preparation')">🟡 En préparation</button>`;
     } else if (c.statut === 'en_preparation') {
-      actionsHtml = `
-        <button class="kds-btn prete" onclick="changerStatutKDS('${c.id}', 'prete')">🟢 Prête</button>
-        <button class="kds-btn imprimer" onclick="imprimerCommandeKDS('${c.id}')">🖨️</button>
-      `;
+      actionsHtml = `<button class="kds-btn prete" onclick="changerStatutKDS('${c.id}', 'prete')">🟢 Prête</button>`;
     } else if (c.statut === 'prete') {
-      actionsHtml = `
-        <button class="kds-btn recup" onclick="changerStatutKDS('${c.id}', 'recuperee')">✓ Récupérée</button>
-      `;
+      actionsHtml = `<button class="kds-btn recup" onclick="changerStatutKDS('${c.id}', 'recuperee')">✓ Récupérée</button>`;
     }
     
     return `
@@ -6749,46 +6671,11 @@ async function changerStatutKDS(id, nouveauStatut) {
   
   try {
     await sb.from('commandes_en_cours').update(maj).eq('id', id);
-    // Le Realtime va mettre à jour l'affichage automatiquement
   } catch (e) {
     alert('Erreur : ' + e.message);
   }
 }
 
-async function imprimerCommandeKDS(id) {
-  const cmd = kdsCommandes.find(c => c.id === id);
-  if (!cmd) return;
-  
-  // Essayer d'imprimer via le relais d'impression existant
-  try {
-    if (typeof envoyerImpressionCuisine === 'function') {
-      await envoyerImpressionCuisine({
-        numero: cmd.numero,
-        source: cmd.source,
-        mode_service: cmd.mode_service,
-        lignes: cmd.lignes,
-        total: cmd.total
-      });
-      // Notifier sans alerter
-      console.log('✅ Ticket envoyé à l\'impression');
-    } else {
-      console.log('Pas de fonction d\'impression disponible');
-    }
-  } catch (e) {
-    console.error('Erreur impression:', e);
-  }
-}
-
-// Lancer le KDS au chargement
-document.addEventListener('DOMContentLoaded', () => {
-  setTimeout(() => {
-    if (typeof sb !== 'undefined') {
-      demarrerKDSRealtime();
-    }
-  }, 2000);
-});
-
-// Fermer modale en cliquant dehors
 document.getElementById('overlay-kds').addEventListener('click', e => {
   if (e.target.id === 'overlay-kds') fermerKDS();
 });
