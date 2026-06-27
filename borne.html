@@ -1769,6 +1769,68 @@ body {
   font-weight: 700;
   color: var(--orange);
 }
+
+/* ============================================================ */
+/* ✨ BARRE PANIER pendant le parcours formule (sticky bottom)   */
+/* ============================================================ */
+.formule-panier-bar {
+  position: sticky;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  background: #FFFFFF;
+  border-top: 2px solid var(--border-soft);
+  box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.08);
+  z-index: 20;
+  gap: 16px;
+}
+.formule-panier-info {
+  flex: 1;
+}
+.formule-panier-count {
+  font-size: 13px;
+  color: var(--text-mute);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+.formule-panier-total {
+  font-family: var(--display);
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--text);
+}
+.formule-panier-total span {
+  font-size: 18px;
+  color: var(--text-mute);
+}
+.formule-panier-btn {
+  background: linear-gradient(135deg, var(--orange), #FF8552);
+  color: #FFFFFF;
+  border: none;
+  padding: 16px 28px;
+  font-size: 16px;
+  font-weight: 800;
+  border-radius: 999px;
+  cursor: pointer;
+  font-family: var(--font);
+  box-shadow: 0 8px 24px rgba(255, 107, 53, 0.3);
+  transition: all 0.2s;
+}
+.formule-panier-btn:active {
+  transform: scale(0.96);
+}
+.formule-panier-btn:disabled {
+  background: #e5e7eb;
+  color: #9ca3af;
+  cursor: not-allowed;
+  box-shadow: none;
+}
 .parcours-etape {
   display: inline-block;
   background: var(--orange);
@@ -2943,8 +3005,14 @@ function ajouterUpsell(produitId, type) {
   const card = event.target.closest('.upsell-card-v2');
   if (card) {
     card.classList.add('ajoute');
-    setTimeout(() => card.classList.remove('ajoute'), 600);
   }
+  
+  // ✨ AUTO-PASSER À LA PAGE SUIVANTE après l'ajout
+  setTimeout(() => {
+    if (window._upsellOnNext) {
+      window._upsellOnNext();
+    }
+  }, 500);
 }
 
 function ouvrirVariantesUpsell(produitId, type) {
@@ -2991,8 +3059,10 @@ function choisirVarianteUpsell(produitId, indexVariante) {
   });
   majBarrePanier();
   
-  // Retour à la grille (entrées ou boissons selon le contexte)
-  declencherUpsellEntrees();
+  // ✨ AUTO-PASSER À LA PAGE SUIVANTE après l'ajout
+  if (window._upsellOnNext) {
+    window._upsellOnNext();
+  }
 }
 
 function fermerUpsellEtContinuer(type, action) {
@@ -3236,13 +3306,29 @@ function lancerParcoursFormule(sousCatFormule) {
   afficherEcranFormuleEntree();
 }
 
+// Helper : génère la barre panier flottante pour les écrans formule
+function barrePanierFormule() {
+  const n = nbArticles();
+  const total = totalPanier();
+  const [e, c] = total.toFixed(2).split('.');
+  const lbl = n === 0 ? 'Panier vide' : n + ' article' + (n > 1 ? 's' : '');
+  return `
+    <div class="formule-panier-bar">
+      <div class="formule-panier-info">
+        <div class="formule-panier-count">${lbl}</div>
+        <div class="formule-panier-total">${e}<span>,${c} €</span></div>
+      </div>
+      <button class="formule-panier-btn" ${n === 0 ? 'disabled' : ''} onclick="allerPanier()">Voir le panier</button>
+    </div>
+  `;
+}
+
 function afficherEcranFormuleEntree() {
   const catEntrees = categories.find(c => c.nom === 'Entrées');
   if (!catEntrees) {
     alert('Catégorie Entrées introuvable');
     return;
-  }
-  const entrees = produits.filter(p => p.categorie_id === catEntrees.id && p.actif !== false);
+  }const entrees = produits.filter(p => p.categorie_id === catEntrees.id && p.actif !== false);
   
   // Pour chaque entrée, prendre la variante 2 pièces ou label par défaut
   const items = entrees.map(e => {
@@ -3285,6 +3371,7 @@ function afficherEcranFormuleEntree() {
         `;
       }).join('')}
     </div>
+    ${barrePanierFormule()}
   `;
   
   allerEcran('ecran-formule-step');
@@ -3328,6 +3415,7 @@ function afficherEcranFormulePlat() {
         `;
       }).join('')}
     </div>
+    ${barrePanierFormule()}
   `;
 }
 
@@ -3416,6 +3504,7 @@ function afficherEcranFormuleBoisson() {
         `;
       }).join('')}
     </div>
+    ${barrePanierFormule()}
   `;
   
   allerEcran('ecran-formule-step');
