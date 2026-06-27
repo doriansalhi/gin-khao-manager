@@ -6604,11 +6604,21 @@ function afficherKDS() {
   const zone = document.getElementById('kds-zone');
   if (!zone) return;
   
+  console.log('[KDS] afficherKDS - total:', kdsCommandes.length, 'filtre:', kdsFiltreActif);
+  console.log('[KDS] Statuts présents:', kdsCommandes.map(c => c.statut));
+  
   let commandes;
   if (kdsFiltreActif === 'actives') {
-    commandes = kdsCommandes.filter(c => ['nouvelle','a_preparer','en_preparation','prete'].includes(c.statut));
+    // Actives = tout sauf récupérée et annulée
+    commandes = kdsCommandes.filter(c => 
+      c.statut !== 'recuperee' && 
+      c.statut !== 'annulee' && 
+      c.statut !== 'recuperees'
+    );
   } else if (kdsFiltreActif === 'a_preparer') {
-    commandes = kdsCommandes.filter(c => ['nouvelle','a_preparer'].includes(c.statut));
+    commandes = kdsCommandes.filter(c => 
+      ['nouvelle', 'a_preparer', null, undefined, ''].includes(c.statut)
+    );
   } else if (kdsFiltreActif === 'en_preparation') {
     commandes = kdsCommandes.filter(c => c.statut === 'en_preparation');
   } else if (kdsFiltreActif === 'prete') {
@@ -6618,6 +6628,8 @@ function afficherKDS() {
   } else {
     commandes = kdsCommandes;
   }
+  
+  console.log('[KDS] Commandes filtrées:', commandes.length);
   
   if (commandes.length === 0) {
     zone.innerHTML = '<div class="kds-vide"><div class="ic">📭</div><p>Aucune commande dans cette catégorie</p></div>';
@@ -6631,11 +6643,13 @@ function afficherKDS() {
                      'il y a ' + Math.floor(tempsEcoule/60) + 'h' + (tempsEcoule%60);
     
     const articles = (c.lignes || []).map(l => 
-      '<div class="kds-cmd-article"><span><span class="kds-cmd-article-qte">' + (l.quantite || 1) + '×</span>' + escapeHtmlPos(l.nom) + '</span></div>'
+      '<div class="kds-cmd-article"><span><span class="kds-cmd-article-qte">' + (l.quantite || 1) + '×</span>' + escapeHtmlPos(l.nom || l.nom_produit || '?') + '</span></div>'
     ).join('');
     
+    const statutNormalise = c.statut || 'nouvelle';
+    
     let actionsHtml = '';
-    if (c.statut === 'nouvelle' || c.statut === 'a_preparer') {
+    if (['nouvelle', 'a_preparer', null, undefined, ''].includes(c.statut)) {
       actionsHtml = `<button class="kds-btn prep" onclick="changerStatutKDS('${c.id}', 'en_preparation')">🟡 En préparation</button>`;
     } else if (c.statut === 'en_preparation') {
       actionsHtml = `<button class="kds-btn prete" onclick="changerStatutKDS('${c.id}', 'prete')">🟢 Prête</button>`;
@@ -6644,14 +6658,14 @@ function afficherKDS() {
     }
     
     return `
-      <div class="kds-commande statut-${c.statut}">
+      <div class="kds-commande statut-${statutNormalise}">
         <div class="kds-cmd-head">
           <div>
             <div class="kds-cmd-numero">#${escapeHtmlPos(c.numero || '?')}</div>
             <div class="kds-cmd-mode">${c.mode_service === 'sur_place' ? '🍽️ Sur place' : '🥡 À emporter'}</div>
           </div>
           <div style="text-align:right;">
-            <span class="kds-cmd-source ${c.source}">${sourceLabel(c.source)}</span>
+            <span class="kds-cmd-source ${c.source || ''}">${sourceLabel(c.source)}</span>
             <div class="kds-cmd-time">${tempsTxt}</div>
           </div>
         </div>
